@@ -404,6 +404,19 @@
     },
     {
       "parameters": {
+        "jsCode": "// Extract and format data for Activities API with proper field mapping\nconst data = $input.first().json;\n\n// Ensure all required fields are present at root level\nreturn [{\n  json: {\n    user_id: data.user_id,\n    itinerary_title: data.itinerary_title,\n    cart_name: data.cart_name,\n    cart_reference: data.cart_reference,\n    request_id: data.request_id,\n    itinerary: data.itinerary,\n    travel_data: data.travel_data,\n    force_new_cart: data.force_new_cart,\n    metadata: data.metadata\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2496,
+        112
+      ],
+      "id": "8f3e1e5d-9c2a-4e1a-8bc1-ff4ee179f4d3",
+      "name": "Format Activities API Payload"
+    },
+    {
+      "parameters": {
         "method": "POST",
         "url": "http://192.16.26.182:8000/api/automate/cart_process",
         "sendBody": true,
@@ -577,6 +590,17 @@
       ]
     },
     "Parse Activities Response": {
+      "main": [
+        [
+          {
+            "node": "Format Activities API Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Activities API Payload": {
       "main": [
         [
           {
