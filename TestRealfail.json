@@ -9,9 +9,9 @@
       "typeVersion": 1.3,
       "position": [
         -4784,
-        -224
+        -384
       ],
-      "id": "d18c7eab-3cc5-462e-9eb6-60f44f0f831e",
+      "id": "1a75ee18-5cc1-4601-adb1-bcf5b32a875a",
       "name": "When chat message received",
       "webhookId": "9d2612f3-b699-4bee-bda6-52b98551f2cf"
     },
@@ -26,9 +26,9 @@
       "typeVersion": 2,
       "position": [
         -4784,
-        32
+        -128
       ],
-      "id": "97c626de-d29b-4845-9135-da4cf372282d",
+      "id": "288b2cee-e843-453f-8386-b51631f89c25",
       "name": "Webhook API Trigger",
       "webhookId": "127e3f0a-4469-48c8-996c-ab7c16ec18ce"
     },
@@ -40,9 +40,9 @@
       "typeVersion": 2,
       "position": [
         -4544,
-        32
+        -128
       ],
-      "id": "5a3e0e4e-bebb-4ce5-b2be-73eee0716279",
+      "id": "7a027c77-a93a-432d-b2d1-3f9d33cb7445",
       "name": "Extract Webhook Data"
     },
     {
@@ -55,9 +55,9 @@
       "typeVersion": 1.1,
       "position": [
         -1600,
-        -224
+        -384
       ],
-      "id": "8a896b3c-8528-4610-9d96-c489f0204387",
+      "id": "6ab60e67-4272-4487-a471-58a1223214f8",
       "name": "Respond to Webhook"
     },
     {
@@ -68,9 +68,9 @@
       "typeVersion": 2,
       "position": [
         -4528,
-        -224
+        -384
       ],
-      "id": "43bca076-db35-458f-b968-8d7817fccac9",
+      "id": "f1eac74c-4f40-4e33-b31f-6ea810887641",
       "name": "Merge Input Sources"
     },
     {
@@ -83,9 +83,9 @@
       "typeVersion": 2.2,
       "position": [
         -4240,
-        -224
+        -384
       ],
-      "id": "aa92f8be-6549-472f-81ec-13d0177f4e47",
+      "id": "c83409dc-816a-407f-8d5f-4116519741b8",
       "name": "AI Agent"
     },
     {
@@ -101,9 +101,9 @@
       "typeVersion": 1.2,
       "position": [
         -4240,
-        96
+        -64
       ],
-      "id": "83165059-4474-45f7-bd34-9c2de37c134d",
+      "id": "b2e9fb88-e702-49f8-9d72-fed9672f86e7",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
@@ -118,9 +118,9 @@
       "typeVersion": 1.3,
       "position": [
         -4144,
-        96
+        -64
       ],
-      "id": "da8e31f3-3344-4d6f-9de0-a00c7ebed247",
+      "id": "fe8b9a64-72a0-4582-9c77-b25f26eb79c2",
       "name": "Simple Memory"
     },
     {
@@ -131,9 +131,9 @@
       "typeVersion": 2,
       "position": [
         -3904,
-        -224
+        -384
       ],
-      "id": "00f3d9ff-6830-44d2-8b35-77f86fce6b25",
+      "id": "fe0fb1a4-0b69-4e89-a12f-41156541734e",
       "name": "Format for OpenAI Parser"
     },
     {
@@ -160,9 +160,9 @@
       "typeVersion": 4.2,
       "position": [
         -3712,
-        -224
+        -384
       ],
-      "id": "a62e4601-159b-4bf0-b626-92748c2f958e",
+      "id": "2b8ca1e3-b052-4fc5-9b28-af768c786b50",
       "name": "OpenAI Travel Parser",
       "credentials": {
         "openAiApi": {
@@ -179,9 +179,9 @@
       "typeVersion": 2,
       "position": [
         -3504,
-        -224
+        -384
       ],
-      "id": "65f98b3f-86c6-42d1-838b-e5fa1d93647e",
+      "id": "86474c45-cd75-4ede-8cba-b61b26528fb0",
       "name": "Parse Travel Data"
     },
     {
@@ -192,9 +192,9 @@
       "typeVersion": 2,
       "position": [
         -3312,
-        -224
+        -384
       ],
-      "id": "944f3f89-1608-42ac-8f53-170523c232ff",
+      "id": "f869b991-9f88-4593-8254-9f5c34404b4b",
       "name": "Add Cart Metadata"
     },
     {
@@ -205,9 +205,9 @@
       "typeVersion": 2,
       "position": [
         -3136,
-        -384
+        -544
       ],
-      "id": "4c78800e-faca-43b9-aa11-8ff5ce8fc095",
+      "id": "694e3c85-9467-40fb-845c-ac9fcb192360",
       "name": "Process Cities & Hotel Rating"
     },
     {
@@ -218,22 +218,22 @@
       "typeVersion": 2,
       "position": [
         -3136,
-        -64
+        -224
       ],
-      "id": "54cbfff1-3d80-4655-83e5-f1abeea943f6",
+      "id": "7d12d196-d682-47b6-b568-21bdb69280a1",
       "name": "Process Cities & Activities"
     },
     {
       "parameters": {
-        "jsCode": "// Merge Google Sheets data with processed activities data\nconst processedData = $input.first().json;\nconst sheetsData = $('Get row(s) in sheet').all();\n\n// Extract countries, cities, and activities from Google Sheets\nconst sheetActivities = sheetsData.map(row => ({\n  country: row.json.Country || row.json.country,\n  city: row.json.City || row.json.city,\n  activity: row.json.Activity || row.json.activity || row.json.Activities || row.json.activities\n}));\n\n// Add Google Sheets data to processed data\nprocessedData.google_sheets_data = sheetActivities;\n\n// Group activities by city from Google Sheets\nconst activitiesByCity = {};\nsheetActivities.forEach(item => {\n  const city = item.city;\n  if (city && item.activity) {\n    if (!activitiesByCity[city]) {\n      activitiesByCity[city] = [];\n    }\n    activitiesByCity[city].push({\n      activity_name: item.activity,\n      country: item.country\n    });\n  }\n});\n\nprocessedData.activities_by_city = activitiesByCity;\n\nreturn [{\n  json: processedData\n}];"
+        "jsCode": "// Merge Google Sheets data with processed activities data - FILTER BY REQUESTED CITIES ONLY\nconst processedData = $input.first().json;\nconst sheetsData = $('Get row(s) in sheet').all();\n\n// Get the list of cities that ChatGPT selected for this trip\nconst requestedCities = processedData.travel_data?.destination || [];\n\n// Extract countries, cities, and activities from Google Sheets\nconst sheetActivities = sheetsData.map(row => ({\n  country: row.json.Country || row.json.country,\n  city: row.json.City || row.json.city,\n  activity: row.json.Activity || row.json.activity || row.json.Activities || row.json.activities\n}));\n\n// CRITICAL: Filter activities to ONLY include cities that ChatGPT selected\n// This ensures we only fetch relevant activities for the trip\nconst filteredActivities = sheetActivities.filter(item => {\n  if (!item.city || !item.activity) return false;\n  \n  // Check if this city is in the requested cities list (case-insensitive)\n  return requestedCities.some(requestedCity => \n    requestedCity.toLowerCase().trim() === item.city.toLowerCase().trim()\n  );\n});\n\n// Add filtered Google Sheets data to processed data\nprocessedData.google_sheets_data = filteredActivities;\n\n// Group activities by city from Google Sheets (only for requested cities)\nconst activitiesByCity = {};\nfilteredActivities.forEach(item => {\n  const city = item.city;\n  if (city && item.activity) {\n    if (!activitiesByCity[city]) {\n      activitiesByCity[city] = [];\n    }\n    activitiesByCity[city].push({\n      activity_name: item.activity,\n      country: item.country\n    });\n  }\n});\n\nprocessedData.activities_by_city = activitiesByCity;\n\n// Add metadata about filtering\nprocessedData.activity_metadata = {\n  requested_cities: requestedCities,\n  total_sheet_activities: sheetActivities.length,\n  filtered_activities_count: filteredActivities.length,\n  cities_with_activities: Object.keys(activitiesByCity),\n  cities_without_activities: requestedCities.filter(city => !activitiesByCity[city])\n};\n\nreturn [{\n  json: processedData\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         -3088,
-        320
+        160
       ],
-      "id": "b27b6b99-1e71-4037-b552-9e4f36fc34ab",
+      "id": "2f10005f-68af-45c6-bfa0-36d429f5b573",
       "name": "Merge Sheets Data"
     },
     {
@@ -244,9 +244,9 @@
       "typeVersion": 2,
       "position": [
         -2976,
-        -560
+        -720
       ],
-      "id": "83da5cb4-dbf5-49eb-8ff0-e208c1eedf8a",
+      "id": "f2c80f64-d536-4ef4-92ec-6033b33e5392",
       "name": "Sanitize Hotels Data"
     },
     {
@@ -257,9 +257,9 @@
       "typeVersion": 2,
       "position": [
         -2736,
-        320
+        160
       ],
-      "id": "ea47c6ba-71c1-4a07-9af2-20de30c0e579",
+      "id": "4087798e-f4cd-4dc8-8b53-ae951b0162e9",
       "name": "Sanitize Activities Data"
     },
     {
@@ -270,22 +270,22 @@
       "typeVersion": 2,
       "position": [
         -2816,
-        -384
+        -544
       ],
-      "id": "87b20685-4743-4415-8f71-cb7ad7e61653",
+      "id": "b2e67082-fa1c-486b-a4d2-27abf3bfd8b3",
       "name": "Build Itinerary Prompt"
     },
     {
       "parameters": {
-        "jsCode": "// Build OpenAI prompt for ACTIVITIES-ONLY itinerary generation\nconst inputData = $input.first().json;\nconst data = inputData.travel_data;\n\nconst destination = data.destination?.[0] || 'Unknown';\nconst startDate = data.travel_dates?.start || '';\nconst endDate = data.travel_dates?.end || '';\nconst duration = data.duration || '';\nconst adults = data.pax?.adults || 1;\nconst children = data.pax?.children || 0;\nconst childAges = data.pax?.child_ages || [];\nconst activityPreferences = data.activity_preferences || 'popular_attractions';\nconst budgetLevel = data.budget_level || 'mid-range';\n\n// Get cities from city_details\nconst cities = data.city_details || [];\nconst citiesStr = cities.map(c => `${c.city} (${c.days_in_city} days)`).join(', ');\n\n// Calculate total days\nconst start = new Date(startDate);\nconst end = new Date(endDate);\nconst totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;\n\n// Build city stays breakdown\nconst cityStaysBreakdown = cities.map(c => `- ${c.city}: ${c.days_in_city} days with activities (Day ${c.check_in_day} to Day ${c.check_out_day - 1}) - NO activities on checkout day ${c.check_out_day}`).join('\\n');\n\nconst lastCity = cities[cities.length - 1]?.city || 'last city';\nconst citiesRoute = cities.map(c => c.city).join(' → ');\n\n// Build detailed city-specific activity instructions\nconst cityActivityInstructions = cities.map((city, index) => {\n  const cityNum = index + 1;\n  const checkInDay = city.check_in_day;\n  const checkOutDay = city.check_out_day;\n  const stayDays = [];\n  \n  // Generate list of days for this city (excluding checkout day)\n  for (let day = checkInDay; day < checkOutDay; day++) {\n    stayDays.push(day);\n  }\n  \n  return `CITY ${cityNum}: ${city.city}\\n   - Days ${checkInDay} to ${checkOutDay - 1} (${city.nights} nights = ${city.nights} days with activities)\\n   - Day ${checkOutDay} is checkout day - NO ACTIVITIES on this day\\n   - Activities MUST be in ${city.city} area ONLY\\n   - GPS coordinates MUST be within ${city.city} city limits\\n   - MAXIMUM 2 activities per day (strictly enforced - NO exceptions)\\n   - Activities should be LOCAL to ${city.city} - NOT from other cities`;\n}).join('\\n\\n');\n\n// Build the complete prompt for ACTIVITIES with strict city-wise filtering\nconst userPrompt = `You are an expert travel planner. Create a detailed day-by-day ACTIVITIES itinerary for a ${totalDays}-day trip.\n\n⚠️ CRITICAL: CITY-WISE ACTIVITY FILTERING - READ THIS FIRST! ⚠️\n\nEach city in the itinerary has specific check-in and check-out days.\nYou MUST suggest activities ONLY for the city where the traveler is staying on that specific day.\nActivities are ONLY on days when they are staying (check-in day to day before checkout).\n\nExample - 9 days with 4 cities:\n- Days 1-2 in Colombo (checkout Day 3) → Activities on Day 1 & 2 ONLY in Colombo (2 activities each day)\n- Days 3-4 in Kandy (checkout Day 5) → Activities on Day 3 & 4 ONLY in Kandy (2 activities each day)\n- Days 5-6 in Ella (checkout Day 7) → Activities on Day 5 & 6 ONLY in Ella (2 activities each day)\n- Days 7-8 in Galle (checkout Day 9) → Activities on Day 7 & 8 ONLY in Galle (2 activities each day)\n- Day 9 is departure - NO ACTIVITIES\n\nDO NOT mix cities! If they are staying in Colombo, do NOT suggest Kandy or Galle activities.\n\nIMPORTANT: ACTIVITIES ONLY - DO NOT include accommodation/hotels!\n\nTRIP DETAILS:\n- Cities: ${citiesStr}\n- Duration: ${duration} (${startDate} to ${endDate})\n- Total Days: ${totalDays}\n- Travelers: ${adults} adults, ${children} children\n- Child Ages: ${JSON.stringify(childAges)}\n- Activity Preferences: ${activityPreferences}\n- Budget Level: ${budgetLevel}\n\nCITY BREAKDOWN WITH STRICT ACTIVITY ZONES:\n${cityStaysBreakdown}\n\n⚠️ MANDATORY CITY-WISE ACTIVITY MAPPING:\n${cityActivityInstructions}\n\nCRITICAL REQUIREMENTS:\n\n1. ACTIVITIES ONLY - NO HOTELS:\n   - DO NOT include accommodation/hotel information\n   - FOCUS on activities, attractions, experiences\n   - Include activities array for each day\n\n2. PAX OBJECT (MANDATORY):\n   - EVERY day MUST include pax object: {\"adults\": ${adults}, \"children\": ${children}, \"child_ages\": ${JSON.stringify(childAges)}}\n\n3. ⚠️ STRICT CITY-WISE ACTIVITY RULES (MOST IMPORTANT):\n   - MAXIMUM 2 activities per day (STRICTLY ENFORCED - DO NOT suggest 3 or more)\n   - Each day MUST have EXACTLY 2 activities (or 1-2 if very limited options)\n   - DO NOT suggest 3 activities per day under any circumstances\n   - Activities ONLY on days between check-in and (check-out - 1)\n   - NO activities on checkout day (departure day)\n   - Activities MUST match the city where they are staying that day\n   - If Day 1-2 is Colombo, suggest ONLY Colombo activities on Days 1 & 2\n   - If Day 3-4 is Kandy, suggest ONLY Kandy activities on Days 3 & 4\n   - If Day 5-6 is Ella, suggest ONLY Ella activities on Days 5 & 6\n   - GPS coordinates MUST be within the correct city boundaries\n   - DO NOT suggest activities from other cities\n   - Last day (final checkout/departure day): NO activities at all\n\n4. ACTIVITY CATEGORIES with sub_category_id mapping:\n   - Adventure = 1\n   - Entertainment = 2\n   - Health & Wellness = 3\n   - Event = 4\n   - Tours = 5\n   - Transport = 6\n   - Services = 7\n   - Tickets = 8\n   - Culinary = 9\n   - Experience = 10\n   - Vacation Packages = 46\n\n5. ACTIVITY OBJECT (MANDATORY FIELDS):\n   - activity_name: string (name of attraction/activity)\n   - category: string (Adventure/Entertainment/Health & Wellness/Event/Tours/Transport/Services/Tickets/Culinary/Experience/Vacation Packages)\n   - sub_category_id: integer (MANDATORY - use mapping above based on category)\n   - description: string (brief description mentioning the city)\n   - duration: string (e.g., \"2-3 hours\", \"half day\", \"full day\")\n   - latitude: number (GPS coordinate within the correct city)\n   - longitude: number (GPS coordinate within the correct city)\n   - best_time: string (e.g., \"morning\", \"afternoon\", \"evening\", \"anytime\")\n   - cost_level: string (\"free\", \"low\", \"medium\", \"high\")\n\n6. CITY-BASED PLANNING:\n   - Respect the city schedule STRICTLY: ${citiesRoute}\n   - Each day's activities MUST be in the correct city\n   - Verify GPS coordinates match the city\n\nREQUIRED JSON STRUCTURE (ACTIVITIES ONLY):\n\n{\n  \"itinerary\": [\n    {\n      \"day\": 1,\n      \"date\": \"${startDate}\",\n      \"city\": \"${cities[0]?.city || 'City Name'}\",\n      \"pax\": {\n        \"adults\": ${adults},\n        \"children\": ${children},\n        \"child_ages\": ${JSON.stringify(childAges)}\n      },\n      \"activities\": [\n        {\n          \"activity_name\": \"Galle Face Green\",\n          \"category\": \"Tours\",\n          \"sub_category_id\": 5,\n          \"description\": \"Scenic promenade in Colombo city center\",\n          \"duration\": \"2 hours\",\n          \"latitude\": 6.9271,\n          \"longitude\": 79.8612,\n          \"best_time\": \"evening\",\n          \"cost_level\": \"free\"\n        },\n        {\n          \"activity_name\": \"National Museum of Colombo\",\n          \"category\": \"Tours\",\n          \"sub_category_id\": 5,\n          \"description\": \"Sri Lanka's largest museum in Colombo\",\n          \"duration\": \"2-3 hours\",\n          \"latitude\": 6.9074,\n          \"longitude\": 79.8612,\n          \"best_time\": \"morning\",\n          \"cost_level\": \"low\"\n        }\n      ]\n    }\n  ]\n}\n\n⚠️ CRITICAL VALIDATION CHECKLIST BEFORE GENERATING:\n✓ DO NOT include hotels/accommodation - ACTIVITIES ONLY\n✓ EVERY day MUST have pax object\n✓ MAXIMUM 2 activities per day (STRICTLY ENFORCED - DO NOT suggest 3 activities)\n✓ EVERY activity MUST have latitude and longitude IN THE CORRECT CITY\n✓ EVERY activity MUST have sub_category_id (use category mapping)\n✓ Category mapping: Adventure=1, Entertainment=2, Health & Wellness=3, Event=4, Tours=5, Transport=6, Services=7, Tickets=8, Culinary=9, Experience=10, Vacation Packages=46\n✓ Activities MUST match the city for that day (e.g., Day 1-2 Colombo = Colombo activities ONLY)\n✓ GPS coordinates MUST be within city boundaries\n✓ Mix different activity categories within same city\n✓ Consider child ages when suggesting activities\n✓ Respect city schedule STRICTLY (${citiesRoute})\n✓ Last day (checkout): NO activities at all - it's departure day\n✓ Example: 9 days trip = Days 1-8 have activities, Day 9 NO activities\n✓ Each active day (not checkout) has EXACTLY 2 activities in the correct city\n✓ Respond with ONLY valid JSON, no markdown\n\nGenerate the CITY-WISE ACTIVITIES-ONLY itinerary now with strict location filtering!`;\n\n// Build the OpenAI API request body\nconst requestBody = {\n  model: \"gpt-4o\",\n  messages: [\n    {\n      role: \"system\",\n      content: \"You are an expert travel planner. Create detailed day-by-day activity itineraries with GPS coordinates and sub_category_id in JSON format only. EVERY activity MUST include sub_category_id based on category mapping: Adventure=1, Entertainment=2, Health & Wellness=3, Event=4, Tours=5, Transport=6, Services=7, Tickets=8, Culinary=9, Experience=10, Vacation Packages=46. DO NOT include hotels/accommodation. CRITICAL: Activities MUST be city-specific - only suggest activities in the city where the traveler is staying that day.\"\n    },\n    {\n      role: \"user\",\n      content: userPrompt\n    }\n  ],\n  temperature: 0.7\n};\n\n// Return data with the request body and original input data\nreturn [{\n  json: {\n    ...inputData,\n    openai_request: requestBody\n  }\n}];"
+        "jsCode": "// Build OpenAI prompt for ACTIVITIES-ONLY itinerary generation\nconst inputData = $input.first().json;\nconst data = inputData.travel_data || {};\n\nconst destination = data.destination?.[0] || 'Unknown';\nconst startDate = data.travel_dates?.start || '';\nconst endDate = data.travel_dates?.end || '';\nconst duration = data.duration || '';\nconst adults = data.pax?.adults || 1;\nconst children = data.pax?.children || 0;\nconst childAges = data.pax?.child_ages || [];\nconst activityPreferences = data.activity_preferences || 'popular_attractions';\nconst budgetLevel = data.budget_level || 'mid-range';\n\n// Get cities from city_details\nconst cities = data.city_details || [];\nconst citiesStr = cities.map(c => `${c.city} (${c.days_in_city} days)`).join(', ');\n\n// Calculate total days\nconst start = new Date(startDate);\nconst end = new Date(endDate);\nconst totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;\n\n// Build city stays breakdown\nconst cityStaysBreakdown = cities.map(c => `- ${c.city}: ${c.days_in_city} days with activities (Day ${c.check_in_day} to Day ${c.check_out_day - 1}) - NO activities on checkout day ${c.check_out_day}`).join('\\n');\n\nconst lastCity = cities[cities.length - 1]?.city || 'last city';\nconst citiesRoute = cities.map(c => c.city).join(' → ');\n\n// Build detailed city-specific activity instructions\nconst cityActivityInstructions = cities.map((city, index) => {\n  const cityNum = index + 1;\n  const checkInDay = city.check_in_day;\n  const checkOutDay = city.check_out_day;\n  const stayDays = [];\n  \n  // Generate list of days for this city (excluding checkout day)\n  for (let day = checkInDay; day < checkOutDay; day++) {\n    stayDays.push(day);\n  }\n  \n  return `CITY ${cityNum}: ${city.city}\\n   - Days ${checkInDay} to ${checkOutDay - 1} (${city.nights} nights = ${city.nights} days with activities)\\n   - Day ${checkOutDay} is checkout day - NO ACTIVITIES on this day\\n   - Activities MUST be in ${city.city} area ONLY\\n   - GPS coordinates MUST be within ${city.city} city limits\\n   - MAXIMUM 2 activities per day (strictly enforced - NO exceptions)\\n   - Activities should be LOCAL to ${city.city} - NOT from other cities`;\n}).join('\\n\\n');\n\n// Get activities from Google Sheets grouped by city\nconst activitiesByCity = inputData.activities_by_city || {};\n\n// Build available activities list for each city from Google Sheets\nlet availableActivitiesText = '\\n\\n⚠️ AVAILABLE ACTIVITIES FROM DATABASE (PRIORITY - USE THESE ACTIVITIES):\\n\\n';\nlet hasActivitiesData = false;\n\ncities.forEach(city => {\n  const cityName = city.city;\n  const cityActivities = activitiesByCity[cityName] || [];\n  \n  if (cityActivities.length > 0) {\n    hasActivitiesData = true;\n    availableActivitiesText += `${cityName} Activities (SELECT FROM THESE):\\n`;\n    cityActivities.forEach((act, index) => {\n      availableActivitiesText += `  ${index + 1}. ${act.activity_name}\\n`;\n    });\n    availableActivitiesText += '\\n';\n  }\n});\n\nif (!hasActivitiesData) {\n  availableActivitiesText = '\\n\\n⚠️ NOTE: No pre-defined activities found in database. Suggest popular tourist attractions for each city.\\n\\n';\n} else {\n  availableActivitiesText += '⚠️ CRITICAL INSTRUCTIONS:\\n';\n  availableActivitiesText += '1. PRIORITIZE activities from the database list above\\n';\n  availableActivitiesText += '2. If a city has database activities, USE THEM FIRST\\n';\n  availableActivitiesText += '3. If database activities are insufficient, add popular attractions to meet 2 activities per day\\n';\n  availableActivitiesText += '4. If a city has NO database activities, suggest popular attractions for that city\\n\\n';\n}\n\n// Build the complete prompt for ACTIVITIES with strict city-wise filtering\nconst userPrompt = `You are an expert travel planner. Create a detailed day-by-day ACTIVITIES itinerary for a ${totalDays}-day trip.\n\n⚠️ CRITICAL: CITY-WISE ACTIVITY FILTERING - READ THIS FIRST! ⚠️\n\nEach city in the itinerary has specific check-in and check-out days.\nYou MUST suggest activities ONLY for the city where the traveler is staying on that specific day.\nActivities are ONLY on days when they are staying (check-in day to day before checkout).\n\nExample - 9 days with 4 cities:\n- Days 1-2 in Colombo (checkout Day 3) → Activities on Day 1 & 2 ONLY in Colombo (2 activities each day)\n- Days 3-4 in Kandy (checkout Day 5) → Activities on Day 3 & 4 ONLY in Kandy (2 activities each day)\n- Days 5-6 in Ella (checkout Day 7) → Activities on Day 5 & 6 ONLY in Ella (2 activities each day)\n- Days 7-8 in Galle (checkout Day 9) → Activities on Day 7 & 8 ONLY in Galle (2 activities each day)\n- Day 9 is departure - NO ACTIVITIES\n\nDO NOT mix cities! If they are staying in Colombo, do NOT suggest Kandy or Galle activities.\n\nIMPORTANT: ACTIVITIES ONLY - DO NOT include accommodation/hotels!\n\nTRIP DETAILS:\n- Cities: ${citiesStr}\n- Duration: ${duration} (${startDate} to ${endDate})\n- Total Days: ${totalDays}\n- Travelers: ${adults} adults, ${children} children\n- Child Ages: ${JSON.stringify(childAges)}\n- Activity Preferences: ${activityPreferences}\n- Budget Level: ${budgetLevel}\n\nCITY BREAKDOWN WITH STRICT ACTIVITY ZONES:\n${cityStaysBreakdown}\n\n⚠️ MANDATORY CITY-WISE ACTIVITY MAPPING:\n${cityActivityInstructions}\n${availableActivitiesText}\nCRITICAL REQUIREMENTS:\n\n1. ACTIVITIES ONLY - NO HOTELS:\n   - DO NOT include accommodation/hotel information\n   - FOCUS on activities, attractions, experiences\n   - Include activities array for each day\n\n2. PAX OBJECT (MANDATORY):\n   - EVERY day MUST include pax object: {\"adults\": ${adults}, \"children\": ${children}, \"child_ages\": ${JSON.stringify(childAges)}}\n\n3. ⚠️ STRICT CITY-WISE ACTIVITY RULES (MOST IMPORTANT):\n   - MAXIMUM 2 activities per day (STRICTLY ENFORCED - DO NOT suggest 3 or more)\n   - Each day MUST have EXACTLY 2 activities (or 1-2 if very limited options)\n   - DO NOT suggest 3 activities per day under any circumstances\n   - Activities ONLY on days between check-in and (check-out - 1)\n   - NO activities on checkout day (departure day)\n   - Activities MUST match the city where they are staying that day\n   - If Day 1-2 is Colombo, suggest ONLY Colombo activities on Days 1 & 2\n   - If Day 3-4 is Kandy, suggest ONLY Kandy activities on Days 3 & 4\n   - If Day 5-6 is Ella, suggest ONLY Ella activities on Days 5 & 6\n   - GPS coordinates MUST be within the correct city boundaries\n   - DO NOT suggest activities from other cities\n   - Last day (final checkout/departure day): NO activities at all\n\n4. ACTIVITY CATEGORIES with sub_category_id mapping:\n   - Adventure = 1\n   - Entertainment = 2\n   - Health & Wellness = 3\n   - Event = 4\n   - Tours = 5\n   - Transport = 6\n   - Services = 7\n   - Tickets = 8\n   - Culinary = 9\n   - Experience = 10\n   - Vacation Packages = 46\n\n5. ACTIVITY OBJECT (MANDATORY FIELDS):\n   - activity_name: string (name of attraction/activity)\n   - category: string (Adventure/Entertainment/Health & Wellness/Event/Tours/Transport/Services/Tickets/Culinary/Experience/Vacation Packages)\n   - sub_category_id: integer (MANDATORY - use mapping above based on category)\n   - description: string (brief description mentioning the city)\n   - duration: string (e.g., \"2-3 hours\", \"half day\", \"full day\")\n   - latitude: number (GPS coordinate within the correct city)\n   - longitude: number (GPS coordinate within the correct city)\n   - best_time: string (e.g., \"morning\", \"afternoon\", \"evening\", \"anytime\")\n   - cost_level: string (\"free\", \"low\", \"medium\", \"high\")\n\n6. CITY-BASED PLANNING:\n   - Respect the city schedule STRICTLY: ${citiesRoute}\n   - Each day's activities MUST be in the correct city\n   - Verify GPS coordinates match the city\n\nREQUIRED JSON STRUCTURE (ACTIVITIES ONLY):\n\n{\n  \"itinerary\": [\n    {\n      \"day\": 1,\n      \"date\": \"${startDate}\",\n      \"city\": \"${cities[0]?.city || 'City Name'}\",\n      \"pax\": {\n        \"adults\": ${adults},\n        \"children\": ${children},\n        \"child_ages\": ${JSON.stringify(childAges)}\n      },\n      \"activities\": [\n        {\n          \"activity_name\": \"Galle Face Green\",\n          \"category\": \"Tours\",\n          \"sub_category_id\": 5,\n          \"description\": \"Scenic promenade in Colombo city center\",\n          \"duration\": \"2 hours\",\n          \"latitude\": 6.9271,\n          \"longitude\": 79.8612,\n          \"best_time\": \"evening\",\n          \"cost_level\": \"free\"\n        },\n        {\n          \"activity_name\": \"National Museum of Colombo\",\n          \"category\": \"Tours\",\n          \"sub_category_id\": 5,\n          \"description\": \"Sri Lanka's largest museum in Colombo\",\n          \"duration\": \"2-3 hours\",\n          \"latitude\": 6.9074,\n          \"longitude\": 79.8612,\n          \"best_time\": \"morning\",\n          \"cost_level\": \"low\"\n        }\n      ]\n    }\n  ]\n}\n\n⚠️ CRITICAL VALIDATION CHECKLIST BEFORE GENERATING:\n✓ DO NOT include hotels/accommodation - ACTIVITIES ONLY\n✓ EVERY day MUST have pax object\n✓ MAXIMUM 2 activities per day (STRICTLY ENFORCED - DO NOT suggest 3 activities)\n✓ EVERY activity MUST have latitude and longitude IN THE CORRECT CITY\n✓ EVERY activity MUST have sub_category_id (use category mapping)\n✓ Category mapping: Adventure=1, Entertainment=2, Health & Wellness=3, Event=4, Tours=5, Transport=6, Services=7, Tickets=8, Culinary=9, Experience=10, Vacation Packages=46\n✓ Activities MUST match the city for that day (e.g., Day 1-2 Colombo = Colombo activities ONLY)\n✓ GPS coordinates MUST be within city boundaries\n✓ Mix different activity categories within same city\n✓ Consider child ages when suggesting activities\n✓ Respect city schedule STRICTLY (${citiesRoute})\n✓ Last day (checkout): NO activities at all - it's departure day\n✓ Example: 9 days trip = Days 1-8 have activities, Day 9 NO activities\n✓ Each active day (not checkout) has EXACTLY 2 activities in the correct city\n✓ Respond with ONLY valid JSON, no markdown\n\nGenerate the CITY-WISE ACTIVITIES-ONLY itinerary now with strict location filtering!`;\n\n// Build the OpenAI API request body\nconst requestBody = {\n  model: \"gpt-4o\",\n  messages: [\n    {\n      role: \"system\",\n      content: \"You are an expert travel planner. Create detailed day-by-day activity itineraries with GPS coordinates and sub_category_id in JSON format only. EVERY activity MUST include sub_category_id based on category mapping: Adventure=1, Entertainment=2, Health & Wellness=3, Event=4, Tours=5, Transport=6, Services=7, Tickets=8, Culinary=9, Experience=10, Vacation Packages=46. DO NOT include hotels/accommodation. CRITICAL: Activities MUST be city-specific - only suggest activities in the city where the traveler is staying that day.\"\n    },\n    {\n      role: \"user\",\n      content: userPrompt\n    }\n  ],\n  temperature: 0.7\n};\n\n// Return data with the request body and original input data\nreturn [{\n  json: {\n    ...inputData,\n    openai_request: requestBody\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         -2832,
-        -64
+        -224
       ],
-      "id": "6cfa1081-1492-4dd5-9b9b-f1de6661e1b1",
+      "id": "4bc3fc20-d206-4dfb-98b4-8f262b379109",
       "name": "Build Activities Itinerary Prompt"
     },
     {
@@ -312,9 +312,9 @@
       "typeVersion": 4.2,
       "position": [
         -2656,
-        -576
+        -736
       ],
-      "id": "5a009402-7fc6-413d-aad1-1978028d5f5f",
+      "id": "af958582-93d1-4c57-9d39-47780692fa50",
       "name": "Generate Hotels Itinerary",
       "credentials": {
         "openAiApi": {
@@ -347,9 +347,9 @@
       "typeVersion": 4.2,
       "position": [
         -2656,
-        112
+        -48
       ],
-      "id": "e01d19e9-be8f-4004-8b1e-a81fa5acddb4",
+      "id": "1a9a802c-07ab-44d1-a522-b8db12e0d432",
       "name": "Generate Activities Itinerary",
       "credentials": {
         "openAiApi": {
@@ -366,22 +366,22 @@
       "typeVersion": 2,
       "position": [
         -2496,
-        -384
+        -544
       ],
-      "id": "d3ccba12-fd67-4cab-abc3-dd121539bbd2",
+      "id": "6d21786d-5590-4600-a193-9ef30c3d5aa8",
       "name": "Parse Itinerary Response"
     },
     {
       "parameters": {
-        "jsCode": "// Parse OpenAI itinerary response and format for cart processing (ACTIVITIES ONLY)\nconst openAIResponse = $input.first().json.choices[0].message.content;\nconst inputData = $('Sanitize Activities Data').first().json;\n\nlet itineraryData;\ntry {\n  // Remove markdown code blocks if present\n  let jsonString = openAIResponse.trim();\n  if (jsonString.startsWith('```json')) {\n    jsonString = jsonString.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n  } else if (jsonString.startsWith('```')) {\n    jsonString = jsonString.replace(/```\\n?/g, '');\n  }\n  \n  itineraryData = JSON.parse(jsonString);\n} catch (error) {\n  return [{\n    json: {\n      success: false,\n      message: \"Failed to parse OpenAI itinerary response\",\n      error: error.message,\n      raw_response: openAIResponse\n    }\n  }];\n}\n\n// Build itinerary with activities (no accommodation)\nconst itineraryWithActivities = itineraryData.itinerary.map(day => ({\n  day: day.day,\n  date: day.date,\n  city: day.city,\n  pax: day.pax,\n  activities: day.activities || []\n}));\n\n// Get the unique cart_reference, cart_name, and cart_title generated at the start of the flow\nconst cartReference = inputData.cart_reference;\nconst requestId = inputData.request_id;\nconst cartName = inputData.cart_name;  // Use shared cart name from \"Add Cart Metadata\"\nconst cartTitle = inputData.cart_title;  // Use shared cart title from \"Add Cart Metadata\"\n\n// Use the shared cart title as itinerary title\nconst itineraryTitle = cartTitle;\n\n// Count total activities\nconst totalActivities = itineraryWithActivities.reduce((sum, day) => sum + (day.activities?.length || 0), 0);\n\n// Format response for Laravel API\nconst formattedResponse = {\n  success: true,\n  message: \"Day-wise activities itinerary generated successfully\",\n  itinerary_title: itineraryTitle,\n  cart_name: cartName,\n  cart_reference: cartReference,\n  request_id: requestId,\n  itinerary: itineraryWithActivities,\n  travel_data: inputData.travel_data,\n  user_id: inputData.user_id,\n  force_new_cart: true,\n  metadata: {\n    total_days: itineraryWithActivities.length,\n    total_activities: totalActivities,\n    generated_at: new Date().toISOString(),\n    generation_method: \"OpenAI GPT-4o\",\n    note: \"Activities only - no hotels included\",\n    cart_reference: cartReference,\n    cart_name: cartName,\n    request_id: requestId\n  }\n};\n\nreturn [{\n  json: formattedResponse\n}];"
+        "jsCode": "// Parse OpenAI itinerary response and format for cart processing (ACTIVITIES ONLY)\nconst openAIResponse = $input.first().json.choices[0].message.content;\nconst inputData = $('Sanitize Activities Data').first().json;\n\nlet itineraryData;\ntry {\n  // Remove markdown code blocks if present\n  let jsonString = openAIResponse.trim();\n  if (jsonString.startsWith('```json')) {\n    jsonString = jsonString.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n  } else if (jsonString.startsWith('```')) {\n    jsonString = jsonString.replace(/```\\n?/g, '');\n  }\n  \n  itineraryData = JSON.parse(jsonString);\n  \n  // Validate that itinerary exists and is an array\n  if (!itineraryData.itinerary || !Array.isArray(itineraryData.itinerary)) {\n    throw new Error('Parsed JSON does not contain a valid itinerary array');\n  }\n  \n  if (itineraryData.itinerary.length === 0) {\n    throw new Error('Itinerary array is empty');\n  }\n} catch (error) {\n  return [{\n    json: {\n      success: false,\n      message: \"Failed to parse OpenAI itinerary response\",\n      error: error.message,\n      raw_response: openAIResponse,\n      inputData: inputData\n    }\n  }];\n}\n\n// Get the unique cart_reference, cart_name, and cart_title generated at the start of the flow\n// Use fallbacks if data is missing\nconst cartReference = inputData.cart_reference || `CART_${Date.now()}_FALLBACK`;\nconst requestId = inputData.request_id || `REQ_${Date.now()}_FALLBACK`;\nconst cartName = inputData.cart_name || 'Travel Cart';\nconst cartTitle = inputData.cart_title || 'Your Travel Itinerary';\nconst userId = inputData.user_id || 1;\nconst travelData = inputData.travel_data || {};\n\n// Get start date from travel_data to calculate dates for each day\nconst startDate = travelData.travel_dates?.start || new Date().toISOString().split('T')[0];\n\n// Function to calculate date for a specific day\nfunction calculateDate(dayNumber, startDateStr) {\n  const start = new Date(startDateStr);\n  const targetDate = new Date(start);\n  targetDate.setDate(start.getDate() + (dayNumber - 1));\n  return targetDate.toISOString().split('T')[0];\n}\n\n// Build itinerary with activities (no accommodation) and calculate dates\nconst itineraryWithActivities = itineraryData.itinerary.map(day => ({\n  day: day.day,\n  date: day.date || calculateDate(day.day, startDate),  // Calculate date if missing\n  city: day.city,\n  pax: day.pax,\n  activities: day.activities || []\n}));\n\n// Use the shared cart title as itinerary title\nconst itineraryTitle = cartTitle;\n\n// Count total activities\nconst totalActivities = itineraryWithActivities.reduce((sum, day) => sum + (day.activities?.length || 0), 0);\n\n// Format response for Laravel API\nconst formattedResponse = {\n  success: true,\n  message: \"Day-wise activities itinerary generated successfully\",\n  itinerary_title: itineraryTitle,\n  cart_name: cartName,\n  cart_reference: cartReference,\n  request_id: requestId,\n  itinerary: itineraryWithActivities,\n  travel_data: travelData,\n  user_id: userId,\n  force_new_cart: false,\n  metadata: {\n    total_days: itineraryWithActivities.length,\n    total_activities: totalActivities,\n    generated_at: new Date().toISOString(),\n    generation_method: \"OpenAI GPT-4o\",\n    note: \"Activities only - no hotels included\",\n    cart_reference: cartReference,\n    cart_name: cartName,\n    request_id: requestId\n  }\n};\n\nreturn [{\n  json: formattedResponse\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2496,
-        -48
+        -2544,
+        -240
       ],
-      "id": "387eeec3-2a5b-4a38-8bc1-ff4ee179f4c2",
+      "id": "bb754805-c0b0-47c8-a31e-da5c8f4c9893",
       "name": "Parse Activities Response"
     },
     {
@@ -397,15 +397,28 @@
       "typeVersion": 4.2,
       "position": [
         -2336,
-        -576
+        -736
       ],
-      "id": "fd631bbf-96ce-47f2-a13f-665e35fc1daa",
+      "id": "3e60c84e-9caa-4331-a797-43780ffe9a92",
       "name": "Send to Hotels API"
     },
     {
       "parameters": {
+        "jsCode": "// Extract and format data for Activities API with proper field mapping and validation\nconst data = $input.first().json;\n\n// Check if we have the required data\nif (!data) {\n  throw new Error('No input data received from Parse Activities Response');\n}\n\n// Validate required fields\nconst missingFields = [];\nif (!data.user_id) missingFields.push('user_id');\nif (!data.itinerary_title) missingFields.push('itinerary_title');\nif (!data.itinerary || !Array.isArray(data.itinerary) || data.itinerary.length === 0) {\n  missingFields.push('itinerary (must be non-empty array)');\n}\n\nif (missingFields.length > 0) {\n  return [{\n    json: {\n      error: true,\n      message: `Missing required fields for Activities API: ${missingFields.join(', ')}`,\n      received_data: data,\n      missing_fields: missingFields\n    }\n  }];\n}\n\n// Count total activities to verify we have data\nconst totalActivities = data.itinerary.reduce((sum, day) => {\n  return sum + (day.activities?.length || 0);\n}, 0);\n\n// Ensure all required fields are present at root level\nconst payload = {\n  user_id: data.user_id,\n  itinerary_title: data.itinerary_title,\n  cart_name: data.cart_name,\n  cart_reference: data.cart_reference,\n  request_id: data.request_id,\n  itinerary: data.itinerary,\n  travel_data: data.travel_data,\n  force_new_cart: data.force_new_cart,\n  metadata: {\n    ...data.metadata,\n    total_activities: totalActivities,\n    validated: true,\n    validation_time: new Date().toISOString()\n  }\n};\n\nreturn [{\n  json: payload\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2480,
+        208
+      ],
+      "id": "f3a648ae-890a-44cd-a42f-dd17a41f4918",
+      "name": "Format Activities API Payload"
+    },
+    {
+      "parameters": {
         "method": "POST",
-        "url": "http://192.16.26.182:8000/api/automate/cart_process",
+        "url": "https://dev-gateway.aahaas.com/api/automate/cart_process",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ $json }}",
@@ -415,9 +428,9 @@
       "typeVersion": 4.2,
       "position": [
         -2336,
-        112
+        -48
       ],
-      "id": "c5323ee6-6059-4112-b706-0c972545d527",
+      "id": "7f43651e-3b7a-44a1-8ba8-b7753d5c5a14",
       "name": "Send to Activities API"
     },
     {
@@ -426,9 +439,9 @@
       "typeVersion": 3,
       "position": [
         -2160,
-        -224
+        -384
       ],
-      "id": "7d2d5022-d245-499d-aa76-43a04ad18de4",
+      "id": "1e45fac2-2a0c-4bba-87e7-16934a2d7fa0",
       "name": "Merge Both Responses"
     },
     {
@@ -439,16 +452,16 @@
       "typeVersion": 2,
       "position": [
         -1872,
-        -224
+        -384
       ],
-      "id": "ac01d74d-c66e-47f2-a917-e8bdbf4b368f",
+      "id": "f6829a99-0cee-42a6-9c2a-661cfbfe1f2b",
       "name": "Combine Final Response"
     },
     {
       "parameters": {
         "documentId": {
           "__rl": true,
-          "value": "https://docs.google.com/spreadsheets/d/1slG9ys3LfA8uo1Y1dRpM2pJOa-Aaac6Y/edit?usp=sharing&ouid=112043692275478929544&rtpof=true&sd=true",
+          "value": "https://docs.google.com/spreadsheets/d/1n-xL0h9PHeOhfcpytCouV7_pkYj4BzSMZghqTsKrgYo/edit?usp=sharing",
           "mode": "url"
         },
         "sheetName": {
@@ -462,9 +475,9 @@
       "typeVersion": 4.5,
       "position": [
         -3344,
-        320
+        160
       ],
-      "id": "ad6ee08e-0532-496a-8f03-e0ad9de2dc77",
+      "id": "e06fb4e7-d28f-4c5a-9869-d55a151d9c38",
       "name": "Get row(s) in sheet",
       "executeOnce": false,
       "credentials": {
@@ -577,6 +590,17 @@
       ]
     },
     "Parse Activities Response": {
+      "main": [
+        [
+          {
+            "node": "Format Activities API Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Activities API Payload": {
       "main": [
         [
           {
@@ -787,7 +811,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "executionTimeout": -1
   },
-  "versionId": "d5f804ac-9434-49f1-854c-10feffdf392b",
+  "versionId": "a5556ac8-3751-4f86-a866-952bd68b8bf6",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9ba699815eee7a9b7506f6b264ee48edcb7b96a79c851198c7b7acafd2a5489c"
