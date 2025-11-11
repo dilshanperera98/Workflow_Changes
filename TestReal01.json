@@ -1,5 +1,5 @@
 {
-  "name": "Test",
+  "name": "TestReal",
   "nodes": [
     {
       "parameters": {
@@ -8,10 +8,10 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.3,
       "position": [
-        -5824,
-        224
+        -4784,
+        -224
       ],
-      "id": "a4973776-4ff7-4ffb-b155-7fb778677faf",
+      "id": "d18c7eab-3cc5-462e-9eb6-60f44f0f831e",
       "name": "When chat message received",
       "webhookId": "9d2612f3-b699-4bee-bda6-52b98551f2cf"
     },
@@ -25,10 +25,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -5824,
-        464
+        -4784,
+        32
       ],
-      "id": "cab1a406-ca0f-45c3-90d3-4228007055ed",
+      "id": "97c626de-d29b-4845-9135-da4cf372282d",
       "name": "Webhook API Trigger",
       "webhookId": "127e3f0a-4469-48c8-996c-ab7c16ec18ce"
     },
@@ -39,10 +39,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -5584,
-        464
+        -4544,
+        32
       ],
-      "id": "57b07bfe-de28-4394-9ef7-383e7e656409",
+      "id": "5a3e0e4e-bebb-4ce5-b2be-73eee0716279",
       "name": "Extract Webhook Data"
     },
     {
@@ -54,10 +54,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        -2640,
-        224
+        -1600,
+        -224
       ],
-      "id": "9da19347-e7b0-4a42-be04-3b80f168a20f",
+      "id": "8a896b3c-8528-4610-9d96-c489f0204387",
       "name": "Respond to Webhook"
     },
     {
@@ -67,10 +67,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -5568,
-        224
+        -4528,
+        -224
       ],
-      "id": "d68dc35d-0023-4ebc-ba6f-e9754f52cf8c",
+      "id": "43bca076-db35-458f-b968-8d7817fccac9",
       "name": "Merge Input Sources"
     },
     {
@@ -82,10 +82,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 2.2,
       "position": [
-        -5280,
-        224
+        -4240,
+        -224
       ],
-      "id": "4a4e2abb-a7a1-4dec-9d29-fe078cb3a55a",
+      "id": "aa92f8be-6549-472f-81ec-13d0177f4e47",
       "name": "AI Agent"
     },
     {
@@ -100,10 +100,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        -5280,
-        528
+        -4240,
+        96
       ],
-      "id": "f550cbc5-5b0f-4aac-8df6-0c54b316bbb9",
+      "id": "83165059-4474-45f7-bd34-9c2de37c134d",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
@@ -117,10 +117,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        -5184,
-        528
+        -4144,
+        96
       ],
-      "id": "8556716c-06e5-4a2e-a211-29a0aca7048f",
+      "id": "da8e31f3-3344-4d6f-9de0-a00c7ebed247",
       "name": "Simple Memory"
     },
     {
@@ -130,10 +130,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -4944,
-        224
+        -3904,
+        -224
       ],
-      "id": "d64957b0-f904-4df8-a3c2-d7e4c9abc1a2",
+      "id": "00f3d9ff-6830-44d2-8b35-77f86fce6b25",
       "name": "Format for OpenAI Parser"
     },
     {
@@ -159,10 +159,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -4752,
-        224
+        -3712,
+        -224
       ],
-      "id": "b3703a94-6188-446f-96e0-7c5c093436c4",
+      "id": "a62e4601-159b-4bf0-b626-92748c2f958e",
       "name": "OpenAI Travel Parser",
       "credentials": {
         "openAiApi": {
@@ -178,10 +178,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -4544,
-        224
+        -3504,
+        -224
       ],
-      "id": "2fdb64b1-1a92-4642-bca1-62975d5c35d5",
+      "id": "65f98b3f-86c6-42d1-838b-e5fa1d93647e",
       "name": "Parse Travel Data"
     },
     {
@@ -191,10 +191,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -4352,
-        224
+        -3312,
+        -224
       ],
-      "id": "66b7c78b-ea09-4151-bef1-39e195742179",
+      "id": "944f3f89-1608-42ac-8f53-170523c232ff",
       "name": "Add Cart Metadata"
     },
     {
@@ -204,10 +204,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -4176,
-        64
+        -3136,
+        -384
       ],
-      "id": "ebd5b88d-4fb3-48f0-b205-720908fdf481",
+      "id": "4c78800e-faca-43b9-aa11-8ff5ce8fc095",
       "name": "Process Cities & Hotel Rating"
     },
     {
@@ -217,41 +217,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -4176,
-        384
+        -3136,
+        -64
       ],
-      "id": "fa1c6465-e346-4a5e-a667-6f1aa3eebde4",
+      "id": "54cbfff1-3d80-4655-83e5-f1abeea943f6",
       "name": "Process Cities & Activities"
-    },
-    {
-      "parameters": {
-        "operation": "getRows",
-        "documentId": {
-          "__rl": true,
-          "mode": "id",
-          "value": "1slG9ys3LfA8uo1Y1dRpM2pJOa-Aaac6Y"
-        },
-        "sheetName": {
-          "__rl": true,
-          "mode": "list",
-          "value": "gid=0"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.5,
-      "position": [
-        -4176,
-        600
-      ],
-      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "name": "Get row(s) in sheet",
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "YOUR_CREDENTIAL_ID",
-          "name": "Google Sheets account 2"
-        }
-      }
     },
     {
       "parameters": {
@@ -260,10 +230,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3968,
-        600
+        -3088,
+        320
       ],
-      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "id": "b27b6b99-1e71-4037-b552-9e4f36fc34ab",
       "name": "Merge Sheets Data"
     },
     {
@@ -273,10 +243,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -4016,
-        -112
+        -2976,
+        -560
       ],
-      "id": "6bbadcec-e449-4c45-8f3c-4ba305ee2b8d",
+      "id": "83da5cb4-dbf5-49eb-8ff0-e208c1eedf8a",
       "name": "Sanitize Hotels Data"
     },
     {
@@ -286,10 +256,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -4048,
-        544
+        -2736,
+        320
       ],
-      "id": "c3d1c08c-3db2-428b-b911-89dba239118a",
+      "id": "ea47c6ba-71c1-4a07-9af2-20de30c0e579",
       "name": "Sanitize Activities Data"
     },
     {
@@ -299,10 +269,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3856,
-        64
+        -2816,
+        -384
       ],
-      "id": "af76c177-e573-49b4-85bd-9a1053eabf40",
+      "id": "87b20685-4743-4415-8f71-cb7ad7e61653",
       "name": "Build Itinerary Prompt"
     },
     {
@@ -312,10 +282,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3872,
-        384
+        -2832,
+        -64
       ],
-      "id": "fffcdc98-b05c-4e38-8fef-dddfcec97698",
+      "id": "6cfa1081-1492-4dd5-9b9b-f1de6661e1b1",
       "name": "Build Activities Itinerary Prompt"
     },
     {
@@ -341,10 +311,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -3696,
-        -128
+        -2656,
+        -576
       ],
-      "id": "028864f3-853f-4c7f-a4eb-0b96a56ae174",
+      "id": "5a009402-7fc6-413d-aad1-1978028d5f5f",
       "name": "Generate Hotels Itinerary",
       "credentials": {
         "openAiApi": {
@@ -376,10 +346,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -3696,
-        544
+        -2656,
+        112
       ],
-      "id": "13a36adb-5997-45cd-b2a5-b1c7e456006b",
+      "id": "e01d19e9-be8f-4004-8b1e-a81fa5acddb4",
       "name": "Generate Activities Itinerary",
       "credentials": {
         "openAiApi": {
@@ -395,10 +365,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3536,
-        64
+        -2496,
+        -384
       ],
-      "id": "889765a3-b97f-4ec5-80ee-b70831423181",
+      "id": "d3ccba12-fd67-4cab-abc3-dd121539bbd2",
       "name": "Parse Itinerary Response"
     },
     {
@@ -408,10 +378,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3536,
-        400
+        -2496,
+        -48
       ],
-      "id": "ffbf4ee9-f89b-4082-89d8-be0084c77055",
+      "id": "387eeec3-2a5b-4a38-8bc1-ff4ee179f4c2",
       "name": "Parse Activities Response"
     },
     {
@@ -426,10 +396,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -3376,
-        -128
+        -2336,
+        -576
       ],
-      "id": "568a7994-b2db-4214-8611-1c127a27e414",
+      "id": "fd631bbf-96ce-47f2-a13f-665e35fc1daa",
       "name": "Send to Hotels API"
     },
     {
@@ -444,10 +414,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -3376,
-        544
+        -2336,
+        112
       ],
-      "id": "1306ab71-684c-448a-9bf0-c905aa3e5729",
+      "id": "c5323ee6-6059-4112-b706-0c972545d527",
       "name": "Send to Activities API"
     },
     {
@@ -455,10 +425,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
       "position": [
-        -3200,
-        224
+        -2160,
+        -224
       ],
-      "id": "6877b36e-50eb-431e-a197-60c5c473a130",
+      "id": "7d2d5022-d245-499d-aa76-43a04ad18de4",
       "name": "Merge Both Responses"
     },
     {
@@ -468,11 +438,41 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2912,
-        224
+        -1872,
+        -224
       ],
-      "id": "da9bd8dd-4806-4ed3-ac6d-90a4f37b5da1",
+      "id": "ac01d74d-c66e-47f2-a917-e8bdbf4b368f",
       "name": "Combine Final Response"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1slG9ys3LfA8uo1Y1dRpM2pJOa-Aaac6Y/edit?usp=sharing&ouid=110705654923980321722&rtpof=true&sd=true",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -3344,
+        320
+      ],
+      "id": "ad6ee08e-0532-496a-8f03-e0ad9de2dc77",
+      "name": "Get row(s) in sheet",
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4bqLa45KMMhTDuqo",
+          "name": "Google Sheets account 2"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -702,17 +702,6 @@
         ]
       ]
     },
-    "Get row(s) in sheet": {
-      "main": [
-        [
-          {
-            "node": "Merge Sheets Data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Merge Sheets Data": {
       "main": [
         [
@@ -778,17 +767,28 @@
           }
         ]
       ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Merge Sheets Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "fac0137a-cdd0-4da3-bfb1-967dc97d50f5",
+  "versionId": "7a79690e-7ddf-4bd8-8a74-803191178633",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9ba699815eee7a9b7506f6b264ee48edcb7b96a79c851198c7b7acafd2a5489c"
   },
-  "id": "3Igo9PHNyo5y3WUw",
+  "id": "FvVabvP5WVxttTDD",
   "tags": []
 }
