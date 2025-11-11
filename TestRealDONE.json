@@ -8,10 +8,10 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.3,
       "position": [
-        -4784,
-        -384
+        -2304,
+        -432
       ],
-      "id": "1a75ee18-5cc1-4601-adb1-bcf5b32a875a",
+      "id": "c0747cd4-b528-4ffd-8708-46563048082d",
       "name": "When chat message received",
       "webhookId": "9d2612f3-b699-4bee-bda6-52b98551f2cf"
     },
@@ -25,10 +25,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -4784,
-        -128
+        -2304,
+        -176
       ],
-      "id": "288b2cee-e843-453f-8386-b51631f89c25",
+      "id": "5d871262-0e2e-470a-850e-686672492e3e",
       "name": "Webhook API Trigger",
       "webhookId": "127e3f0a-4469-48c8-996c-ab7c16ec18ce"
     },
@@ -39,10 +39,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -4544,
-        -128
+        -2064,
+        -176
       ],
-      "id": "7a027c77-a93a-432d-b2d1-3f9d33cb7445",
+      "id": "c61cfd0b-859d-43a3-b215-77284a3b85ea",
       "name": "Extract Webhook Data"
     },
     {
@@ -54,10 +54,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        -1600,
-        -384
+        880,
+        -432
       ],
-      "id": "6ab60e67-4272-4487-a471-58a1223214f8",
+      "id": "371fea3d-057f-4e0e-a895-55c924c02c68",
       "name": "Respond to Webhook"
     },
     {
@@ -67,10 +67,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -4528,
-        -384
+        -2048,
+        -432
       ],
-      "id": "f1eac74c-4f40-4e33-b31f-6ea810887641",
+      "id": "7086fa93-eebb-47f2-b860-3a8b81abaa2c",
       "name": "Merge Input Sources"
     },
     {
@@ -82,10 +82,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 2.2,
       "position": [
-        -4240,
-        -384
+        -1760,
+        -432
       ],
-      "id": "c83409dc-816a-407f-8d5f-4116519741b8",
+      "id": "7e0872b7-27cd-4b64-a5b7-00018c14ece1",
       "name": "AI Agent"
     },
     {
@@ -100,10 +100,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        -4240,
-        -64
+        -1760,
+        -112
       ],
-      "id": "b2e9fb88-e702-49f8-9d72-fed9672f86e7",
+      "id": "04e1b550-c756-47fb-a0c5-9c6d8b64630e",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
@@ -117,10 +117,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        -4144,
-        -64
+        -1664,
+        -112
       ],
-      "id": "fe8b9a64-72a0-4582-9c77-b25f26eb79c2",
+      "id": "d92a751c-74c5-4bf2-90ca-bb9464713497",
       "name": "Simple Memory"
     },
     {
@@ -130,10 +130,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3904,
-        -384
+        -1424,
+        -432
       ],
-      "id": "fe0fb1a4-0b69-4e89-a12f-41156541734e",
+      "id": "a1bfbaf6-d53f-4747-bef3-d838913a8a16",
       "name": "Format for OpenAI Parser"
     },
     {
@@ -159,10 +159,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -3712,
-        -384
+        -1232,
+        -432
       ],
-      "id": "2b8ca1e3-b052-4fc5-9b28-af768c786b50",
+      "id": "b0447a7f-8e20-4006-9b4b-1883496ac7d4",
       "name": "OpenAI Travel Parser",
       "credentials": {
         "openAiApi": {
@@ -178,10 +178,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3504,
-        -384
+        -1024,
+        -432
       ],
-      "id": "86474c45-cd75-4ede-8cba-b61b26528fb0",
+      "id": "57f8de6d-844a-4a55-8a9c-8a5fdd437285",
       "name": "Parse Travel Data"
     },
     {
@@ -191,10 +191,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3312,
-        -384
+        -832,
+        -432
       ],
-      "id": "f869b991-9f88-4593-8254-9f5c34404b4b",
+      "id": "fe2a5c04-47d8-4449-a82d-05b5e58f1840",
       "name": "Add Cart Metadata"
     },
     {
@@ -204,10 +204,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3136,
-        -544
+        -720,
+        -736
       ],
-      "id": "694e3c85-9467-40fb-845c-ac9fcb192360",
+      "id": "a1a6d56f-1b74-41b1-894c-811111706ca0",
       "name": "Process Cities & Hotel Rating"
     },
     {
@@ -217,10 +217,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3136,
-        -224
+        -720,
+        -192
       ],
-      "id": "7d12d196-d682-47b6-b568-21bdb69280a1",
+      "id": "95ae22c7-1ae9-4cdd-8d82-39248853428a",
       "name": "Process Cities & Activities"
     },
     {
@@ -230,10 +230,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3088,
-        160
+        -608,
+        112
       ],
-      "id": "2f10005f-68af-45c6-bfa0-36d429f5b573",
+      "id": "1b8ba169-41fa-4c03-a546-e86acc02f411",
       "name": "Merge Sheets Data"
     },
     {
@@ -243,10 +243,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2976,
-        -720
+        -512,
+        -928
       ],
-      "id": "f2c80f64-d536-4ef4-92ec-6033b33e5392",
+      "id": "7a4864f8-664b-488e-b3a1-335473861ed6",
       "name": "Sanitize Hotels Data"
     },
     {
@@ -256,10 +256,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2736,
-        160
+        -336,
+        112
       ],
-      "id": "4087798e-f4cd-4dc8-8b53-ae951b0162e9",
+      "id": "48d00788-575f-4517-8138-ecb6554d3a4a",
       "name": "Sanitize Activities Data"
     },
     {
@@ -269,10 +269,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2816,
-        -544
+        -256,
+        -928
       ],
-      "id": "b2e67082-fa1c-486b-a4d2-27abf3bfd8b3",
+      "id": "98dd14fb-4f80-4308-825c-184b95f70316",
       "name": "Build Itinerary Prompt"
     },
     {
@@ -282,10 +282,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2832,
-        -224
+        -144,
+        112
       ],
-      "id": "4bc3fc20-d206-4dfb-98b4-8f262b379109",
+      "id": "874ef3bc-caf1-4ccb-82e6-9423aa3bc6fe",
       "name": "Build Activities Itinerary Prompt"
     },
     {
@@ -311,10 +311,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -2656,
-        -736
+        -16,
+        -928
       ],
-      "id": "af958582-93d1-4c57-9d39-47780692fa50",
+      "id": "4aef374b-b6bd-4c30-b1e4-265d98617a64",
       "name": "Generate Hotels Itinerary",
       "credentials": {
         "openAiApi": {
@@ -346,10 +346,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -2656,
-        -48
+        192,
+        112
       ],
-      "id": "1a9a802c-07ab-44d1-a522-b8db12e0d432",
+      "id": "e8a25632-b28c-416e-a59c-59a915198667",
       "name": "Generate Activities Itinerary",
       "credentials": {
         "openAiApi": {
@@ -365,10 +365,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2496,
-        -544
+        240,
+        -928
       ],
-      "id": "6d21786d-5590-4600-a193-9ef30c3d5aa8",
+      "id": "e4ed51df-db2e-48aa-a362-a422dc01467b",
       "name": "Parse Itinerary Response"
     },
     {
@@ -378,10 +378,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2544,
-        -240
+        432,
+        112
       ],
-      "id": "bb754805-c0b0-47c8-a31e-da5c8f4c9893",
+      "id": "0cc05c53-bc92-4a67-b238-de60c402a72f",
       "name": "Parse Activities Response"
     },
     {
@@ -396,29 +396,29 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -2336,
-        -736
+        496,
+        -928
       ],
-      "id": "3e60c84e-9caa-4331-a797-43780ffe9a92",
+      "id": "69d76452-9b8b-45d9-b388-0d2cab798f76",
       "name": "Send to Hotels API"
     },
     {
       "parameters": {
-        "jsCode": "// Extract and format data for Activities API with proper field mapping and validation\nconst data = $input.first().json;\n\n// Check if we have the required data\nif (!data) {\n  throw new Error('No input data received from Parse Activities Response');\n}\n\n// Validate required fields\nconst missingFields = [];\nif (!data.user_id) missingFields.push('user_id');\nif (!data.itinerary_title) missingFields.push('itinerary_title');\nif (!data.itinerary || !Array.isArray(data.itinerary) || data.itinerary.length === 0) {\n  missingFields.push('itinerary (must be non-empty array)');\n}\n\nif (missingFields.length > 0) {\n  return [{\n    json: {\n      error: true,\n      message: `Missing required fields for Activities API: ${missingFields.join(', ')}`,\n      received_data: data,\n      missing_fields: missingFields\n    }\n  }];\n}\n\n// Count total activities to verify we have data\nconst totalActivities = data.itinerary.reduce((sum, day) => {\n  return sum + (day.activities?.length || 0);\n}, 0);\n\n// Ensure all required fields are present at root level\nconst payload = {\n  user_id: data.user_id,\n  itinerary_title: data.itinerary_title,\n  cart_name: data.cart_name,\n  cart_reference: data.cart_reference,\n  request_id: data.request_id,\n  itinerary: data.itinerary,\n  travel_data: data.travel_data,\n  force_new_cart: data.force_new_cart,\n  metadata: {\n    ...data.metadata,\n    total_activities: totalActivities,\n    validated: true,\n    validation_time: new Date().toISOString()\n  }\n};\n\nreturn [{\n  json: payload\n}];"
+        "jsCode": "// Extract and format data for Activities API with proper field mapping and validation\nconst data = $input.first().json;\n\n// CRITICAL: Check if the input is an error from Parse Activities Response\nif (data.success === false || data.error === true) {\n  // This is an error response - skip sending to API\n  // Return empty itinerary to prevent API call\n  throw new Error(`Cannot process activities: ${data.message || data.error || 'Unknown error'}`);\n}\n\n// Check if we have the required data\nif (!data) {\n  throw new Error('No input data received from Parse Activities Response');\n}\n\n// Validate required fields\nconst missingFields = [];\nif (!data.user_id) missingFields.push('user_id');\nif (!data.itinerary_title) missingFields.push('itinerary_title');\nif (!data.itinerary || !Array.isArray(data.itinerary) || data.itinerary.length === 0) {\n  missingFields.push('itinerary (must be non-empty array)');\n}\n\nif (missingFields.length > 0) {\n  throw new Error(`Missing required fields for Activities API: ${missingFields.join(', ')}`);\n}\n\n// Count total activities to verify we have data\nconst totalActivities = data.itinerary.reduce((sum, day) => {\n  return sum + (day.activities?.length || 0);\n}, 0);\n\nif (totalActivities === 0) {\n  throw new Error('No activities found in the itinerary');\n}\n\n// Ensure all required fields are present at root level\nconst payload = {\n  user_id: data.user_id,\n  itinerary_title: data.itinerary_title,\n  cart_name: data.cart_name,\n  cart_reference: data.cart_reference,\n  request_id: data.request_id,\n  itinerary: data.itinerary,\n  travel_data: data.travel_data,\n  force_new_cart: data.force_new_cart,\n  metadata: {\n    ...data.metadata,\n    total_activities: totalActivities,\n    validated: true,\n    validation_time: new Date().toISOString()\n  }\n};\n\nreturn [{\n  json: payload\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2480,
-        208
+        640,
+        112
       ],
-      "id": "f3a648ae-890a-44cd-a42f-dd17a41f4918",
+      "id": "96b3e816-e7ab-488d-aace-792567ba1f93",
       "name": "Format Activities API Payload"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://dev-gateway.aahaas.com/api/automate/cart_process",
+        "url": "http://192.16.26.182:8000/api/automate/cart_process",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ $json }}",
@@ -427,10 +427,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -2336,
-        -48
+        752,
+        -160
       ],
-      "id": "7f43651e-3b7a-44a1-8ba8-b7753d5c5a14",
+      "id": "7cfc1cc2-958e-471d-ac2d-5cbea200e8b7",
       "name": "Send to Activities API"
     },
     {
@@ -438,10 +438,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
       "position": [
-        -2160,
-        -384
+        320,
+        -432
       ],
-      "id": "1e45fac2-2a0c-4bba-87e7-16934a2d7fa0",
+      "id": "fb1f06c9-f65d-4646-9e65-5b3b3360a91e",
       "name": "Merge Both Responses"
     },
     {
@@ -451,10 +451,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1872,
-        -384
+        608,
+        -432
       ],
-      "id": "f6829a99-0cee-42a6-9c2a-661cfbfe1f2b",
+      "id": "61073a0e-c861-40d2-b4db-25789c12f49e",
       "name": "Combine Final Response"
     },
     {
@@ -474,11 +474,54 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        -3344,
-        160
+        -864,
+        112
       ],
-      "id": "e06fb4e7-d28f-4c5a-9869-d55a151d9c38",
+      "id": "b54b9bbf-a706-4ea5-9c5d-c06a5a47241f",
       "name": "Get row(s) in sheet",
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4bqLa45KMMhTDuqo",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge Google Sheets data with processed activities data - FILTER BY REQUESTED CITIES ONLY\nconst processedData = $input.first().json;\nconst sheetsData = $('Get row(s) in sheet1').all();\n\n// Get the list of cities that ChatGPT selected for this trip\nconst requestedCities = processedData.travel_data?.destination || [];\n\n// Extract countries, cities, and activities from Google Sheets\nconst sheetActivities = sheetsData.map(row => ({\n  country: row.json.Country || row.json.country,\n  city: row.json.City || row.json.city,\n  activity: row.json.Activity || row.json.activity || row.json.Activities || row.json.activities\n}));\n\n// CRITICAL: Filter activities to ONLY include cities that ChatGPT selected\n// This ensures we only fetch relevant activities for the trip\nconst filteredActivities = sheetActivities.filter(item => {\n  if (!item.city || !item.activity) return false;\n  \n  // Check if this city is in the requested cities list (case-insensitive)\n  return requestedCities.some(requestedCity => \n    requestedCity.toLowerCase().trim() === item.city.toLowerCase().trim()\n  );\n});\n\n// Add filtered Google Sheets data to processed data\nprocessedData.google_sheets_data = filteredActivities;\n\n// Group activities by city from Google Sheets (only for requested cities)\nconst activitiesByCity = {};\nfilteredActivities.forEach(item => {\n  const city = item.city;\n  if (city && item.activity) {\n    if (!activitiesByCity[city]) {\n      activitiesByCity[city] = [];\n    }\n    activitiesByCity[city].push({\n      activity_name: item.activity,\n      country: item.country\n    });\n  }\n});\n\nprocessedData.activities_by_city = activitiesByCity;\n\n// Add metadata about filtering\nprocessedData.activity_metadata = {\n  requested_cities: requestedCities,\n  total_sheet_activities: sheetActivities.length,\n  filtered_activities_count: filteredActivities.length,\n  cities_with_activities: Object.keys(activitiesByCity),\n  cities_without_activities: requestedCities.filter(city => !activitiesByCity[city])\n};\n\nreturn [{\n  json: processedData\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -704,
+        -928
+      ],
+      "id": "b192de71-5ee7-48f6-9914-3075836b7092",
+      "name": "Merge Sheets Data1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1n-xL0h9PHeOhfcpytCouV7_pkYj4BzSMZghqTsKrgYo/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet2",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -896,
+        -928
+      ],
+      "id": "aae66d15-1d76-4924-b24d-430948328670",
+      "name": "Get row(s) in sheet1",
       "executeOnce": false,
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -697,7 +740,7 @@
       "main": [
         [
           {
-            "node": "Sanitize Hotels Data",
+            "node": "Get row(s) in sheet1",
             "type": "main",
             "index": 0
           }
@@ -802,6 +845,28 @@
           }
         ]
       ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Merge Sheets Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Sheets Data1": {
+      "main": [
+        [
+          {
+            "node": "Sanitize Hotels Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -811,7 +876,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "executionTimeout": -1
   },
-  "versionId": "a5556ac8-3751-4f86-a866-952bd68b8bf6",
+  "versionId": "118c648c-8a9d-4f29-b7bf-51d9a53028ea",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9ba699815eee7a9b7506f6b264ee48edcb7b96a79c851198c7b7acafd2a5489c"
