@@ -228,13 +228,13 @@
         "operation": "getRows",
         "documentId": {
           "__rl": true,
-          "mode": "url",
-          "value": "https://docs.google.com/spreadsheets/d/1slG9ys3LfA8uo1Y1dRpM2pJOa-Aaac6Y/edit?usp=sharing&ouid=110705654923980321722&rtpof=true&sd=true"
+          "mode": "id",
+          "value": "1slG9ys3LfA8uo1Y1dRpM2pJOa-Aaac6Y"
         },
         "sheetName": {
           "__rl": true,
           "mode": "list",
-          "value": "Sheet1"
+          "value": "gid=0"
         },
         "options": {}
       },
@@ -245,7 +245,13 @@
         600
       ],
       "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "name": "Get row(s) in sheet"
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Google Sheets account 2"
+        }
+      }
     },
     {
       "parameters": {
