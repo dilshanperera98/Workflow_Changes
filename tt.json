@@ -1,0 +1,527 @@
+[
+  {
+    "success": true,
+    "message": "Day-wise activities itinerary generated successfully",
+    "itinerary_title": "Journey Colombo Voyage #321 - 9 days (2025-11-23)",
+    "cart_name": "Journey Colombo Voyage #321",
+    "cart_reference": "CART_1762759890612_SP5ORVB",
+    "request_id": "REQ_1762759890612_SP5ORVB",
+    "itinerary": [
+      {
+        "day": 1,
+        "date": "2025-11-23",
+        "city": "Colombo",
+        "pax": {
+          "adults": 3,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Gangaramaya Temple",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "A prominent temple that showcases a mix of Sri Lankan, Thai, Indian, and Chinese architecture.",
+            "duration": "1-2 hours",
+            "latitude": 6.9271,
+            "longitude": 79.8612,
+            "best_time": "morning",
+            "cost_level": "low"
+          },
+          {
+            "activity_name": "National Museum of Colombo",
+            "category": "Experience",
+            "sub_category_id": 10,
+            "description": "Sri Lanka's largest museum that displays a vast array of historical artifacts.",
+            "duration": "2-3 hours",
+            "latitude": 6.9275,
+            "longitude": 79.8675,
+            "best_time": "afternoon",
+            "cost_level": "medium"
+          },
+          {
+            "activity_name": "Galle Face Green",
+            "category": "Culinary",
+            "sub_category_id": 9,
+            "description": "A popular urban park facing the Indian Ocean, ideal for enjoying street food and a sunset walk.",
+            "duration": "1-2 hours",
+            "latitude": 6.9278,
+            "longitude": 79.8489,
+            "best_time": "evening",
+            "cost_level": "low"
+          }
+        ]
+      },
+      {
+        "day": 2,
+        "date": "2025-11-24",
+        "city": "Colombo",
+        "pax": {
+          "adults": 3,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Colombo City Tour",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "A comprehensive tour of Colombo's highlights including historical sites and vibrant markets.",
+            "duration": "half day",
+            "latitude": 6.934,
+            "longitude": 79.8522,
+            "best_time": "morning",
+            "cost_level": "medium"
+          },
+          {
+            "activity_name": "Viharamahadevi Park",
+            "category": "Entertainment",
+            "sub_category_id": 2,
+            "description": "The oldest and largest park in Colombo, perfect for a leisurely stroll or picnic.",
+            "duration": "1-2 hours",
+            "latitude": 6.9121,
+            "longitude": 79.8641,
+            "best_time": "afternoon",
+            "cost_level": "free"
+          },
+          {
+            "activity_name": "Old Dutch Hospital",
+            "category": "Culinary",
+            "sub_category_id": 9,
+            "description": "A historic building converted into a shopping and dining precinct.",
+            "duration": "1-2 hours",
+            "latitude": 6.9339,
+            "longitude": 79.8412,
+            "best_time": "evening",
+            "cost_level": "medium"
+          }
+        ]
+      },
+      {
+        "day": 3,
+        "date": "2025-11-25",
+        "city": "Colombo",
+        "pax": {
+          "adults": 3,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Pettah Market",
+            "category": "Experience",
+            "sub_category_id": 10,
+            "description": "A bustling market area offering a variety of goods and a local shopping experience.",
+            "duration": "2-3 hours",
+            "latitude": 6.9395,
+            "longitude": 79.8563,
+            "best_time": "morning",
+            "cost_level": "low"
+          },
+          {
+            "activity_name": "Lotus Tower",
+            "category": "Entertainment",
+            "sub_category_id": 2,
+            "description": "The tallest structure in South Asia offering panoramic views of the city.",
+            "duration": "1-2 hours",
+            "latitude": 6.9273,
+            "longitude": 79.856,
+            "best_time": "afternoon",
+            "cost_level": "medium"
+          },
+          {
+            "activity_name": "Independence Square",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "A national monument in Sri Lanka built for commemoration of the independence of Sri Lanka from British rule.",
+            "duration": "1 hour",
+            "latitude": 6.9099,
+            "longitude": 79.8664,
+            "best_time": "evening",
+            "cost_level": "free"
+          }
+        ]
+      },
+      {
+        "day": 4,
+        "date": "2025-11-26",
+        "city": "Kandy",
+        "pax": {
+          "adults": 3,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Temple of the Sacred Tooth Relic",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "A UNESCO World Heritage site, this temple houses a relic of the tooth of Buddha.",
+            "duration": "2-3 hours",
+            "latitude": 7.2939,
+            "longitude": 80.6411,
+            "best_time": "morning",
+            "cost_level": "low"
+          },
+          {
+            "activity_name": "Kandy Lake",
+            "category": "Experience",
+            "sub_category_id": 10,
+            "description": "A beautiful lake in the heart of the city, perfect for a relaxing stroll.",
+            "duration": "1-2 hours",
+            "latitude": 7.2906,
+            "longitude": 80.6402,
+            "best_time": "afternoon",
+            "cost_level": "free"
+          },
+          {
+            "activity_name": "Cultural Show",
+            "category": "Entertainment",
+            "sub_category_id": 2,
+            "description": "A vibrant performance showcasing traditional Kandyan dance and music.",
+            "duration": "1-2 hours",
+            "latitude": 7.2904,
+            "longitude": 80.641,
+            "best_time": "evening",
+            "cost_level": "medium"
+          }
+        ]
+      },
+      {
+        "day": 5,
+        "date": "2025-11-27",
+        "city": "Kandy",
+        "pax": {
+          "adults": 3,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Royal Botanic Gardens",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "A sprawling garden with a wide variety of plant species and stunning landscapes.",
+            "duration": "2-3 hours",
+            "latitude": 7.2713,
+            "longitude": 80.5953,
+            "best_time": "morning",
+            "cost_level": "low"
+          },
+          {
+            "activity_name": "Bahirawakanda Vihara Buddha Statue",
+            "category": "Experience",
+            "sub_category_id": 10,
+            "description": "A giant Buddha statue offering panoramic views of Kandy city.",
+            "duration": "1-2 hours",
+            "latitude": 7.2906,
+            "longitude": 80.6288,
+            "best_time": "afternoon",
+            "cost_level": "low"
+          },
+          {
+            "activity_name": "Kandy View Point",
+            "category": "Adventure",
+            "sub_category_id": 1,
+            "description": "A short hike to a viewpoint offering stunning views of Kandy and its surroundings.",
+            "duration": "1 hour",
+            "latitude": 7.2909,
+            "longitude": 80.6436,
+            "best_time": "evening",
+            "cost_level": "free"
+          }
+        ]
+      },
+      {
+        "day": 6,
+        "date": "2025-11-28",
+        "city": "Kandy",
+        "pax": {
+          "adults": 3,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Udawatta Kele Sanctuary",
+            "category": "Adventure",
+            "sub_category_id": 1,
+            "description": "A forest reserve located on a hill-ridge in the city of Kandy, perfect for nature lovers.",
+            "duration": "2-3 hours",
+            "latitude": 7.2965,
+            "longitude": 80.6413,
+            "best_time": "morning",
+            "cost_level": "low"
+          },
+          {
+            "activity_name": "Tea Museum",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "A museum dedicated to the history of tea in Sri Lanka, located in an old tea factory.",
+            "duration": "1-2 hours",
+            "latitude": 7.2486,
+            "longitude": 80.6431,
+            "best_time": "afternoon",
+            "cost_level": "medium"
+          },
+          {
+            "activity_name": "Helga's Folly",
+            "category": "Culinary",
+            "sub_category_id": 9,
+            "description": "An eccentric hotel known for its unique decor and delicious meals.",
+            "duration": "1-2 hours",
+            "latitude": 7.2818,
+            "longitude": 80.6532,
+            "best_time": "evening",
+            "cost_level": "medium"
+          }
+        ]
+      },
+      {
+        "day": 7,
+        "date": "2025-11-29",
+        "city": "Nuwara Eliya",
+        "pax": {
+          "adults": 3,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Horton Plains National Park",
+            "category": "Adventure",
+            "sub_category_id": 1,
+            "description": "A protected area in the central highlands known for its biodiversity and scenic beauty.",
+            "duration": "half day",
+            "latitude": 6.8028,
+            "longitude": 80.7882,
+            "best_time": "morning",
+            "cost_level": "medium"
+          },
+          {
+            "activity_name": "Pedro Tea Estate",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "A working tea factory offering guided tours and tastings.",
+            "duration": "1-2 hours",
+            "latitude": 6.9497,
+            "longitude": 80.7891,
+            "best_time": "afternoon",
+            "cost_level": "low"
+          },
+          {
+            "activity_name": "Gregory Lake",
+            "category": "Experience",
+            "sub_category_id": 10,
+            "description": "A picturesque lake ideal for boating and picnics.",
+            "duration": "1-2 hours",
+            "latitude": 6.957,
+            "longitude": 80.769,
+            "best_time": "evening",
+            "cost_level": "low"
+          }
+        ]
+      },
+      {
+        "day": 8,
+        "date": "2025-11-30",
+        "city": "Nuwara Eliya",
+        "pax": {
+          "adults": 3,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Seetha Amman Temple",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "A temple with a rich history linking it to the Ramayana mythology.",
+            "duration": "1-2 hours",
+            "latitude": 6.9517,
+            "longitude": 80.7899,
+            "best_time": "morning",
+            "cost_level": "low"
+          },
+          {
+            "activity_name": "Victoria Park",
+            "category": "Entertainment",
+            "sub_category_id": 2,
+            "description": "A well-maintained park ideal for a relaxing walk or bird watching.",
+            "duration": "1-2 hours",
+            "latitude": 6.9736,
+            "longitude": 80.7665,
+            "best_time": "afternoon",
+            "cost_level": "low"
+          },
+          {
+            "activity_name": "High Tea at The Grand Hotel",
+            "category": "Culinary",
+            "sub_category_id": 9,
+            "description": "Enjoy a traditional high tea at one of Nuwara Eliya's most iconic hotels.",
+            "duration": "1-2 hours",
+            "latitude": 6.9732,
+            "longitude": 80.7636,
+            "best_time": "evening",
+            "cost_level": "high"
+          }
+        ]
+      },
+      {
+        "day": 9,
+        "date": "2025-12-01",
+        "city": "Nuwara Eliya",
+        "pax": {
+          "adults": 3,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Ambewela Farm",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "A dairy farm offering tours and a chance to see farm animals up close.",
+            "duration": "2-3 hours",
+            "latitude": 6.9124,
+            "longitude": 80.7882,
+            "best_time": "morning",
+            "cost_level": "low"
+          },
+          {
+            "activity_name": "Lover's Leap Waterfall",
+            "category": "Adventure",
+            "sub_category_id": 1,
+            "description": "A short hike to a beautiful waterfall with a scenic view.",
+            "duration": "1-2 hours",
+            "latitude": 6.9635,
+            "longitude": 80.7852,
+            "best_time": "afternoon",
+            "cost_level": "free"
+          }
+        ]
+      }
+    ],
+    "travel_data": {
+      "destination": [
+        "Colombo",
+        "Kandy",
+        "Nuwara Eliya",
+        "Galle"
+      ],
+      "optimized_route": [
+        "Colombo",
+        "Kandy",
+        "Nuwara Eliya",
+        "Galle"
+      ],
+      "city_stays": [
+        {
+          "city": "Colombo",
+          "nights": 2,
+          "gps_coordinates": [
+            6.9271,
+            79.8612
+          ],
+          "check_in": 1,
+          "check_out": 3
+        },
+        {
+          "city": "Kandy",
+          "nights": 2,
+          "gps_coordinates": [
+            7.2906,
+            80.6337
+          ],
+          "check_in": 3,
+          "check_out": 5
+        },
+        {
+          "city": "Nuwara Eliya",
+          "nights": 2,
+          "gps_coordinates": [
+            6.9497,
+            80.7891
+          ],
+          "check_in": 5,
+          "check_out": 7
+        },
+        {
+          "city": "Galle",
+          "nights": 2,
+          "gps_coordinates": [
+            6.0328,
+            80.2168
+          ],
+          "check_in": 7,
+          "check_out": 9
+        }
+      ],
+      "duration": "9 days",
+      "total_nights": 8,
+      "travel_dates": {
+        "start": "2025-11-23",
+        "end": "2025-12-01"
+      },
+      "pax": {
+        "adults": 3,
+        "children": 0,
+        "child_ages": []
+      },
+      "meal_plan": "Bed & Breakfast",
+      "hotel_category": "4-star",
+      "additional_requests": "Interested in cultural sites, natural landscapes, wildlife experiences, and city visits.",
+      "activity_preferences": "popular_attractions",
+      "budget_level": "mid-range",
+      "city_details": [
+        {
+          "city": "Colombo",
+          "nights": 2,
+          "activity_focus": "top_attractions",
+          "days_in_city": 3
+        },
+        {
+          "city": "Kandy",
+          "nights": 2,
+          "activity_focus": "top_attractions",
+          "days_in_city": 3
+        },
+        {
+          "city": "Nuwara Eliya",
+          "nights": 2,
+          "activity_focus": "top_attractions",
+          "days_in_city": 3
+        },
+        {
+          "city": "Galle",
+          "nights": 2,
+          "activity_focus": "top_attractions",
+          "days_in_city": 3
+        }
+      ],
+      "total_cities": 4,
+      "activity_summary": {
+        "total_cities": 4,
+        "total_days": 12,
+        "activity_details": [
+          "Colombo: 3 days of activities",
+          "Kandy: 3 days of activities",
+          "Nuwara Eliya: 3 days of activities",
+          "Galle: 3 days of activities"
+        ]
+      }
+    },
+    "user_id": 655,
+    "force_new_cart": true,
+    "metadata": {
+      "total_days": 9,
+      "total_activities": 26,
+      "generated_at": "2025-11-10T07:32:29.568Z",
+      "generation_method": "OpenAI GPT-4o",
+      "note": "Activities only - no hotels included",
+      "cart_reference": "CART_1762759890612_SP5ORVB",
+      "cart_name": "Journey Colombo Voyage #321",
+      "request_id": "REQ_1762759890612_SP5ORVB"
+    }
+  }
+]
