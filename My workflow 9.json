@@ -433,7 +433,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $json;\n\nconst sheetMap = {\n  'Singapore': 'SG',\n  'Vietnam': 'VN',\n  'Sri Lanka': 'LK',\n  'Malaysia': 'MY',\n};\n\nconst country = input.country;\nconst sheetName = sheetMap[country] || 'Sheet3';\n\nconst out = [];\n\nfor (const day of input.itinerary || []) {\n  // Skip days with no city OR no accommodation OR no star_category\n  if (!day.city || !day.accommodation || day.accommodation.star_category == null) {\n    continue;\n  }\n\n  let hotelClass = day.accommodation.star_category;\n\n  // Normalise \"4-star\" → 4\n  if (typeof hotelClass === 'string') {\n    const m = hotelClass.match(/\\d/);\n    if (m) hotelClass = Number(m[0]);\n  }\n\n  out.push({\n    json: {\n      sheetName,\n      city: day.city,\n      hotelClass,\n      day: day.day,\n      date: day.date,\n    },\n  });\n}\n\nreturn out;"
+        "jsCode": "// Extract hotel booking data with city, hotel class, and day information\nconst input = items[0].json;\n\nconst itinerary = input.itinerary || [];\nconst travelData = input.travel_data || {};\nconst destination = travelData.destination || [];\n\nconst output = [];\n\nfor (const day of itinerary) {\n  // Skip days with no city OR no accommodation OR no star_category\n  if (!day.city || !day.accommodation || day.accommodation.star_category == null) {\n    continue;\n  }\n\n  let hotelClass = day.accommodation.star_category;\n\n  // Normalize \"4-star\" → 4\n  if (typeof hotelClass === 'string') {\n    const m = hotelClass.match(/\\d/);\n    if (m) hotelClass = Number(m[0]);\n  }\n\n  output.push({\n    json: {\n      city: day.city,\n      hotelClass: hotelClass,\n      day: day.day,\n      date: day.date,\n      destination: destination // Pass destination array to filter sheets\n    },\n  });\n}\n\nreturn output;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -442,7 +442,7 @@
         16
       ],
       "id": "ebaae02a-79c0-482b-8091-9c4b73b319c8",
-      "name": "Code in JavaScript"
+      "name": "Prepare Hotels Data"
     },
     {
       "parameters": {
@@ -453,19 +453,32 @@
         },
         "sheetName": {
           "__rl": true,
-          "value": "Sheet3",
+          "value": "={{ $json.sheetName || 'Sheet3' }}",
           "mode": "name"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "column": "City",
+              "value": "={{ $json.city }}"
+            },
+            {
+              "column": "Hotel Class",
+              "value": "={{ $json.hotelClass }}"
+            }
+          ],
+          "combineOperation": "AND"
         },
         "options": {}
       },
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1264,
+        1328,
         16
       ],
       "id": "99ad2539-6469-47ce-94d2-558b571467ad",
-      "name": "Get row(s) in sheet",
+      "name": "Get Hotels from Sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "4bqLa45KMMhTDuqo",
@@ -475,7 +488,20 @@
     },
     {
       "parameters": {
-        "jsCode": "// Get the main object\nconst input = items[0].json;\n\nconst itinerary = input.itinerary || [];\nconst cityStays = (input.travel_data && input.travel_data.city_stays) || [];\nconst defaultPax = (input.travel_data && input.travel_data.pax) || { adults: null, children: null };\n\n// Helper: find GPS for a city from travel_data.city_stays\nfunction getCityGps(cityName) {\n  const match = cityStays.find(c => c.city === cityName);\n  if (!match || !match.gps_coordinates) return { lat: null, lon: null };\n  return {\n    lat: match.gps_coordinates.lat,\n    lon: match.gps_coordinates.lon,\n  };\n}\n\nconst output = [];\n\nfor (const day of itinerary) {\n  const gps = getCityGps(day.city);\n  const pax = day.pax || defaultPax;\n\n  output.push({\n    json: {\n      day: day.day,\n      date: day.date,\n      city: day.city,\n      city_lat: gps.lat,\n      city_lon: gps.lon,\n      adults: pax.adults,\n      children: pax.children,\n    },\n  });\n}\n\nreturn output;"
+        "jsCode": "// Format hotel data from Google Sheets to match API requirements\n// Filter by destination cities from Prepare Hotels Data\nconst sheetData = $input.all();\nconst parsedItinerary = $('Parse Itinerary Response').first().json;\nconst prepareHotelsData = $('Prepare Hotels Data').all();\n\n// Get the list of destination cities from Prepare Hotels Data\nconst destinationCities = [];\nif (prepareHotelsData.length > 0 && prepareHotelsData[0].json.destination) {\n  destinationCities.push(...prepareHotelsData[0].json.destination);\n}\n\n// Extract hotel parameters from sheet data and group by city\n// Only include cities that are in the destination list\nconst hotelsByCity = {};\n\nsheetData.forEach(item => {\n  const city = item.json.City;\n  \n  // Only include hotels for cities in the destination list\n  if (destinationCities.includes(city)) {\n    if (!hotelsByCity[city]) {\n      hotelsByCity[city] = [];\n    }\n    \n    hotelsByCity[city].push({\n      City: item.json.City,\n      \"Hotel Class\": item.json[\"Hotel Class\"],\n      \"Hotel Name\": item.json[\"Hotel Name\"],\n      \"Aahaas Hotel ID\": item.json[\"Aahaas Hotel ID\"],\n      \"Apple Hotel ID\": item.json[\"Apple Hotel ID\"],\n      \"Basic Room Categoty\": item.json[\"Basic Room Categoty\"] // Note: typo in original sheet name\n    });\n  }\n});\n\n// Merge hotel parameters with parsed itinerary data\nconst enrichedData = {\n  ...parsedItinerary,\n  hotel_parameters: hotelsByCity,\n  destination_cities: destinationCities // Include for reference\n};\n\nreturn [{\n  json: enrichedData\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1552,
+        16
+      ],
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Format Hotel Parameters"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract activities data with city and GPS information\nconst input = items[0].json;\n\nconst itinerary = input.itinerary || [];\nconst cityStays = (input.travel_data && input.travel_data.city_stays) || [];\nconst defaultPax = (input.travel_data && input.travel_data.pax) || { adults: null, children: null };\n\n// Helper: find GPS for a city from travel_data.city_stays\nfunction getCityGps(cityName) {\n  const match = cityStays.find(c => c.city === cityName);\n  if (!match || !match.gps_coordinates) return { lat: null, lon: null };\n  return {\n    lat: match.gps_coordinates.lat,\n    lon: match.gps_coordinates.lon,\n  };\n}\n\nconst output = [];\n\nfor (const day of itinerary) {\n  const gps = getCityGps(day.city);\n  const pax = day.pax || defaultPax;\n\n  output.push({\n    json: {\n      day: day.day,\n      date: day.date,\n      city: day.city,\n      city_lat: gps.lat,\n      city_lon: gps.lon,\n      adults: pax.adults,\n      children: pax.children,\n    },\n  });\n}\n\nreturn output;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -484,7 +510,7 @@
         496
       ],
       "id": "c46213e3-5a36-4425-80fe-6e9a81720f52",
-      "name": "Code in JavaScript1"
+      "name": "Prepare Activities Data"
     },
     {
       "parameters": {
@@ -498,6 +524,15 @@
           "value": "Sheet4",
           "mode": "name"
         },
+        "filters": {
+          "conditions": [
+            {
+              "column": "City",
+              "value": "={{ $json.city }}"
+            }
+          ],
+          "combineOperation": "AND"
+        },
         "options": {}
       },
       "type": "n8n-nodes-base.googleSheets",
@@ -507,13 +542,26 @@
         496
       ],
       "id": "fe4a1396-2958-455e-9e7f-763054ebed2b",
-      "name": "Get row(s) in sheet1",
+      "name": "Get Activities from Sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "4bqLa45KMMhTDuqo",
           "name": "Google Sheets account 2"
         }
       }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format activities data from Google Sheets to match API requirements\nconst sheetData = $input.all();\nconst parsedActivities = $('Parse Activities Response').first().json;\n\n// Extract activity parameters from sheet data and group by city\nconst activitiesByCity = {};\n\nsheetData.forEach(item => {\n  const city = item.json.City;\n  if (!activitiesByCity[city]) {\n    activitiesByCity[city] = [];\n  }\n  \n  activitiesByCity[city].push({\n    City: item.json.City,\n    \"Lifestyle Category\": item.json[\"Lifestyle  Category\"],\n    \"Must Do Activity\": item.json[\"Must Do Activity\"],\n    \"Aahaas ID\": item.json[\"Aahaas  ID\"],\n    \"Apple ID\": item.json[\"Apple ID\"],\n    \"Extra1\": item.json.Extra1,\n    \"Extra2\": item.json.Extra2\n  });\n});\n\n// Merge activity parameters with parsed itinerary data\nconst enrichedData = {\n  ...parsedActivities,\n  activities_parameters: activitiesByCity\n};\n\nreturn [{\n  json: enrichedData\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        496
+      ],
+      "id": "b2c3d4e5-f6a7-8901-bcde-fg2345678901",
+      "name": "Format Activity Parameters"
     }
   ],
   "pinData": {},
@@ -621,12 +669,7 @@
       "main": [
         [
           {
-            "node": "Send to Activities API",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Code in JavaScript1",
+            "node": "Prepare Activities Data",
             "type": "main",
             "index": 0
           }
@@ -796,34 +839,73 @@
       "main": [
         [
           {
+            "node": "Prepare Hotels Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Hotels Data": {
+      "main": [
+        [
+          {
+            "node": "Get Hotels from Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Hotels from Sheet": {
+      "main": [
+        [
+          {
+            "node": "Format Hotel Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Hotel Parameters": {
+      "main": [
+        [
+          {
             "node": "Send to Hotels API",
             "type": "main",
             "index": 0
-          },
+          }
+        ]
+      ]
+    },
+    "Prepare Activities Data": {
+      "main": [
+        [
           {
-            "node": "Code in JavaScript",
+            "node": "Get Activities from Sheet",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Code in JavaScript": {
+    "Get Activities from Sheet": {
       "main": [
         [
           {
-            "node": "Get row(s) in sheet",
+            "node": "Format Activity Parameters",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Code in JavaScript1": {
+    "Format Activity Parameters": {
       "main": [
         [
           {
-            "node": "Get row(s) in sheet1",
+            "node": "Send to Activities API",
             "type": "main",
             "index": 0
           }
