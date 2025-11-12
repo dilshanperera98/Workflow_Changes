@@ -475,34 +475,6 @@
     },
     {
       "parameters": {
-        "mode": "combine",
-        "combinationMode": "mergeByPosition",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 3,
-      "position": [
-        1488,
-        96
-      ],
-      "id": "merge-hotels-sheet-data",
-      "name": "Merge Hotels Sheet Data"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Format merged data for Hotels API\nconst apiData = $input.first().json;\nconst allItems = $input.all();\n\n// Collect all sheet data from the merged inputs\nconst sheetData = [];\nfor (let i = 1; i < allItems.length; i++) {\n  if (allItems[i].json) {\n    sheetData.push(allItems[i].json);\n  }\n}\n\n// Add sheet data to the API payload\nif (sheetData.length > 0) {\n  apiData.sheet_hotel_data = sheetData;\n}\n\nreturn [{ json: apiData }];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1712,
-        96
-      ],
-      "id": "format-hotels-api-payload",
-      "name": "Format Hotels API Payload"
-    },
-    {
-      "parameters": {
         "jsCode": "// Get the main object\nconst input = items[0].json;\n\nconst itinerary = input.itinerary || [];\nconst cityStays = (input.travel_data && input.travel_data.city_stays) || [];\nconst defaultPax = (input.travel_data && input.travel_data.pax) || { adults: null, children: null };\n\n// Helper: find GPS for a city from travel_data.city_stays\nfunction getCityGps(cityName) {\n  const match = cityStays.find(c => c.city === cityName);\n  if (!match || !match.gps_coordinates) return { lat: null, lon: null };\n  return {\n    lat: match.gps_coordinates.lat,\n    lon: match.gps_coordinates.lon,\n  };\n}\n\nconst output = [];\n\nfor (const day of itinerary) {\n  const gps = getCityGps(day.city);\n  const pax = day.pax || defaultPax;\n\n  output.push({\n    json: {\n      day: day.day,\n      date: day.date,\n      city: day.city,\n      city_lat: gps.lat,\n      city_lon: gps.lon,\n      adults: pax.adults,\n      children: pax.children,\n    },\n  });\n}\n\nreturn output;"
       },
       "type": "n8n-nodes-base.code",
@@ -542,34 +514,6 @@
           "name": "Google Sheets account 2"
         }
       }
-    },
-    {
-      "parameters": {
-        "mode": "combine",
-        "combinationMode": "mergeByPosition",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 3,
-      "position": [
-        1424,
-        576
-      ],
-      "id": "merge-activities-sheet-data",
-      "name": "Merge Activities Sheet Data"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Format merged data for Activities API\nconst apiData = $input.first().json;\nconst allItems = $input.all();\n\n// Collect all sheet data from the merged inputs\nconst sheetData = [];\nfor (let i = 1; i < allItems.length; i++) {\n  if (allItems[i].json) {\n    sheetData.push(allItems[i].json);\n  }\n}\n\n// Add sheet data to the API payload\nif (sheetData.length > 0) {\n  apiData.sheet_activity_data = sheetData;\n}\n\nreturn [{ json: apiData }];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1648,
-        576
-      ],
-      "id": "format-activities-api-payload",
-      "name": "Format Activities API Payload"
     }
   ],
   "pinData": {},
@@ -677,12 +621,12 @@
       "main": [
         [
           {
-            "node": "Code in JavaScript1",
+            "node": "Send to Activities API",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Merge Activities Sheet Data",
+            "node": "Code in JavaScript1",
             "type": "main",
             "index": 0
           }
@@ -852,12 +796,12 @@
       "main": [
         [
           {
-            "node": "Code in JavaScript",
+            "node": "Send to Hotels API",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Merge Hotels Sheet Data",
+            "node": "Code in JavaScript",
             "type": "main",
             "index": 0
           }
@@ -875,77 +819,11 @@
         ]
       ]
     },
-    "Get row(s) in sheet": {
-      "main": [
-        [
-          {
-            "node": "Merge Hotels Sheet Data",
-            "type": "main",
-            "index": 1
-          }
-        ]
-      ]
-    },
-    "Merge Hotels Sheet Data": {
-      "main": [
-        [
-          {
-            "node": "Format Hotels API Payload",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Format Hotels API Payload": {
-      "main": [
-        [
-          {
-            "node": "Send to Hotels API",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Code in JavaScript1": {
       "main": [
         [
           {
             "node": "Get row(s) in sheet1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get row(s) in sheet1": {
-      "main": [
-        [
-          {
-            "node": "Merge Activities Sheet Data",
-            "type": "main",
-            "index": 1
-          }
-        ]
-      ]
-    },
-    "Merge Activities Sheet Data": {
-      "main": [
-        [
-          {
-            "node": "Format Activities API Payload",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Format Activities API Payload": {
-      "main": [
-        [
-          {
-            "node": "Send to Activities API",
             "type": "main",
             "index": 0
           }
