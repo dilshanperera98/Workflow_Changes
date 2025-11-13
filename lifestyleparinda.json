@@ -1,0 +1,465 @@
+[
+  {
+    "user_id": 655,
+    "itinerary_title": "Odyssey Colombo Package #600 - 6 days (2025-11-25)",
+    "cart_name": "Odyssey Colombo Package #600",
+    "cart_reference": "CART_1763005775510_AB3HW3V",
+    "request_id": "REQ_1763005775510_AB3HW3V",
+    "itinerary": [
+      {
+        "day": 1,
+        "date": "2025-11-25",
+        "city": "Colombo",
+        "pax": {
+          "adults": 4,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Galle Face Green",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "Scenic promenade in Colombo city center",
+            "duration": "2 hours",
+            "latitude": 6.9271,
+            "longitude": 79.8612,
+            "best_time": "evening",
+            "cost_level": "free"
+          },
+          {
+            "activity_name": "National Museum of Colombo",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "Sri Lanka's largest museum in Colombo",
+            "duration": "2-3 hours",
+            "latitude": 6.9074,
+            "longitude": 79.8612,
+            "best_time": "morning",
+            "cost_level": "low"
+          }
+        ]
+      },
+      {
+        "day": 2,
+        "date": "2025-11-26",
+        "city": "Colombo",
+        "pax": {
+          "adults": 4,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Colombo Dutch Hospital",
+            "category": "Culinary",
+            "sub_category_id": 9,
+            "description": "Historic shopping and dining precinct in Colombo",
+            "duration": "2-3 hours",
+            "latitude": 6.9329,
+            "longitude": 79.841,
+            "best_time": "afternoon",
+            "cost_level": "medium"
+          },
+          {
+            "activity_name": "Viharamahadevi Park",
+            "category": "Experience",
+            "sub_category_id": 10,
+            "description": "Beautiful public park in Colombo with a variety of flora",
+            "duration": "1-2 hours",
+            "latitude": 6.9185,
+            "longitude": 79.8612,
+            "best_time": "morning",
+            "cost_level": "free"
+          }
+        ]
+      },
+      {
+        "day": 3,
+        "date": "2025-11-27",
+        "city": "Kandy",
+        "pax": {
+          "adults": 4,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Temple of the Sacred Tooth Relic",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "Buddhist temple housing relic of the tooth of Buddha in Kandy",
+            "duration": "2 hours",
+            "latitude": 7.2932,
+            "longitude": 80.6417,
+            "best_time": "morning",
+            "cost_level": "medium"
+          },
+          {
+            "activity_name": "Kandy Lake",
+            "category": "Experience",
+            "sub_category_id": 10,
+            "description": "Picturesque lake in the heart of Kandy",
+            "duration": "1-2 hours",
+            "latitude": 7.2906,
+            "longitude": 80.6374,
+            "best_time": "afternoon",
+            "cost_level": "free"
+          }
+        ]
+      },
+      {
+        "day": 4,
+        "date": "2025-11-28",
+        "city": "Kandy",
+        "pax": {
+          "adults": 4,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Royal Botanical Gardens",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "Extensive gardens with a wide array of plants in Kandy",
+            "duration": "2-3 hours",
+            "latitude": 7.2713,
+            "longitude": 80.5957,
+            "best_time": "morning",
+            "cost_level": "low"
+          },
+          {
+            "activity_name": "Kandy View Point",
+            "category": "Adventure",
+            "sub_category_id": 1,
+            "description": "Scenic viewpoint offering a panoramic view of Kandy",
+            "duration": "1 hour",
+            "latitude": 7.2908,
+            "longitude": 80.6457,
+            "best_time": "evening",
+            "cost_level": "free"
+          }
+        ]
+      },
+      {
+        "day": 5,
+        "date": "2025-11-29",
+        "city": "Sigiriya",
+        "pax": {
+          "adults": 4,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Sigiriya Rock Fortress",
+            "category": "Adventure",
+            "sub_category_id": 1,
+            "description": "Ancient rock fortress with frescoes and gardens in Sigiriya",
+            "duration": "3-4 hours",
+            "latitude": 7.9569,
+            "longitude": 80.7598,
+            "best_time": "morning",
+            "cost_level": "medium"
+          },
+          {
+            "activity_name": "Pidurangala Rock",
+            "category": "Adventure",
+            "sub_category_id": 1,
+            "description": "Offers stunning views over Sigiriya from a nearby rock",
+            "duration": "2-3 hours",
+            "latitude": 7.9647,
+            "longitude": 80.7591,
+            "best_time": "afternoon",
+            "cost_level": "low"
+          }
+        ]
+      },
+      {
+        "day": 6,
+        "date": "2025-11-30",
+        "city": "Galle",
+        "pax": {
+          "adults": 4,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Galle Fort",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "Historic fortification with colonial architecture in Galle",
+            "duration": "2-3 hours",
+            "latitude": 6.0269,
+            "longitude": 80.217,
+            "best_time": "morning",
+            "cost_level": "free"
+          },
+          {
+            "activity_name": "Jungle Beach",
+            "category": "Experience",
+            "sub_category_id": 10,
+            "description": "Secluded beach with calm waters near Galle",
+            "duration": "2-3 hours",
+            "latitude": 6.0246,
+            "longitude": 80.2414,
+            "best_time": "afternoon",
+            "cost_level": "free"
+          }
+        ]
+      }
+    ],
+    "travel_data": {
+      "destination": [
+        "Colombo",
+        "Kandy",
+        "Sigiriya",
+        "Galle"
+      ],
+      "optimized_route": [
+        "Colombo",
+        "Kandy",
+        "Sigiriya",
+        "Galle"
+      ],
+      "city_stays": [
+        {
+          "city": "Colombo",
+          "gps_coordinates": {
+            "lat": 6.9271,
+            "lon": 79.8612
+          },
+          "check_in": "Day 1",
+          "check_out": "Day 2"
+        },
+        {
+          "city": "Kandy",
+          "gps_coordinates": {
+            "lat": 7.2906,
+            "lon": 80.6337
+          },
+          "check_in": "Day 2",
+          "check_out": "Day 3"
+        },
+        {
+          "city": "Sigiriya",
+          "gps_coordinates": {
+            "lat": 7.9569,
+            "lon": 80.7603
+          },
+          "check_in": "Day 3",
+          "check_out": "Day 4"
+        },
+        {
+          "city": "Galle",
+          "gps_coordinates": {
+            "lat": 6.0326,
+            "lon": 80.2168
+          },
+          "check_in": "Day 4",
+          "check_out": "Day 6"
+        }
+      ],
+      "duration": "6 days",
+      "total_nights": null,
+      "travel_dates": {
+        "start": "2025-11-25",
+        "end": "2025-11-30"
+      },
+      "pax": {
+        "adults": 4,
+        "children": 0,
+        "child_ages": []
+      },
+      "meal_plan": "bed & breakfast",
+      "hotel_category": "4-star",
+      "additional_requests": "Mid-range budget, popular tourist attractions, cultural experiences",
+      "activity_preferences": "popular_attractions",
+      "budget_level": "mid-range",
+      "city_details": [
+        {
+          "city": "Colombo",
+          "activity_focus": "top_attractions"
+        },
+        {
+          "city": "Kandy",
+          "activity_focus": "top_attractions"
+        },
+        {
+          "city": "Sigiriya",
+          "activity_focus": "top_attractions"
+        },
+        {
+          "city": "Galle",
+          "activity_focus": "top_attractions"
+        }
+      ],
+      "total_cities": 4,
+      "activity_summary": {
+        "total_cities": 4,
+        "total_activity_days": null,
+        "activity_details": [
+          "Colombo: undefined days of activities (2 per day)",
+          "Kandy: undefined days of activities (2 per day)",
+          "Sigiriya: undefined days of activities (2 per day)",
+          "Galle: undefined days of activities (2 per day)"
+        ]
+      }
+    },
+    "force_new_cart": false,
+    "google_sheets_activities": [
+      {
+        "city": "Colombo",
+        "lifestyle_category": "City Tours",
+        "must_do_activity": "Colombo Full Day City Tour",
+        "aahaas_id": 4321,
+        "apple_id": 1051
+      },
+      {
+        "city": "Colombo",
+        "lifestyle_category": "Attraction",
+        "must_do_activity": "Lotus Tower - Entrance Ticket  , Gangarama Temple  ,  National Museum ,  Puppet art museum",
+        "aahaas_id": "5200 , 6592 , 12918 ,  4660",
+        "apple_id": 44363022049
+      },
+      {
+        "city": "Colombo",
+        "lifestyle_category": "Excursion",
+        "must_do_activity": "Colombo to Bentota Excusrion",
+        "aahaas_id": 4536,
+        "apple_id": 105
+      },
+      {
+        "city": "Kandy",
+        "lifestyle_category": "City Tours",
+        "must_do_activity": "Kandy Full Day City Tour 8 Hours",
+        "aahaas_id": 4332,
+        "apple_id": 1045
+      },
+      {
+        "city": "Kandy",
+        "lifestyle_category": "Attraction",
+        "must_do_activity": "Peradeniya Botanical Garden Entrance Tickets , Cultural Show Entrance Tickets",
+        "aahaas_id": "4656 , 5208",
+        "apple_id": "260, 262"
+      },
+      {
+        "city": "Kandy",
+        "lifestyle_category": "Excursion",
+        "must_do_activity": "Kandy  to Nuwara Eliya Excursion",
+        "aahaas_id": 4546,
+        "apple_id": 58
+      },
+      {
+        "city": "Galle",
+        "lifestyle_category": "City Tours",
+        "must_do_activity": "Half Day City Tour",
+        "aahaas_id": 12688,
+        "apple_id": 12
+      },
+      {
+        "city": "Galle",
+        "lifestyle_category": "Attraction",
+        "must_do_activity": "Galle Dutch Fort - Entrance Ticket Only",
+        "aahaas_id": 5230,
+        "apple_id": 288
+      },
+      {
+        "city": "Galle",
+        "lifestyle_category": "Excursion",
+        "must_do_activity": "Galle to Bentota Excusrion",
+        "aahaas_id": 4635,
+        "apple_id": 89
+      }
+    ],
+    "activities_by_city": {
+      "Colombo": [
+        {
+          "lifestyle_category": "City Tours",
+          "must_do_activity": "Colombo Full Day City Tour",
+          "aahaas_id": 4321,
+          "apple_id": 1051,
+          "city": "Colombo"
+        },
+        {
+          "lifestyle_category": "Attraction",
+          "must_do_activity": "Lotus Tower - Entrance Ticket  , Gangarama Temple  ,  National Museum ,  Puppet art museum",
+          "aahaas_id": "5200 , 6592 , 12918 ,  4660",
+          "apple_id": 44363022049,
+          "city": "Colombo"
+        },
+        {
+          "lifestyle_category": "Excursion",
+          "must_do_activity": "Colombo to Bentota Excusrion",
+          "aahaas_id": 4536,
+          "apple_id": 105,
+          "city": "Colombo"
+        }
+      ],
+      "Kandy": [
+        {
+          "lifestyle_category": "City Tours",
+          "must_do_activity": "Kandy Full Day City Tour 8 Hours",
+          "aahaas_id": 4332,
+          "apple_id": 1045,
+          "city": "Kandy"
+        },
+        {
+          "lifestyle_category": "Attraction",
+          "must_do_activity": "Peradeniya Botanical Garden Entrance Tickets , Cultural Show Entrance Tickets",
+          "aahaas_id": "4656 , 5208",
+          "apple_id": "260, 262",
+          "city": "Kandy"
+        },
+        {
+          "lifestyle_category": "Excursion",
+          "must_do_activity": "Kandy  to Nuwara Eliya Excursion",
+          "aahaas_id": 4546,
+          "apple_id": 58,
+          "city": "Kandy"
+        }
+      ],
+      "Galle": [
+        {
+          "lifestyle_category": "City Tours",
+          "must_do_activity": "Half Day City Tour",
+          "aahaas_id": 12688,
+          "apple_id": 12,
+          "city": "Galle"
+        },
+        {
+          "lifestyle_category": "Attraction",
+          "must_do_activity": "Galle Dutch Fort - Entrance Ticket Only",
+          "aahaas_id": 5230,
+          "apple_id": 288,
+          "city": "Galle"
+        },
+        {
+          "lifestyle_category": "Excursion",
+          "must_do_activity": "Galle to Bentota Excusrion",
+          "aahaas_id": 4635,
+          "apple_id": 89,
+          "city": "Galle"
+        }
+      ]
+    },
+    "metadata": {
+      "total_days": 6,
+      "total_activities": 12,
+      "max_activities_per_day": 2,
+      "activities_before_limit": 12,
+      "activities_after_limit": 12,
+      "activities_removed": 0,
+      "generated_at": "2025-11-13T03:50:08.928Z",
+      "generation_method": "OpenAI GPT-4o",
+      "note": "Activities limited to 2 per day - no hotels included",
+      "cart_reference": "CART_1763005775510_AB3HW3V",
+      "cart_name": "Odyssey Colombo Package #600",
+      "request_id": "REQ_1763005775510_AB3HW3V",
+      "validated": true,
+      "validation_time": "2025-11-13T03:50:08.940Z"
+    }
+  }
+]
