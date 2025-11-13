@@ -1,0 +1,225 @@
+[
+  {
+    "user_id": 655,
+    "itinerary_title": "Odyssey Colombo Package #600 - 6 days (2025-11-25)",
+    "cart_name": "Odyssey Colombo Package #600",
+    "cart_reference": "CART_1763005775510_AB3HW3V",
+    "request_id": "REQ_1763005775510_AB3HW3V",
+    "itinerary": [
+      {
+        "day": 1,
+        "date": "2025-11-25",
+        "city": "Colombo",
+        "pax": {
+          "adults": 4,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Galle Face Green",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "Scenic promenade in Colombo city center",
+            "duration": "2 hours",
+            "latitude": 6.9271,
+            "longitude": 79.8612,
+            "best_time": "evening",
+            "cost_level": "free"
+          },
+          {
+            "activity_name": "National Museum of Colombo",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "Sri Lanka's largest museum in Colombo",
+            "duration": "2-3 hours",
+            "latitude": 6.9074,
+            "longitude": 79.8612,
+            "best_time": "morning",
+            "cost_level": "low"
+          }
+        ],
+        "google_sheets_activities": [
+          {
+            "lifestyle_category": "Adventure",
+            "must_do_activity": "Water Sports at Mount Lavinia Beach",
+            "aahaas_id": 101,
+            "apple_id": 201,
+            "extra1": "Beach",
+            "extra2": "Water",
+            "country": "Sri Lanka",
+            "city": "Colombo"
+          },
+          {
+            "lifestyle_category": "Cultural",
+            "must_do_activity": "Visit Gangaramaya Temple",
+            "aahaas_id": 102,
+            "apple_id": 202,
+            "extra1": "Temple",
+            "extra2": "Buddhist",
+            "country": "Sri Lanka",
+            "city": "Colombo"
+          },
+          {
+            "lifestyle_category": "Shopping",
+            "must_do_activity": "Pettah Market Shopping",
+            "aahaas_id": 103,
+            "apple_id": 203,
+            "extra1": "Market",
+            "extra2": "Local",
+            "country": "Sri Lanka",
+            "city": "Colombo"
+          }
+        ]
+      },
+      {
+        "day": 2,
+        "date": "2025-11-26",
+        "city": "Colombo",
+        "pax": {
+          "adults": 4,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Colombo Dutch Hospital",
+            "category": "Culinary",
+            "sub_category_id": 9,
+            "description": "Historic shopping and dining precinct in Colombo",
+            "duration": "2-3 hours",
+            "latitude": 6.9329,
+            "longitude": 79.841,
+            "best_time": "afternoon",
+            "cost_level": "medium"
+          },
+          {
+            "activity_name": "Viharamahadevi Park",
+            "category": "Experience",
+            "sub_category_id": 10,
+            "description": "Beautiful public park in Colombo with a variety of flora",
+            "duration": "1-2 hours",
+            "latitude": 6.9185,
+            "longitude": 79.8612,
+            "best_time": "morning",
+            "cost_level": "free"
+          }
+        ],
+        "google_sheets_activities": [
+          {
+            "lifestyle_category": "Adventure",
+            "must_do_activity": "Water Sports at Mount Lavinia Beach",
+            "aahaas_id": 101,
+            "apple_id": 201,
+            "extra1": "Beach",
+            "extra2": "Water",
+            "country": "Sri Lanka",
+            "city": "Colombo"
+          },
+          {
+            "lifestyle_category": "Cultural",
+            "must_do_activity": "Visit Gangaramaya Temple",
+            "aahaas_id": 102,
+            "apple_id": 202,
+            "extra1": "Temple",
+            "extra2": "Buddhist",
+            "country": "Sri Lanka",
+            "city": "Colombo"
+          },
+          {
+            "lifestyle_category": "Shopping",
+            "must_do_activity": "Pettah Market Shopping",
+            "aahaas_id": 103,
+            "apple_id": 203,
+            "extra1": "Market",
+            "extra2": "Local",
+            "country": "Sri Lanka",
+            "city": "Colombo"
+          }
+        ]
+      },
+      {
+        "day": 3,
+        "date": "2025-11-27",
+        "city": "Kandy",
+        "pax": {
+          "adults": 4,
+          "children": 0,
+          "child_ages": []
+        },
+        "activities": [
+          {
+            "activity_name": "Temple of the Sacred Tooth Relic",
+            "category": "Tours",
+            "sub_category_id": 5,
+            "description": "Buddhist temple housing relic of the tooth of Buddha in Kandy",
+            "duration": "2 hours",
+            "latitude": 7.2932,
+            "longitude": 80.6417,
+            "best_time": "morning",
+            "cost_level": "medium"
+          },
+          {
+            "activity_name": "Kandy Lake",
+            "category": "Experience",
+            "sub_category_id": 10,
+            "description": "Scenic lake in the heart of Kandy",
+            "duration": "1-2 hours",
+            "latitude": 7.2906,
+            "longitude": 80.6337,
+            "best_time": "evening",
+            "cost_level": "free"
+          }
+        ],
+        "google_sheets_activities": [
+          {
+            "lifestyle_category": "Cultural",
+            "must_do_activity": "Kandyan Dance Performance",
+            "aahaas_id": 201,
+            "apple_id": 301,
+            "extra1": "Dance",
+            "extra2": "Traditional",
+            "country": "Sri Lanka",
+            "city": "Kandy"
+          },
+          {
+            "lifestyle_category": "Nature",
+            "must_do_activity": "Royal Botanical Gardens",
+            "aahaas_id": 202,
+            "apple_id": 302,
+            "extra1": "Garden",
+            "extra2": "Flora",
+            "country": "Sri Lanka",
+            "city": "Kandy"
+          },
+          {
+            "lifestyle_category": "Adventure",
+            "must_do_activity": "Hiking Knuckles Mountain Range",
+            "aahaas_id": 203,
+            "apple_id": 303,
+            "extra1": "Hiking",
+            "extra2": "Mountain",
+            "country": "Sri Lanka",
+            "city": "Kandy"
+          }
+        ]
+      }
+    ],
+    "travel_data": {
+      "destination": ["Colombo", "Kandy", "Sigiriya", "Galle"],
+      "duration": "6 days"
+    },
+    "force_new_cart": false,
+    "metadata": {
+      "total_days": 6,
+      "total_activities": 12,
+      "max_activities_per_day": 2,
+      "generated_at": "2025-11-13T03:49:50.962Z",
+      "generation_method": "OpenAI GPT-4o",
+      "note": "Activities with embedded Google Sheets suggestions (limited to 2 per day) - no hotels included",
+      "cart_reference": "CART_1763005775510_AB3HW3V",
+      "cart_name": "Odyssey Colombo Package #600",
+      "request_id": "REQ_1763005775510_AB3HW3V"
+    }
+  }
+]
