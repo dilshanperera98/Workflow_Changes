@@ -1,0 +1,377 @@
+{
+  "name": "Clean Travel Workflow - One Hotel Per City",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "travel-planner",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "webhookId": "travel-planner-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract and validate webhook input\nconst body = $input.first().json.body || {};\nconst emailContent = body.email_content || body.chatInput || '';\nconst userId = body.user_id || 'default-user';\n\nif (!emailContent) {\n  throw new Error('No travel request provided');\n}\n\n// Generate unique identifiers for this request\nconst timestamp = Date.now();\nconst requestId = `REQ_${timestamp}`;\nconst cartReference = `CART_${timestamp}`;\n\nreturn [{\n  json: {\n    chatInput: emailContent,\n    sessionId: userId,\n    request_id: requestId,\n    cart_reference: cartReference,\n    request_timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 300],
+      "id": "extract-input",
+      "name": "Extract Input Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  \"model\": \"gpt-4o\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a travel planner. Parse travel requests and extract structured information in JSON format.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Parse this travel request and provide JSON with: destination (array of cities), travel_dates (start, end), duration, total_nights, pax (adults, children, child_ages), hotel_category, meal_plan, city_stays (array with: city, nights, check_in_day, check_out_day, coordinates).\\n\\nIMPORTANT RULES:\\n1. Calculate nights = days - 1\\n2. If duration not mentioned, use 7 days (6 nights)\\n3. Distribute nights evenly across cities\\n4. First city gets check_in_day=1, each subsequent city starts on checkout day of previous\\n5. Each city needs ONE hotel for all nights in that city\\n\\nTravel request: \" + $json.chatInput + \"\\n\\nRespond with ONLY valid JSON, no markdown.\"\n    }\n  ],\n  \"temperature\": 0.7\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [600, 300],
+      "id": "parse-travel-request",
+      "name": "Parse Travel Request",
+      "credentials": {
+        "openAiApi": {
+          "id": "CYHGS3KAjICCaQqY",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse OpenAI response and structure travel data\nconst response = $input.first().json.choices[0].message.content;\nlet travelData;\n\ntry {\n  let jsonString = response.trim();\n  if (jsonString.startsWith('```json')) {\n    jsonString = jsonString.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n  } else if (jsonString.startsWith('```')) {\n    jsonString = jsonString.replace(/```\\n?/g, '');\n  }\n  travelData = JSON.parse(jsonString);\n} catch (error) {\n  throw new Error('Failed to parse travel data: ' + error.message);\n}\n\n// Validate required fields\nif (!travelData.destination || !Array.isArray(travelData.destination)) {\n  throw new Error('Missing or invalid destination array');\n}\n\nif (!travelData.city_stays || !Array.isArray(travelData.city_stays)) {\n  throw new Error('Missing or invalid city_stays array');\n}\n\n// Extract hotel star rating\nconst hotelCategory = travelData.hotel_category || '4-Star';\nconst starMatch = hotelCategory.match(/(\\d+)/);\ntravelData.hotel_star = starMatch ? parseInt(starMatch[1]) : 4;\n\n// Get metadata from previous node\nconst metadata = $('Extract Input Data').first().json;\n\n// Generate cart name\nconst destination = travelData.destination[0] || 'Unknown';\nconst duration = travelData.duration || '';\nconst startDate = travelData.travel_dates?.start || '';\nconst cartName = `${destination} ${duration} Trip`;\nconst cartTitle = `${cartName} - ${startDate}`;\n\nreturn [{\n  json: {\n    travel_data: travelData,\n    user_id: metadata.sessionId,\n    cart_reference: metadata.cart_reference,\n    request_id: metadata.request_id,\n    cart_name: cartName,\n    cart_title: cartTitle,\n    request_timestamp: metadata.request_timestamp\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 300],
+      "id": "structure-travel-data",
+      "name": "Structure Travel Data"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1n-xL0h9PHeOhfcpytCouV7_pkYj4BzSMZghqTsKrgYo/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet3",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1000, 200],
+      "id": "fetch-hotels-sheet",
+      "name": "Fetch Hotels from Excel",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4bqLa45KMMhTDuqo",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1n-xL0h9PHeOhfcpytCouV7_pkYj4BzSMZghqTsKrgYo/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet4",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1000, 400],
+      "id": "fetch-activities-sheet",
+      "name": "Fetch Activities from Excel",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4bqLa45KMMhTDuqo",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process hotel data - ONE HOTEL PER CITY\nconst travelData = $('Structure Travel Data').first().json;\nconst hotelsSheet = $input.all();\n\nconst requestedCities = travelData.travel_data.destination || [];\nconst hotelStar = travelData.travel_data.hotel_star;\nconst cityStays = travelData.travel_data.city_stays || [];\n\n// Group hotels by city and filter by requested cities and star rating\nconst hotelsByCity = {};\n\nhotelsSheet.forEach(row => {\n  const city = row.json.City || row.json.city;\n  const hotelClass = parseInt(row.json['Hotel Class'] || row.json.hotel_class);\n  const hotelName = row.json['Hotel Name'] || row.json.hotel_name;\n  \n  if (!city || !hotelName) return;\n  \n  // Only include hotels in requested cities with matching star rating\n  const isRequestedCity = requestedCities.some(reqCity => \n    reqCity.toLowerCase().trim() === city.toLowerCase().trim()\n  );\n  \n  if (isRequestedCity && hotelClass === hotelStar) {\n    if (!hotelsByCity[city]) {\n      hotelsByCity[city] = [];\n    }\n    \n    hotelsByCity[city].push({\n      hotel_name: hotelName,\n      hotel_class: hotelClass,\n      aahaas_hotel_id: row.json['Aahaas Hotel ID'] || row.json.aahaas_hotel_id,\n      apple_hotel_id: row.json['Apple Hotel ID'] || row.json.apple_hotel_id,\n      basic_room_category: row.json['Basic Room Category'] || row.json.basic_room_category,\n      deluxe: row.json['Deluxe'] || row.json.deluxe,\n      city: city,\n      country: row.json.Country || row.json.country\n    });\n  }\n});\n\n// CRITICAL: Select ONE hotel per city (first matching hotel)\nconst selectedHotels = {};\nObject.keys(hotelsByCity).forEach(city => {\n  if (hotelsByCity[city].length > 0) {\n    selectedHotels[city] = hotelsByCity[city][0]; // Take first hotel only\n  }\n});\n\nreturn [{\n  json: {\n    ...travelData,\n    hotels_by_city: selectedHotels,\n    hotel_metadata: {\n      total_cities: requestedCities.length,\n      cities_with_hotels: Object.keys(selectedHotels),\n      cities_without_hotels: requestedCities.filter(city => !selectedHotels[city]),\n      selection_method: 'ONE_HOTEL_PER_CITY'\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 200],
+      "id": "select-one-hotel-per-city",
+      "name": "Select ONE Hotel Per City"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process activities data - Filter by requested cities\nconst travelData = $('Structure Travel Data').first().json;\nconst activitiesSheet = $input.all();\n\nconst requestedCities = travelData.travel_data.destination || [];\nconst cityStays = travelData.travel_data.city_stays || [];\n\n// Group activities by city and filter by requested cities\nconst activitiesByCity = {};\n\nactivitiesSheet.forEach(row => {\n  const city = row.json.City || row.json.city;\n  const activityName = row.json['Must Do Activity'] || row.json.must_do_activity;\n  \n  if (!city || !activityName) return;\n  \n  // Only include activities in requested cities\n  const isRequestedCity = requestedCities.some(reqCity => \n    reqCity.toLowerCase().trim() === city.toLowerCase().trim()\n  );\n  \n  if (isRequestedCity) {\n    if (!activitiesByCity[city]) {\n      activitiesByCity[city] = [];\n    }\n    \n    activitiesByCity[city].push({\n      activity_name: activityName,\n      lifestyle_category: row.json['Lifestyle Category'] || row.json.lifestyle_category,\n      aahaas_id: row.json['Aahaas ID'] || row.json.aahaas_id,\n      apple_id: row.json['Apple ID'] || row.json.apple_id,\n      extra1: row.json['Extra1'] || row.json.extra1,\n      extra2: row.json['Extra2'] || row.json.extra2,\n      city: city,\n      country: row.json.Country || row.json.country\n    });\n  }\n});\n\nreturn [{\n  json: {\n    ...travelData,\n    activities_by_city: activitiesByCity,\n    activity_metadata: {\n      total_cities: requestedCities.length,\n      cities_with_activities: Object.keys(activitiesByCity),\n      cities_without_activities: requestedCities.filter(city => !activitiesByCity[city])\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 400],
+      "id": "filter-activities-by-city",
+      "name": "Filter Activities by City"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build hotel itinerary prompt with ONE hotel per city\nconst hotelData = $input.first().json;\nconst data = hotelData.travel_data;\nconst hotelsByCity = hotelData.hotels_by_city || {};\nconst cityStays = data.city_stays || [];\n\nconst startDate = data.travel_dates?.start || '';\nconst endDate = data.travel_dates?.end || '';\nconst adults = data.pax?.adults || 1;\nconst children = data.pax?.children || 0;\nconst childAges = data.pax?.child_ages || [];\nconst mealPlan = data.meal_plan || 'BB';\nconst hotelStar = data.hotel_star || 4;\n\n// Build city-specific hotel information\nlet cityHotelInfo = '';\ncityStays.forEach(cityStay => {\n  const cityName = cityStay.city;\n  const selectedHotel = hotelsByCity[cityName];\n  \n  if (selectedHotel) {\n    cityHotelInfo += `\\n${cityName} (${cityStay.nights} nights, Days ${cityStay.check_in_day}-${cityStay.check_out_day - 1}):\\n`;\n    cityHotelInfo += `  Selected Hotel: ${selectedHotel.hotel_name}\\n`;\n    cityHotelInfo += `  Hotel ID (Aahaas): ${selectedHotel.aahaas_hotel_id}\\n`;\n    cityHotelInfo += `  Room Category: ${selectedHotel.basic_room_category}\\n`;\n  } else {\n    cityHotelInfo += `\\n${cityName} (${cityStay.nights} nights, Days ${cityStay.check_in_day}-${cityStay.check_out_day - 1}): No hotel found in database\\n`;\n  }\n});\n\nconst userPrompt = `Create a hotel itinerary in JSON format.\\n\\nTRIP DETAILS:\\n- Start: ${startDate}, End: ${endDate}\\n- Travelers: ${adults} adults, ${children} children (ages: ${JSON.stringify(childAges)})\\n- Meal Plan: ${mealPlan}\\n- Hotel Star: ${hotelStar}\\n\\nCITY STAYS & SELECTED HOTELS:${cityHotelInfo}\\n\\nCRITICAL RULES:\\n1. ONE hotel per city for ALL nights in that city\\n2. Same check_in and check_out dates for all days in same city\\n3. First day in city: check_in date\\n4. Last day in city + 1: check_out date\\n5. All days in same city must have IDENTICAL accommodation object\\n6. Use selected hotel information from database\\n\\nJSON Structure:\\n{\\n  \\\"itinerary\\\": [\\n    {\\n      \\\"day\\\": 1,\\n      \\\"date\\\": \\\"${startDate}\\\",\\n      \\\"city\\\": \\\"City Name\\\",\\n      \\\"pax\\\": {\\\"adults\\\": ${adults}, \\\"children\\\": ${children}, \\\"child_ages\\\": ${JSON.stringify(childAges)}},\\n      \\\"accommodation\\\": {\\n        \\\"hotel_name\\\": \\\"From database\\\",\\n        \\\"aahaas_hotel_id\\\": \\\"From database\\\",\\n        \\\"check_in\\\": \\\"First day in city\\\",\\n        \\\"check_out\\\": \\\"Day after last night\\\",\\n        \\\"star_category\\\": ${hotelStar},\\n        \\\"room_category\\\": \\\"From database\\\",\\n        \\\"meal_plan\\\": \\\"${mealPlan}\\\",\\n        \\\"latitude\\\": 0.0,\\n        \\\"longitude\\\": 0.0\\n      }\\n    }\\n  ]\\n}\\n\\nRespond with ONLY valid JSON.`;\n\nconst requestBody = {\n  model: \"gpt-4o\",\n  messages: [\n    {\n      role: \"system\",\n      content: \"You are a hotel booking specialist. Create hotel itineraries with ONE hotel per city. All days in same city must share the same hotel and check-in/check-out dates.\"\n    },\n    {\n      role: \"user\",\n      content: userPrompt\n    }\n  ],\n  temperature: 0.7\n};\n\nreturn [{\n  json: {\n    ...hotelData,\n    openai_request: requestBody\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1400, 200],
+      "id": "build-hotel-prompt",
+      "name": "Build Hotel Itinerary Prompt"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build activities itinerary prompt\nconst activityData = $input.first().json;\nconst data = activityData.travel_data;\nconst activitiesByCity = activityData.activities_by_city || {};\nconst cityStays = data.city_stays || [];\n\nconst startDate = data.travel_dates?.start || '';\nconst endDate = data.travel_dates?.end || '';\nconst adults = data.pax?.adults || 1;\nconst children = data.pax?.children || 0;\nconst childAges = data.pax?.child_ages || [];\n\n// Build city-specific activity information\nlet cityActivityInfo = '';\ncityStays.forEach(cityStay => {\n  const cityName = cityStay.city;\n  const cityActivities = activitiesByCity[cityName] || [];\n  \n  cityActivityInfo += `\\n${cityName} (Days ${cityStay.check_in_day}-${cityStay.check_out_day - 1}, ${cityStay.nights} activity days):\\n`;\n  \n  if (cityActivities.length > 0) {\n    cityActivityInfo += `  Available activities from database:\\n`;\n    cityActivities.slice(0, 10).forEach((act, i) => {\n      cityActivityInfo += `    ${i + 1}. ${act.activity_name}\\n`;\n    });\n  } else {\n    cityActivityInfo += `  No activities in database - suggest popular attractions\\n`;\n  }\n});\n\nconst userPrompt = `Create an activities itinerary in JSON format.\\n\\nTRIP DETAILS:\\n- Start: ${startDate}, End: ${endDate}\\n- Travelers: ${adults} adults, ${children} children (ages: ${JSON.stringify(childAges)})\\n\\nCITY ACTIVITIES:${cityActivityInfo}\\n\\nCRITICAL RULES:\\n1. Maximum 2 activities per day\\n2. Activities ONLY on days in that city (not checkout day)\\n3. Use activities from database when available\\n4. Activities must match the city for that day\\n5. Include sub_category_id based on category\\n\\nCategory Mapping:\\n- Adventure = 1\\n- Entertainment = 2\\n- Health & Wellness = 3\\n- Event = 4\\n- Tours = 5\\n- Transport = 6\\n- Services = 7\\n- Tickets = 8\\n- Culinary = 9\\n- Experience = 10\\n\\nJSON Structure:\\n{\\n  \\\"itinerary\\\": [\\n    {\\n      \\\"day\\\": 1,\\n      \\\"date\\\": \\\"${startDate}\\\",\\n      \\\"city\\\": \\\"City Name\\\",\\n      \\\"pax\\\": {\\\"adults\\\": ${adults}, \\\"children\\\": ${children}, \\\"child_ages\\\": ${JSON.stringify(childAges)}},\\n      \\\"activities\\\": [\\n        {\\n          \\\"activity_name\\\": \\\"From database or popular\\\",\\n          \\\"category\\\": \\\"Tours\\\",\\n          \\\"sub_category_id\\\": 5,\\n          \\\"description\\\": \\\"Brief description\\\",\\n          \\\"duration\\\": \\\"2 hours\\\",\\n          \\\"latitude\\\": 0.0,\\n          \\\"longitude\\\": 0.0,\\n          \\\"best_time\\\": \\\"morning\\\",\\n          \\\"cost_level\\\": \\\"medium\\\"\\n        }\\n      ]\\n    }\\n  ]\\n}\\n\\nRespond with ONLY valid JSON.`;\n\nconst requestBody = {\n  model: \"gpt-4o\",\n  messages: [\n    {\n      role: \"system\",\n      content: \"You are a travel activity planner. Create city-specific activity itineraries with max 2 activities per day. Activities must match the city where travelers are staying.\"\n    },\n    {\n      role: \"user\",\n      content: userPrompt\n    }\n  ],\n  temperature: 0.7\n};\n\nreturn [{\n  json: {\n    ...activityData,\n    openai_request: requestBody\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1400, 400],
+      "id": "build-activity-prompt",
+      "name": "Build Activity Itinerary Prompt"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.openai_request) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1600, 200],
+      "id": "generate-hotel-itinerary",
+      "name": "Generate Hotel Itinerary",
+      "credentials": {
+        "openAiApi": {
+          "id": "CYHGS3KAjICCaQqY",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.openai_request) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1600, 400],
+      "id": "generate-activity-itinerary",
+      "name": "Generate Activity Itinerary",
+      "credentials": {
+        "openAiApi": {
+          "id": "CYHGS3KAjICCaQqY",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse hotel itinerary response\nconst response = $input.first().json.choices[0].message.content;\nconst inputData = $('Build Hotel Itinerary Prompt').first().json;\n\nlet itinerary;\ntry {\n  let jsonString = response.trim();\n  if (jsonString.startsWith('```json')) {\n    jsonString = jsonString.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n  } else if (jsonString.startsWith('```')) {\n    jsonString = jsonString.replace(/```\\n?/g, '');\n  }\n  itinerary = JSON.parse(jsonString);\n} catch (error) {\n  throw new Error('Failed to parse hotel itinerary: ' + error.message);\n}\n\nif (!itinerary.itinerary || !Array.isArray(itinerary.itinerary)) {\n  throw new Error('Invalid itinerary structure');\n}\n\nreturn [{\n  json: {\n    success: true,\n    itinerary_title: inputData.cart_title,\n    cart_name: inputData.cart_name,\n    cart_reference: inputData.cart_reference,\n    request_id: inputData.request_id,\n    itinerary: itinerary.itinerary,\n    travel_data: inputData.travel_data,\n    user_id: inputData.user_id,\n    force_new_cart: true,\n    metadata: {\n      type: 'hotels',\n      total_days: itinerary.itinerary.length,\n      generated_at: new Date().toISOString()\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1800, 200],
+      "id": "parse-hotel-response",
+      "name": "Parse Hotel Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse activity itinerary response\nconst response = $input.first().json.choices[0].message.content;\nconst inputData = $('Build Activity Itinerary Prompt').first().json;\n\nlet itinerary;\ntry {\n  let jsonString = response.trim();\n  if (jsonString.startsWith('```json')) {\n    jsonString = jsonString.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n  } else if (jsonString.startsWith('```')) {\n    jsonString = jsonString.replace(/```\\n?/g, '');\n  }\n  itinerary = JSON.parse(jsonString);\n} catch (error) {\n  throw new Error('Failed to parse activity itinerary: ' + error.message);\n}\n\nif (!itinerary.itinerary || !Array.isArray(itinerary.itinerary)) {\n  throw new Error('Invalid itinerary structure');\n}\n\n// Limit to 2 activities per day\nconst limitedItinerary = itinerary.itinerary.map(day => ({\n  ...day,\n  activities: (day.activities || []).slice(0, 2)\n}));\n\nreturn [{\n  json: {\n    success: true,\n    itinerary_title: inputData.cart_title,\n    cart_name: inputData.cart_name,\n    cart_reference: inputData.cart_reference,\n    request_id: inputData.request_id,\n    itinerary: limitedItinerary,\n    travel_data: inputData.travel_data,\n    user_id: inputData.user_id,\n    force_new_cart: false,\n    metadata: {\n      type: 'activities',\n      total_days: limitedItinerary.length,\n      max_activities_per_day: 2,\n      generated_at: new Date().toISOString()\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1800, 400],
+      "id": "parse-activity-response",
+      "name": "Parse Activity Response"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev-gateway.aahaas.com/api/automate/cart_process/hotels",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2000, 200],
+      "id": "send-hotels-api",
+      "name": "Send to Hotels API"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev-gateway.aahaas.com/api/automate/cart_process",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2000, 400],
+      "id": "send-activities-api",
+      "name": "Send to Activities API"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [2200, 300],
+      "id": "merge-responses",
+      "name": "Merge API Responses"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine final response\nconst inputs = $input.all();\nconst hotelResponse = inputs.find(i => i.json.cart?.cart_title) || inputs[0];\nconst activityResponse = inputs[1];\n\nconst cartTitle = hotelResponse?.json.cart?.cart_title || 'Your Travel Cart';\nconst cartId = hotelResponse?.json.cart?.id;\n\nreturn [{\n  json: {\n    success: true,\n    message: `Successfully created \"${cartTitle}\" with hotels and activities`,\n    cart_id: cartId,\n    cart_title: cartTitle,\n    hotels_added: true,\n    activities_added: true,\n    hotel_selection: 'ONE_HOTEL_PER_CITY',\n    generated_at: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2400, 300],
+      "id": "format-final-response",
+      "name": "Format Final Response"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2600, 300],
+      "id": "respond-webhook",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{"node": "Extract Input Data", "type": "main", "index": 0}]]
+    },
+    "Extract Input Data": {
+      "main": [[{"node": "Parse Travel Request", "type": "main", "index": 0}]]
+    },
+    "Parse Travel Request": {
+      "main": [[{"node": "Structure Travel Data", "type": "main", "index": 0}]]
+    },
+    "Structure Travel Data": {
+      "main": [[
+        {"node": "Fetch Hotels from Excel", "type": "main", "index": 0},
+        {"node": "Fetch Activities from Excel", "type": "main", "index": 0}
+      ]]
+    },
+    "Fetch Hotels from Excel": {
+      "main": [[{"node": "Select ONE Hotel Per City", "type": "main", "index": 0}]]
+    },
+    "Fetch Activities from Excel": {
+      "main": [[{"node": "Filter Activities by City", "type": "main", "index": 0}]]
+    },
+    "Select ONE Hotel Per City": {
+      "main": [[{"node": "Build Hotel Itinerary Prompt", "type": "main", "index": 0}]]
+    },
+    "Filter Activities by City": {
+      "main": [[{"node": "Build Activity Itinerary Prompt", "type": "main", "index": 0}]]
+    },
+    "Build Hotel Itinerary Prompt": {
+      "main": [[{"node": "Generate Hotel Itinerary", "type": "main", "index": 0}]]
+    },
+    "Build Activity Itinerary Prompt": {
+      "main": [[{"node": "Generate Activity Itinerary", "type": "main", "index": 0}]]
+    },
+    "Generate Hotel Itinerary": {
+      "main": [[{"node": "Parse Hotel Response", "type": "main", "index": 0}]]
+    },
+    "Generate Activity Itinerary": {
+      "main": [[{"node": "Parse Activity Response", "type": "main", "index": 0}]]
+    },
+    "Parse Hotel Response": {
+      "main": [[{"node": "Send to Hotels API", "type": "main", "index": 0}]]
+    },
+    "Parse Activity Response": {
+      "main": [[{"node": "Send to Activities API", "type": "main", "index": 0}]]
+    },
+    "Send to Hotels API": {
+      "main": [[{"node": "Merge API Responses", "type": "main", "index": 0}]]
+    },
+    "Send to Activities API": {
+      "main": [[{"node": "Merge API Responses", "type": "main", "index": 1}]]
+    },
+    "Merge API Responses": {
+      "main": [[{"node": "Format Final Response", "type": "main", "index": 0}]]
+    },
+    "Format Final Response": {
+      "main": [[{"node": "Respond to Webhook", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "clean-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "clean-workflow-one-hotel-per-city"
+  },
+  "id": "CleanWorkflow",
+  "tags": []
+}
