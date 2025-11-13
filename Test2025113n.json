@@ -1,5 +1,5 @@
 {
-  "name": "Test",
+  "name": "Test2025113",
   "nodes": [
     {
       "parameters": {
@@ -8,10 +8,10 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.3,
       "position": [
-        -1936,
-        -464
+        -1152,
+        -432
       ],
-      "id": "865b0466-e2c3-4b14-a83c-de3f17e5b092",
+      "id": "bed52871-836a-4d0b-8332-2312ec7ed99f",
       "name": "When chat message received",
       "webhookId": "9d2612f3-b699-4bee-bda6-52b98551f2cf"
     },
@@ -25,10 +25,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -1936,
-        -208
+        -1152,
+        -176
       ],
-      "id": "1521ddb3-9d93-4f16-8a0d-f6d73ad6384c",
+      "id": "0d08f5a2-ab9a-490a-9c01-b02e3320c025",
       "name": "Webhook API Trigger",
       "webhookId": "127e3f0a-4469-48c8-996c-ab7c16ec18ce"
     },
@@ -39,10 +39,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1696,
-        -208
+        -912,
+        -176
       ],
-      "id": "21163ecd-6c6d-4571-b129-3b0aa2efa99e",
+      "id": "efb13b19-3417-4cc7-a2bb-d5392ba87d7e",
       "name": "Extract Webhook Data"
     },
     {
@@ -54,10 +54,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        1200,
-        -464
+        1984,
+        -432
       ],
-      "id": "c8c055a1-4779-40c0-b44c-1f49d265e959",
+      "id": "0a288dc1-d453-459a-b831-67d41f6fefad",
       "name": "Respond to Webhook"
     },
     {
@@ -67,25 +67,25 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1680,
-        -464
+        -896,
+        -432
       ],
-      "id": "17c0a9ec-a328-477f-b748-1cb10b3c4bb7",
+      "id": "a4ba6e27-a29e-4ad8-9403-d0211c69fe9f",
       "name": "Merge Input Sources"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Travel Content Processor Prompt\n\n⚠️ CRITICAL: Treat EACH request as INDEPENDENT. IGNORE any previous conversation history. Process ONLY the current customer input below.\n\nYou are a travel content processor. Your job is to take customer travel requests and convert them into a complete, detailed travel inquiry ready for processing. NEVER ask questions or request more information — always make reasonable assumptions.\n\nYour Task\n\nTranslate any non-English content to English.\n\nExtract all provided information (destination, dates, travelers, preferences).\n\nFill in missing details using these DEFAULT assumptions:\n\n🔧 DEFAULT DURATION: If duration is NOT mentioned, use 7 days (6 nights) as the default.\n\nTravel Dates:\nIf the travel start date is not provided, assume the travel begins from 15 days after request_timestamp and today is 2025-11-10\nand determine the duration automatically based on the type of destination.\n\n\nCity tours → 7 days (6 nights) - DEFAULT\n\nCountry tours → 7 days (6 nights) - DEFAULT\n\nMulti-country tours → 7 days (6 nights) - DEFAULT\n\nNumber of Travelers: If not specified, assume 1 adult.\n\nBudget: If not mentioned, assume mid-range/standard budget.\n\nAccommodation: If not mentioned, assume 4-star hotels.\n\nMeal Plan: If not mentioned, assume Bed & Breakfast (BB).\n\nActivities: Assume popular tourist attractions and experiences for the destination.\n\n⚠️ CRITICAL Duration & Night Calculation Logic (MUST FOLLOW EXACTLY):\n\n🔴 SIMPLE RULE - MEMORIZE THIS:\n\nWhen customer says \"X days\":\n\nDays Mentioned → Nights to Use → Cities to Use\n1 day        → 1 night      → 1 city\n2 days       → 1 night      → 1 city  \n3 days       → 2 nights     → 2 cities\n4 days       → 3 nights     → normal logic\n5 days       → 4 nights     → normal logic\n\nDO NOT calculate anything - just use the table above!\n\nExamples:\n- Customer says \"2 days\" → You MUST write \"2 days, 1 night\" (NOT 2 nights)\n- Customer says \"3 days\" → You MUST write \"3 days, 2 nights\" (NOT 3 nights)\n- Customer says \"5 days\" → You write \"5 days, 4 nights\" (days - 1)\n- Customer does NOT mention duration → You write \"7 days, 6 nights\" (DEFAULT)\n\nOutput Format\n\nProvide only a clear, professional travel description in paragraph form.\nInclude:\n\nDestination(s)\n\nTravel dates (specific start and end dates)\n\nTotal days and nights (FOLLOW THE TABLE ABOVE EXACTLY)\n\nNumber of travelers\n\nAccommodation and meal plan\n\nBudget level\n\nKey activities or interests\n\nExample Output\n\n\"Customer requesting a Singapore city tour for 2 adults from November 15–19, 2025 (5 days, 4 nights). Mid-range budget with 4-star hotel accommodation and bed & breakfast meal plan. Interested in major attractions including Marina Bay Sands, Gardens by the Bay, Sentosa Island, and cultural spots such as Little India and Chinatown.\"\n\nCustomer Input:\n{{ $json.chatInput }}\n\n⚠️ REMEMBER: Process ONLY this current input. Ignore previous conversations. FOLLOW the days-to-nights table EXACTLY.\n\nProvide ONLY the refined travel description with all assumptions filled in. Do NOT ask questions.",
+        "text": "=Travel Content Processor Prompt\n\n⚠️ CRITICAL: Treat EACH request as INDEPENDENT. IGNORE any previous conversation history. Process ONLY the current customer input below.\n\nYou are a travel content processor. Your job is to take customer travel requests and convert them into a complete, detailed travel inquiry ready for processing. NEVER ask questions or request more information — always make reasonable assumptions.\n\nYour Task\n\nTranslate any non-English content to English.\n\nExtract all provided information (destination, dates, travelers, preferences).\n\nFill in missing details using these DEFAULT assumptions:\n\n🔧 DEFAULT DURATION: If duration is NOT mentioned, use 7 days (6 nights) as the default.\n\nTravel Dates:\nIf the travel start date is not provided, assume the travel begins from 15 days after request_timestamp and today is 2025-11-13\nand determine the duration automatically based on the type of destination.\n\n\nCity tours → 7 days (6 nights) - DEFAULT\n\nCountry tours → 7 days (6 nights) - DEFAULT\n\nMulti-country tours → 7 days (6 nights) - DEFAULT\n\nNumber of Travelers: If not specified, assume 1 adult.\n\nBudget: If not mentioned, assume mid-range/standard budget.\n\nAccommodation: If not mentioned, assume 4-star hotels.\n\nMeal Plan: If not mentioned, assume Bed & Breakfast (BB).\n\nActivities: Assume popular tourist attractions and experiences for the destination.\n\n⚠️ CRITICAL Duration & Night Calculation Logic (MUST FOLLOW EXACTLY):\n\n🔴 SIMPLE RULE - MEMORIZE THIS:\n\nWhen customer says \"X days\":\n\nDays Mentioned → Nights to Use → Cities to Use\n1 day        → 1 night      → 1 city\n2 days       → 1 night      → 1 city  \n3 days       → 2 nights     → 2 cities\n4 days       → 3 nights     → normal logic\n5 days       → 4 nights     → normal logic\n\nDO NOT calculate anything - just use the table above!\n\nExamples:\n- Customer says \"2 days\" → You MUST write \"2 days, 1 night\" (NOT 2 nights)\n- Customer says \"3 days\" → You MUST write \"3 days, 2 nights\" (NOT 3 nights)\n- Customer says \"5 days\" → You write \"5 days, 4 nights\" (days - 1)\n- Customer does NOT mention duration → You write \"7 days, 6 nights\" (DEFAULT)\n\nOutput Format\n\nProvide only a clear, professional travel description in paragraph form.\nInclude:\n\nDestination(s)\n\nTravel dates (specific start and end dates)\n\nTotal days and nights (FOLLOW THE TABLE ABOVE EXACTLY)\n\nNumber of travelers\n\nAccommodation and meal plan\n\nBudget level\n\nKey activities or interests\n\nExample Output\n\n\"Customer requesting a Singapore city tour for 2 adults from November 15–19, 2025 (5 days, 4 nights). Mid-range budget with 4-star hotel accommodation and bed & breakfast meal plan. Interested in major attractions including Marina Bay Sands, Gardens by the Bay, Sentosa Island, and cultural spots such as Little India and Chinatown.\"\n\nCustomer Input:\n{{ $json.chatInput }}\n\n⚠️ REMEMBER: Process ONLY this current input. Ignore previous conversations. FOLLOW the days-to-nights table EXACTLY.\n\nProvide ONLY the refined travel description with all assumptions filled in. Do NOT ask questions.",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 2.2,
       "position": [
-        -1392,
-        -464
+        -608,
+        -432
       ],
-      "id": "59de4342-5332-4e8d-8158-bdb12ab5cd90",
+      "id": "28380614-e60b-44de-8a23-f21a5d4c1163",
       "name": "AI Agent"
     },
     {
@@ -100,10 +100,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        -1392,
-        -144
+        -608,
+        -112
       ],
-      "id": "1e06a497-cdf9-41ed-bd50-7ad265875ca4",
+      "id": "dd3d23d4-cdd5-427f-aa71-e4dc715a938f",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
@@ -117,10 +117,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        -1296,
-        -144
+        -512,
+        -112
       ],
-      "id": "923f5780-ec50-4cbe-825a-15057742ce44",
+      "id": "7ea11acd-f620-4bae-8890-23591d698099",
       "name": "Simple Memory"
     },
     {
@@ -130,10 +130,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1056,
-        -464
+        -272,
+        -432
       ],
-      "id": "c1fe84ea-6cae-4023-b7d3-3b2960d7c4df",
+      "id": "ee60da11-d3c9-4369-9749-465056faaa13",
       "name": "Format for OpenAI Parser"
     },
     {
@@ -159,10 +159,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -864,
-        -464
+        -80,
+        -432
       ],
-      "id": "ad37d750-b7db-4a2b-9aa1-485e51165d0a",
+      "id": "c41c113a-b09e-405f-8a31-30f9a92c37d4",
       "name": "OpenAI Travel Parser",
       "credentials": {
         "openAiApi": {
@@ -178,10 +178,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -656,
-        -464
+        128,
+        -432
       ],
-      "id": "fde82a3d-524d-48ea-b5a2-d201a221e66a",
+      "id": "f2c74e55-ec1a-4f67-b7ee-32aa85ea46c8",
       "name": "Parse Travel Data"
     },
     {
@@ -191,10 +191,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -464,
-        -464
+        320,
+        -432
       ],
-      "id": "ff3cfedb-2dd7-4db0-9fa2-48a536b6528c",
+      "id": "36ba6e8e-b2c9-4af5-a60a-55e2506ba1e5",
       "name": "Add Cart Metadata"
     },
     {
@@ -204,10 +204,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -352,
-        -688
+        432,
+        -656
       ],
-      "id": "7b057d86-cdae-4e94-9610-118b15abd420",
+      "id": "7ee93380-a362-41dc-9a96-e0dd7b5de777",
       "name": "Process Cities & Hotel Rating"
     },
     {
@@ -217,23 +217,23 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -720,
-        -176
+        64,
+        -144
       ],
-      "id": "775a3a9e-9011-4dc7-bc85-1bd885fb5b61",
+      "id": "c1529dcc-8c72-4de1-9720-a348a45a5bbd",
       "name": "Process Cities & Activities"
     },
     {
       "parameters": {
-        "jsCode": "// Merge Google Sheets activity data (already filtered by city) with processed travel data\n// Google Sheets node now returns only the first row per city due to filters\nconst sheetsData = $input.all();\n\n// Get the processed data from the first item (all items have the same base data)\nconst processedData = sheetsData[0]?.json || {};\n\n// Extract activity data from Google Sheets response\n// Each item from Google Sheets already has the city it was queried for\nconst activitiesByCity = {};\n\nsheetsData.forEach(item => {\n  const city = item.json.city;  // City from our split\n  const activityData = {\n    country: item.json.Country || item.json.country,\n    city: item.json.City || item.json.city,\n    lifestyle_category: item.json['Lifestyle Category'] || item.json['Lifestyle  Category'] || item.json.lifestyle_category,\n    must_do_activity: item.json['Must Do Activity'] || item.json.must_do_activity,\n    aahaas_id: item.json['Aahaas ID'] || item.json['Aahaas  ID'] || item.json.aahaas_id,\n    apple_id: item.json['Apple ID'] || item.json.apple_id,\n    extra1: item.json['Extra1'] || item.json.extra1,\n    extra2: item.json['Extra2'] || item.json.extra2\n  };\n  \n  // Only add if we got valid activity data from sheets\n  if (activityData.must_do_activity) {\n    if (!activitiesByCity[city]) {\n      activitiesByCity[city] = [];\n    }\n    activitiesByCity[city].push(activityData);\n  }\n});\n\n// Build final data structure\nconst finalData = {\n  ...processedData,\n  activities_by_city: activitiesByCity,\n  activity_metadata: {\n    cities_queried: Object.keys(activitiesByCity),\n    total_activities_found: Object.values(activitiesByCity).reduce((sum, activities) => sum + activities.length, 0),\n    query_method: 'Google Sheets filters (city-specific)'\n  }\n};\n\n// Remove the temporary 'city' field used for splitting\ndelete finalData.city;\n\nreturn [{\n  json: finalData\n}];"
+        "jsCode": "// Merge Google Sheets data with processed activities data - FILTER BY REQUESTED CITIES ONLY\n// Include ALL activity parameters from Google Sheets\nconst processedData = $('Process Cities & Activities').first().json;\nconst sheetsData = $input.all();\n\n// Get the list of cities from Process Cities & Activities\nconst requestedCities = processedData.travel_data?.destination || [];\n\n// Extract ALL activity parameters from Google Sheets (Sheet4)\nconst sheetActivities = sheetsData.map(row => ({\n  country: row.json.Country || row.json.country,\n  city: row.json.City || row.json.city,\n  lifestyle_category: row.json['Lifestyle Category'] || row.json['Lifestyle  Category'] || row.json.lifestyle_category,\n  must_do_activity: row.json['Must Do Activity'] || row.json.must_do_activity,\n  aahaas_id: row.json['Aahaas ID'] || row.json['Aahaas  ID'] || row.json.aahaas_id,\n  apple_id: row.json['Apple ID'] || row.json.apple_id,\n  extra1: row.json['Extra1'] || row.json.extra1,\n  extra2: row.json['Extra2'] || row.json.extra2\n}));\n\n// CRITICAL: Filter activities to ONLY include cities from the itinerary\nconst filteredActivities = sheetActivities.filter(item => {\n  if (!item.city) return false;\n  \n  // Check if this city is in the requested cities list (case-insensitive)\n  return requestedCities.some(requestedCity => \n    requestedCity.toLowerCase().trim() === item.city.toLowerCase().trim()\n  );\n});\n\n// Add filtered Google Sheets data to processed data\nprocessedData.google_sheets_activities = filteredActivities;\n\n// Group activities by city from Google Sheets (only for requested cities)\n// Include ALL activity parameters in the output\nconst activitiesByCity = {};\nfilteredActivities.forEach(item => {\n  const city = item.city;\n  if (city && item.must_do_activity) {\n    if (!activitiesByCity[city]) {\n      activitiesByCity[city] = [];\n    }\n    activitiesByCity[city].push({\n      lifestyle_category: item.lifestyle_category,\n      must_do_activity: item.must_do_activity,\n      aahaas_id: item.aahaas_id,\n      apple_id: item.apple_id,\n      extra1: item.extra1,\n      extra2: item.extra2,\n      country: item.country,\n      city: item.city\n    });\n  }\n});\n\nprocessedData.activities_by_city = activitiesByCity;\n\n// Add metadata about filtering\nprocessedData.activity_metadata = {\n  requested_cities: requestedCities,\n  total_sheet_activities: sheetActivities.length,\n  filtered_activities_count: filteredActivities.length,\n  cities_with_activities: Object.keys(activitiesByCity),\n  cities_without_activities: requestedCities.filter(city => !activitiesByCity[city])\n};\n\nreturn [{\n  json: processedData\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -320,
-        -176
+        464,
+        -144
       ],
-      "id": "a82f70bf-d77f-40d2-9f4a-25ed52111750",
+      "id": "7754cc8e-1185-4681-a4ef-84d60a99d1bb",
       "name": "Merge Sheets Data"
     },
     {
@@ -243,10 +243,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -144,
-        -832
+        640,
+        -800
       ],
-      "id": "5e9d5390-8af3-4568-9bd0-6b509dc89ce2",
+      "id": "d3f9c930-65c2-4fc0-9aff-a2c084fc8f32",
       "name": "Sanitize Hotels Data"
     },
     {
@@ -256,10 +256,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -112,
-        -176
+        672,
+        -144
       ],
-      "id": "7d9ed080-beb3-49b2-9bcf-81cee43808a5",
+      "id": "76fcd61f-54d1-40e1-89c3-3bdc75c9ef6a",
       "name": "Sanitize Activities Data"
     },
     {
@@ -269,10 +269,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        64,
-        -832
+        848,
+        -800
       ],
-      "id": "f5292d5a-a5e7-4233-b136-32ff53b1abdf",
+      "id": "35f81186-77f6-4c2d-9e0a-4e4bd2b56b73",
       "name": "Build Itinerary Prompt"
     },
     {
@@ -282,10 +282,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        96,
-        -176
+        880,
+        -144
       ],
-      "id": "5555d094-431d-41a7-be7a-fc7fe56e575d",
+      "id": "8a3ee935-9dab-44ac-bb17-e8cd5f34cfe4",
       "name": "Build Activities Itinerary Prompt"
     },
     {
@@ -311,10 +311,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        288,
-        -832
+        1072,
+        -800
       ],
-      "id": "4df834ac-1b12-4588-a209-d2baf6b8f1db",
+      "id": "2e19d0cb-1809-485d-949b-4dd1f3d42bae",
       "name": "Generate Hotels Itinerary",
       "credentials": {
         "openAiApi": {
@@ -346,10 +346,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        288,
-        -176
+        1072,
+        -144
       ],
-      "id": "3bf6df5c-0568-4626-9eca-e2fb5315573a",
+      "id": "71da1c66-c32f-4b3f-8e66-82e0e3ef3853",
       "name": "Generate Activities Itinerary",
       "credentials": {
         "openAiApi": {
@@ -365,10 +365,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        512,
-        -832
+        1296,
+        -800
       ],
-      "id": "63788f80-400a-4841-b080-828935686b5e",
+      "id": "25ef6971-50bc-4176-8ece-e4887988975b",
       "name": "Parse Itinerary Response"
     },
     {
@@ -378,10 +378,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        400,
-        112
+        1184,
+        144
       ],
-      "id": "8c75fd3f-7ded-4377-8507-7ce7743503a8",
+      "id": "c0ec6f0e-b0f2-4a13-bd2c-8dd50fd17123",
       "name": "Parse Activities Response"
     },
     {
@@ -396,10 +396,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        688,
-        -832
+        1472,
+        -800
       ],
-      "id": "16d4e0ad-7c2b-4203-aa56-8395eb89b4f8",
+      "id": "5cde2c3d-14cb-473a-864b-96f608d73589",
       "name": "Send to Hotels API"
     },
     {
@@ -409,10 +409,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        624,
-        112
+        1408,
+        144
       ],
-      "id": "ba3c2e72-7ccd-476f-b0eb-e06dc0b9cfc7",
+      "id": "88431374-849d-43fe-b8bd-2a75d38bc020",
       "name": "Format Activities API Payload"
     },
     {
@@ -427,10 +427,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        736,
-        -192
+        1520,
+        -160
       ],
-      "id": "dd1853df-6cb2-4118-845d-42f96fdac395",
+      "id": "a54e6134-14f9-431c-85fb-7fe3acc5437b",
       "name": "Send to Activities API"
     },
     {
@@ -438,10 +438,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
       "position": [
-        704,
-        -464
+        1488,
+        -432
       ],
-      "id": "46a7dcd1-cc59-444d-949a-cdc2eae35b37",
+      "id": "c68c8e72-b5dc-4a82-8d26-44ba4c100c6a",
       "name": "Merge Both Responses"
     },
     {
@@ -451,24 +451,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        928,
-        -464
+        1712,
+        -432
       ],
-      "id": "5c93ed17-c3ed-48fd-83cd-7e2252f20615",
+      "id": "b07a379d-5b32-45d0-966e-8c8c6769e9bc",
       "name": "Combine Final Response"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Split destination cities into individual items for parallel Google Sheets queries\nconst processedData = $input.first().json;\nconst cities = processedData.travel_data?.destination || [];\n\nif (cities.length === 0) {\n  return [{\n    json: {\n      ...processedData,\n      city: null,\n      error: 'No cities found in destination array'\n    }\n  }];\n}\n\n// Create one item per city\nconst cityItems = cities.map(city => ({\n  json: {\n    ...processedData,\n    city: city  // This will be used to filter Google Sheets\n  }\n}));\n\nreturn cityItems;"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -624,
-        -176
-      ],
-      "id": "split-cities-activities",
-      "name": "Split Cities for Activities"
     },
     {
       "parameters": {
@@ -482,25 +469,15 @@
           "value": "Sheet4",
           "mode": "name"
         },
-        "filtersUI": {
-          "values": [
-            {
-              "lookupColumn": "City",
-              "lookupValue": "={{ $json.city }}"
-            }
-          ]
-        },
-        "options": {
-          "returnAllMatches": false
-        }
+        "options": {}
       },
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        -512,
-        -176
+        272,
+        -144
       ],
-      "id": "c4174e2b-2a78-47bb-ab4b-4b6890079ad7",
+      "id": "c52924e4-6f2f-488b-9e52-950e53092f88",
       "name": "Get row(s) in sheet",
       "executeOnce": false,
       "credentials": {
@@ -512,29 +489,16 @@
     },
     {
       "parameters": {
-        "jsCode": "// Merge Google Sheets hotel data (already filtered by city) with processed travel data\n// Google Sheets node now returns only the first row per city due to filters\nconst sheetsData = $input.all();\n\n// Get the processed data from the first item (all items have the same base data)\nconst processedData = sheetsData[0]?.json || {};\n\n// Extract hotel data from Google Sheets response\n// Each item from Google Sheets already has the city it was queried for\nconst hotelsByCity = {};\n\nsheetsData.forEach(item => {\n  const city = item.json.city;  // City from our split\n  const hotelData = {\n    country: item.json.Country || item.json.country,\n    city: item.json.City || item.json.city,\n    hotel_class: item.json['Hotel Class'] || item.json.hotel_class,\n    hotel_name: item.json['Hotel Name'] || item.json.hotel_name,\n    aahaas_hotel_id: item.json['Aahaas Hotel ID'] || item.json.aahaas_hotel_id,\n    apple_hotel_id: item.json['Apple Hotel ID'] || item.json.apple_hotel_id,\n    basic_room_category: item.json['Basic Room Category'] || item.json.basic_room_category || item.json['Basic Room Categoty'],\n    deluxe: item.json['Deluxe'] || item.json.deluxe\n  };\n  \n  // Only add if we got valid hotel data from sheets\n  if (hotelData.hotel_name) {\n    if (!hotelsByCity[city]) {\n      hotelsByCity[city] = [];\n    }\n    hotelsByCity[city].push(hotelData);\n  }\n});\n\n// Build final data structure\nconst finalData = {\n  ...processedData,\n  hotels_by_city: hotelsByCity,\n  hotel_metadata: {\n    cities_queried: Object.keys(hotelsByCity),\n    total_hotels_found: Object.values(hotelsByCity).reduce((sum, hotels) => sum + hotels.length, 0),\n    query_method: 'Google Sheets filters (city-specific)'\n  }\n};\n\n// Remove the temporary 'city' field used for splitting\ndelete finalData.city;\n\nreturn [{\n  json: finalData\n}];"
+        "jsCode": "// Merge Google Sheets hotel data with processed travel data\n// Filter by cities from 'Get row(s) in sheet1' input side and include ALL hotel parameters\nconst processedData = $('Process Cities & Hotel Rating').first().json;\nconst sheetsData = $input.all();\n\n// Get the list of cities from 'Get row(s) in sheet1' input (from Process Cities & Hotel Rating)\nconst requestedCities = processedData.travel_data?.destination || [];\n\n// Extract ALL hotel parameters from Google Sheets (Sheet3)\nconst sheetHotels = sheetsData.map(row => ({\n  country: row.json.Country || row.json.country,\n  city: row.json.City || row.json.city,\n  hotel_class: row.json['Hotel Class'] || row.json.hotel_class,\n  hotel_name: row.json['Hotel Name'] || row.json.hotel_name,\n  aahaas_hotel_id: row.json['Aahaas Hotel ID'] || row.json.aahaas_hotel_id,\n  apple_hotel_id: row.json['Apple Hotel ID'] || row.json.apple_hotel_id,\n  basic_room_category: row.json['Basic Room Category'] || row.json.basic_room_category || row.json['Basic Room Categoty'],\n  deluxe: row.json['Deluxe'] || row.json.deluxe\n}));\n\n// CRITICAL: Filter hotels to ONLY include cities that are in the city array from input\nconst filteredHotels = sheetHotels.filter(item => {\n  if (!item.city) return false;\n  \n  // Check if this city is in the requested cities list (case-insensitive)\n  return requestedCities.some(requestedCity => \n    requestedCity.toLowerCase().trim() === item.city.toLowerCase().trim()\n  );\n});\n\n// Add filtered Google Sheets hotel data to processed data\nprocessedData.google_sheets_hotels = filteredHotels;\n\n// Group hotels by city from Google Sheets (only for requested cities)\n// Include ALL hotel parameters in the output\nconst hotelsByCity = {};\nfilteredHotels.forEach(item => {\n  const city = item.city;\n  if (city && item.hotel_name) {\n    if (!hotelsByCity[city]) {\n      hotelsByCity[city] = [];\n    }\n    hotelsByCity[city].push({\n      hotel_class: item.hotel_class,\n      hotel_name: item.hotel_name,\n      aahaas_hotel_id: item.aahaas_hotel_id,\n      apple_hotel_id: item.apple_hotel_id,\n      basic_room_category: item.basic_room_category,\n      deluxe: item.deluxe,\n      country: item.country,\n      city: item.city\n    });\n  }\n});\n\nprocessedData.hotels_by_city = hotelsByCity;\n\n// Add metadata about filtering\nprocessedData.hotel_metadata = {\n  requested_cities: requestedCities,\n  total_sheet_hotels: sheetHotels.length,\n  filtered_hotels_count: filteredHotels.length,\n  cities_with_hotels: Object.keys(hotelsByCity),\n  cities_without_hotels: requestedCities.filter(city => !hotelsByCity[city])\n};\n\nreturn [{\n  json: processedData\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -336,
-        -832
+        448,
+        -800
       ],
-      "id": "b36f5db6-397b-471c-a5ac-18af13c3c3a6",
+      "id": "81e29ce6-aebc-479b-8043-be9af21e746f",
       "name": "Merge Sheets Data1"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Split destination cities into individual items for parallel Google Sheets queries\nconst processedData = $input.first().json;\nconst cities = processedData.travel_data?.destination || [];\n\nif (cities.length === 0) {\n  return [{\n    json: {\n      ...processedData,\n      city: null,\n      error: 'No cities found in destination array'\n    }\n  }];\n}\n\n// Create one item per city\nconst cityItems = cities.map(city => ({\n  json: {\n    ...processedData,\n    city: city  // This will be used to filter Google Sheets\n  }\n}));\n\nreturn cityItems;"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -640,
-        -832
-      ],
-      "id": "split-cities-hotels",
-      "name": "Split Cities for Hotels"
     },
     {
       "parameters": {
@@ -552,21 +516,25 @@
           "values": [
             {
               "lookupColumn": "City",
-              "lookupValue": "={{ $json.city }}"
+              "lookupValue": "={{ $json.travel_data.city_stays[1].city }}"
+            },
+            {
+              "lookupColumn": "Hotel Class",
+              "lookupValue": "={{ $json.travel_data.hotel_star }}"
             }
           ]
         },
         "options": {
-          "returnAllMatches": false
+          "returnFirstMatch": true
         }
       },
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        -528,
-        -832
+        256,
+        -800
       ],
-      "id": "cdca8908-8006-48b0-b863-5b9b8557a949",
+      "id": "2da41e13-d97f-4d82-a6ce-bd1d96581c65",
       "name": "Get row(s) in sheet1",
       "executeOnce": false,
       "credentials": {
@@ -786,17 +754,6 @@
       "main": [
         [
           {
-            "node": "Split Cities for Hotels",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Split Cities for Hotels": {
-      "main": [
-        [
-          {
             "node": "Get row(s) in sheet1",
             "type": "main",
             "index": 0
@@ -816,17 +773,6 @@
       ]
     },
     "Process Cities & Activities": {
-      "main": [
-        [
-          {
-            "node": "Split Cities for Activities",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Split Cities for Activities": {
       "main": [
         [
           {
@@ -941,11 +887,11 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "9b3d7c96-de89-4bd0-a7d4-53a8c7b4f3b5",
+  "versionId": "6b640699-d6fa-4773-beea-2940cffed3d2",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9ba699815eee7a9b7506f6b264ee48edcb7b96a79c851198c7b7acafd2a5489c"
   },
-  "id": "3Igo9PHNyo5y3WUw",
+  "id": "wikRw3iB39p5rLSI",
   "tags": []
 }
