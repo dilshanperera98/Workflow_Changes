@@ -1,0 +1,154 @@
+[
+  {
+    "success": true,
+    "message": "Day-wise hotel itinerary generated successfully",
+    "itinerary_title": "Odyssey Colombo Package #600 - 6 days (2025-11-25)",
+    "cart_name": "Odyssey Colombo Package #600",
+    "cart_reference": "CART_1763005775510_AB3HW3V",
+    "request_id": "REQ_1763005775510_AB3HW3V",
+    "itinerary": [
+      {
+        "day": 1,
+        "date": "2025-11-25",
+        "city": "Colombo",
+        "pax": {
+          "adults": 4,
+          "children": 0,
+          "child_ages": []
+        },
+        "accommodation": {
+          "check_in": "2025-11-25",
+          "check_out": "2025-11-26",
+          "star_category": 4,
+          "keywords": [
+            "4-star",
+            "bed & breakfast",
+            "Colombo",
+            "pool",
+            "wifi"
+          ],
+          "latitude": 6.9271,
+          "longitude": 79.8612,
+          "google_sheets_hotels": [
+            {
+              "hotel_class": 3,
+              "hotel_name": "Berjaya Hotel",
+              "aahaas_hotel_id": 6,
+              "apple_hotel_id": 12,
+              "basic_room_category": "Standard",
+              "city": "Colombo"
+            },
+            {
+              "hotel_class": 4,
+              "hotel_name": "Pegasus Reef",
+              "aahaas_hotel_id": 377,
+              "apple_hotel_id": 217,
+              "basic_room_category": "Standard",
+              "city": "Colombo"
+            },
+            {
+              "hotel_class": 4,
+              "hotel_name": "Morven Colombo",
+              "aahaas_hotel_id": 261,
+              "apple_hotel_id": 2496,
+              "basic_room_category": "Deluxe Room",
+              "city": "Colombo"
+            }
+          ]
+        }
+      },
+      {
+        "day": 2,
+        "date": "2025-11-26",
+        "city": "Kandy",
+        "pax": {
+          "adults": 4,
+          "children": 0,
+          "child_ages": []
+        },
+        "accommodation": {
+          "check_in": "2025-11-26",
+          "check_out": "2025-11-27",
+          "star_category": 4,
+          "keywords": [
+            "4-star",
+            "bed & breakfast",
+            "Kandy",
+            "pool",
+            "wifi"
+          ],
+          "latitude": 7.2906,
+          "longitude": 80.6337,
+          "google_sheets_hotels": [
+            {
+              "hotel_class": 3,
+              "hotel_name": "Hotel Devon",
+              "aahaas_hotel_id": 15,
+              "apple_hotel_id": 59,
+              "basic_room_category": "Deluxe Room",
+              "city": "Kandy"
+            },
+            {
+              "hotel_class": 4,
+              "hotel_name": "Royal Classic Resort",
+              "aahaas_hotel_id": 256,
+              "apple_hotel_id": 2046,
+              "basic_room_category": "Deluxe Room",
+              "city": "Kandy"
+            },
+            {
+              "hotel_class": 4,
+              "hotel_name": "Wisdom Boutique Resort",
+              "aahaas_hotel_id": 327,
+              "apple_hotel_id": 3747,
+              "basic_room_category": "Deluxe",
+              "city": "Kandy"
+            }
+          ]
+        }
+      },
+      {
+        "day": 3,
+        "date": "2025-11-27",
+        "city": "Sigiriya",
+        "pax": {
+          "adults": 4,
+          "children": 0,
+          "child_ages": []
+        },
+        "accommodation": {
+          "check_in": "2025-11-27",
+          "check_out": "2025-11-28",
+          "star_category": 4,
+          "keywords": [
+            "4-star",
+            "bed & breakfast",
+            "Sigiriya",
+            "pool",
+            "wifi"
+          ],
+          "latitude": 7.9569,
+          "longitude": 80.7603,
+          "google_sheets_hotels": []
+        }
+      }
+    ],
+    "travel_data": {
+      "destination": ["Colombo", "Kandy", "Sigiriya", "Galle"],
+      "duration": "6 days",
+      "total_nights": 5
+    },
+    "user_id": 655,
+    "force_new_cart": true,
+    "metadata": {
+      "total_days": 6,
+      "total_hotels": 4,
+      "generated_at": "2025-11-13T03:49:50.962Z",
+      "generation_method": "OpenAI GPT-4o",
+      "note": "Hotels with embedded Google Sheets suggestions - no activities included",
+      "cart_reference": "CART_1763005775510_AB3HW3V",
+      "cart_name": "Odyssey Colombo Package #600",
+      "request_id": "REQ_1763005775510_AB3HW3V"
+    }
+  }
+]
