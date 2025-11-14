@@ -184,7 +184,7 @@
         {
             "parameters": {
                 "mode": "combine",
-                "combinationMode": "mergeByPosition",
+                "combineOperation": "mergeByPosition",
                 "options": {}
             },
             "type": "n8n-nodes-base.merge",
