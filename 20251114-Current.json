@@ -390,7 +390,7 @@
         "url": "https://dev-gateway.aahaas.com/api/automate/cart_process/hotels",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ $json }}",
+        "jsonBody": "={{ JSON.stringify({\n  user_id: $json.user_id,\n  itinerary_title: $json.itinerary_title,\n  cart_name: $json.cart_name,\n  cart_reference: $json.cart_reference,\n  request_id: $json.request_id,\n  itinerary: $json.itinerary,\n  travel_data: $json.travel_data,\n  force_new_cart: $json.force_new_cart,\n  metadata: $json.metadata\n}) }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
