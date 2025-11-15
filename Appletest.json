@@ -1,0 +1,208 @@
+{
+  "name": "Apple",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "9f8305ca-cfc7-4868-8872-3d81441b3cd3",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        640,
+        224
+      ],
+      "webhookId": "travel-chat-webhook"
+    },
+    {
+      "parameters": {
+        "agent": "conversationalAgent",
+        "promptType": "define",
+        "text": "=You are a travel itinerary generator. Based on the user's travel request, create a COMPLETE and DETAILED travel itinerary.\n\nDo NOT ask questions. Instead, analyze their request and generate a full itinerary with:\n\n1. Specific cities/places to visit (use actual city names like Colombo, Galle, Kandy, etc.)\n2. Arrival date (use format DD/MM/YYYY)\n3. Number of travelers (default: 2 adults, 0 children if not specified)\n4. Market/origin country (infer from context or use default)\n5. Detailed list of attractions and places to visit in each city\n6. Duration/nights (suggest appropriate duration based on destinations)\n\nGenerate a complete, ready-to-use itinerary immediately. Be specific with city names and attraction names.\n\nExample output format:\nCountry: Sri Lanka\nCities: Colombo, Galle, Kandy\nPlaces: National Museum Colombo, Galle Fort, Temple of Tooth, Sigiriya Rock\nArrival: 15/12/2025\nTravelers: 2 adults\nNights: 7\nMarket: United Kingdom",
+        "options": {
+          "systemMessage": "Generate complete travel itineraries immediately without asking questions. Use real city and place names."
+        }
+      },
+      "id": "383c2d68-3fde-4198-94d7-2084ef596207",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        848,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "maxTokens": 1000,
+          "temperature": 0.7
+        }
+      },
+      "id": "4b6f418e-7936-4433-ab27-a40a5c1e2d00",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        848,
+        464
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "CYHGS3KAjICCaQqY",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "travel_preferences",
+              "name": "travel_data",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "04f42755-f579-40eb-b206-0f66c0983525",
+      "name": "Extract Travel Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1152,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a data extraction assistant. Extract travel information and format it as JSON with this EXACT structure:\n\n{\n  \"country\": \"Country name\",\n  \"places\": [\"City1\", \"City2\", \"Attraction1\", \"Attraction2\"],\n  \"arrival_date\": \"DD/MM/YYYY\",\n  \"pax\": {\n    \"adult\": 2,\n    \"cwb\": 0,\n    \"cnb\": 0\n  },\n  \"market\": \"Origin country name\"\n}\n\nThe 'places' array should contain city names AND specific attractions/places to visit.\nUse actual location names (e.g., Colombo, Galle, Temple of Tooth, Galle Fort).\nOnly respond with valid JSON, no additional text.",
+              "role": "system"
+            },
+            {
+              "content": "={{ $json.travel_data }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "e883e168-8c0e-49f4-876e-0198d9ea04a9",
+      "name": "Parse Travel Info to JSON",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.4,
+      "position": [
+        1312,
+        224
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "CYHGS3KAjICCaQqY",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const travelData = JSON.parse($input.first().json.message.content);\n\n// Generate tour session ID (timestamp-based)\nconst tourSession = Math.floor(Date.now() / 1000);\n\n// Parse arrival date\nconst arrivalDate = travelData.arrival_date;\n\n// Build the final JSON structure matching your exact format\nconst output = {\n  \"config\": {\n    \"status\": 1,\n    \"tour_session\": tourSession,\n    \"tour_type\": 3,\n    \"user\": 116\n  },\n  \"country_data\": {\n    \"country\": travelData.country\n  },\n  \"general_data\": {\n    \"arrival_date\": arrivalDate,\n    \"pax\": {\n      \"adult\": travelData.pax.adult || 2,\n      \"cwb\": travelData.pax.cwb || 0,\n      \"cnb\": travelData.pax.cnb || 0\n    },\n    \"market\": travelData.market\n  },\n  \"destination_data\": {\n    \"place\": travelData.places || []\n  }\n};\n\nreturn { json: output };"
+      },
+      "id": "29db4d2c-4b50-49b4-8275-7e10c2d4aa60",
+      "name": "Build Final JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        224
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Extract Travel Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Travel Data": {
+      "main": [
+        [
+          {
+            "node": "Parse Travel Info to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Travel Info to JSON": {
+      "main": [
+        [
+          {
+            "node": "Build Final JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Final JSON": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3ac2aa59-2a7c-4828-abaf-26f204e2e839",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9ba699815eee7a9b7506f6b264ee48edcb7b96a79c851198c7b7acafd2a5489c"
+  },
+  "id": "wikRw3iB39p5rLSI",
+  "tags": []
+}

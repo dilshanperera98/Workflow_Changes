@@ -1,0 +1,235 @@
+{
+  "name": "Travel Itinerary Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "4a3c8e9d-1f2b-4a5c-9d8e-7f6a5b4c3d2e",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "travel-chat-webhook"
+    },
+    {
+      "parameters": {
+        "agent": "conversationalAgent",
+        "promptType": "define",
+        "text": "=You are a travel itinerary generator. Based on the user's travel request, create a COMPLETE and DETAILED travel itinerary.\n\nDo NOT ask questions. Instead, analyze their request and generate a full itinerary with:\n\n1. Specific cities/places to visit (use actual city names like Colombo, Galle, Kandy, etc.)\n2. Arrival date (use format DD/MM/YYYY)\n3. Number of travelers (default: 2 adults, 0 children if not specified)\n4. Market/origin country (infer from context or use default)\n5. Detailed list of attractions and places to visit in each city\n6. Duration/nights (suggest appropriate duration based on destinations)\n\nGenerate a complete, ready-to-use itinerary immediately. Be specific with city names and attraction names.\n\nExample output format:\nCountry: Sri Lanka\nCities: Colombo, Galle, Kandy\nPlaces: National Museum Colombo, Galle Fort, Temple of Tooth, Sigiriya Rock\nArrival: 15/12/2025\nTravelers: 2 adults\nNights: 7\nMarket: United Kingdom",
+        "options": {
+          "systemMessage": "Generate complete travel itineraries immediately without asking questions. Use real city and place names."
+        }
+      },
+      "id": "8b7c6d5e-4f3a-2b1c-0d9e-8f7a6b5c4d3e",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 1000
+        }
+      },
+      "id": "9c8d7e6f-5a4b-3c2d-1e0f-9a8b7c6d5e4f",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        460,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "travel_preferences",
+              "name": "travel_data",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+      "name": "Extract Travel Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "temperature": 0.3
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a data extraction assistant. Extract travel information and format it as JSON with this EXACT structure:\n\n{\n  \"country\": \"Country name\",\n  \"places\": [\"City1\", \"City2\", \"Attraction1\", \"Attraction2\"],\n  \"arrival_date\": \"DD/MM/YYYY\",\n  \"pax\": {\n    \"adult\": 2,\n    \"cwb\": 0,\n    \"cnb\": 0\n  },\n  \"market\": \"Origin country name\"\n}\n\nThe 'places' array should contain city names AND specific attractions/places to visit.\nUse actual location names (e.g., Colombo, Galle, Temple of Tooth, Galle Fort).\nOnly respond with valid JSON, no additional text."
+            },
+            {
+              "role": "user",
+              "content": "={{ $json.travel_data }}"
+            }
+          ]
+        }
+      },
+      "id": "b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e",
+      "name": "Parse Travel Info to JSON",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.4,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const travelData = JSON.parse($input.first().json.message.content);\n\n// Generate tour session ID (timestamp-based)\nconst tourSession = Math.floor(Date.now() / 1000);\n\n// Parse arrival date\nconst arrivalDate = travelData.arrival_date;\n\n// Build the final JSON structure matching your exact format\nconst output = {\n  \"config\": {\n    \"status\": 1,\n    \"tour_session\": tourSession,\n    \"tour_type\": 3,\n    \"user\": 116\n  },\n  \"country_data\": {\n    \"country\": travelData.country\n  },\n  \"general_data\": {\n    \"arrival_date\": arrivalDate,\n    \"pax\": {\n      \"adult\": travelData.pax.adult || 2,\n      \"cwb\": travelData.pax.cwb || 0,\n      \"cnb\": travelData.pax.cnb || 0\n    },\n    \"market\": travelData.market\n  },\n  \"destination_data\": {\n    \"place\": travelData.places || []\n  }\n};\n\nreturn { json: output };"
+      },
+      "id": "c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f",
+      "name": "Build Final JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=travel-itinerary-{{ $json.config.tour_session }}.json",
+        "data": "={{ JSON.stringify($json, null, 2) }}",
+        "options": {}
+      },
+      "id": "d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a",
+      "name": "Save to File",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=✅ Your travel itinerary has been created successfully!\n\n📋 Summary:\n- Destination: {{ $json.country_data.country }}\n- Arrival: {{ $json.general_data.arrival_date }}\n- Travelers: {{ $json.general_data.pax.adult }} adult(s), {{ $json.general_data.pax.cwb }} child(ren) with bed, {{ $json.general_data.pax.cnb }} child(ren) no bed\n- Market: {{ $json.general_data.market }}\n\n🎯 Places to visit: {{ $json.destination_data.place.join(', ') }}\n\nYour itinerary has been saved with session ID: {{ $json.config.tour_session }}",
+        "options": {}
+      },
+      "id": "e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b",
+      "name": "Send Confirmation",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1560,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Extract Travel Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "ai_languageModel": [
+        [
+          {
+            "node": "OpenAI Chat Model",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Travel Data": {
+      "main": [
+        [
+          {
+            "node": "Parse Travel Info to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Travel Info to JSON": {
+      "main": [
+        [
+          {
+            "node": "Build Final JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Final JSON": {
+      "main": [
+        [
+          {
+            "node": "Save to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to File": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-11-15T10:00:00.000Z",
+  "versionId": "1"
+}
