@@ -1,5 +1,5 @@
 {
-  "name": "20251114-Test",
+  "name": "My workflow 9",
   "nodes": [
     {
       "parameters": {
@@ -9,9 +9,9 @@
       "typeVersion": 1.3,
       "position": [
         -2976,
-        -480
+        -496
       ],
-      "id": "2bfd9ca7-70a5-43ac-9caa-fff7bb951097",
+      "id": "426af762-037b-47b5-a052-2c3f4b3aadf4",
       "name": "When chat message received",
       "webhookId": "9d2612f3-b699-4bee-bda6-52b98551f2cf"
     },
@@ -26,9 +26,9 @@
       "typeVersion": 2,
       "position": [
         -2976,
-        -224
+        -240
       ],
-      "id": "1bb4d19e-79fa-4d5d-9395-a03bac692933",
+      "id": "716f3dcd-93a2-459e-ab97-55a2eb7726a7",
       "name": "Webhook API Trigger",
       "webhookId": "127e3f0a-4469-48c8-996c-ab7c16ec18ce"
     },
@@ -40,9 +40,9 @@
       "typeVersion": 2,
       "position": [
         -2736,
-        -224
+        -240
       ],
-      "id": "50c8ef30-a20b-474e-81f3-10e1b8d9cb80",
+      "id": "8ae53dbb-ea48-43fa-b7a1-08575c090325",
       "name": "Extract Webhook Data"
     },
     {
@@ -54,10 +54,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        176,
-        -480
+        192,
+        -496
       ],
-      "id": "ddaa5c6a-7a3d-458f-a00d-76c92fccef7a",
+      "id": "fdfc5e55-1cb2-48b6-bba2-a35404192bc0",
       "name": "Respond to Webhook"
     },
     {
@@ -68,9 +68,9 @@
       "typeVersion": 2,
       "position": [
         -2720,
-        -480
+        -496
       ],
-      "id": "928f7e06-8b72-4696-afe8-e3f004ea5173",
+      "id": "0a1513ba-fbc9-459a-8698-7d35a73ce817",
       "name": "Merge Input Sources"
     },
     {
@@ -100,9 +100,9 @@
       "typeVersion": 2,
       "position": [
         -2560,
-        -480
+        -496
       ],
-      "id": "651ff397-514c-4766-b50a-2d6da61f1b87",
+      "id": "415491b9-2de9-41d6-b2cb-ad8f1c74f273",
       "name": "Check If Editable"
     },
     {
@@ -114,22 +114,22 @@
       "typeVersion": 4.2,
       "position": [
         -2448,
-        -784
+        -800
       ],
-      "id": "bba2ccbc-ff69-4402-be03-5a3e7bebe593",
+      "id": "fae08a23-b1e4-4b85-9bf4-39dc037241d7",
       "name": "Load Existing Itinerary"
     },
     {
       "parameters": {
-        "jsCode": "// Build GPT prompt to detect modification intent\n// ENHANCED: Better detection for adding cities vs replacing cities\nconst emailContent = $('Merge Input Sources').first().json.chatInput;\nconst existingData = $input.first().json;\n\nconst systemPrompt = `You are an expert travel modification analyzer. Your job is to understand customer requests and extract modification details.\n\nMODIFICATION TYPES:\n1. date_change: Customer wants to change travel dates\n2. location_change: Customer wants to change destination OR add new cities\n3. extend: Customer wants to add more nights/days\n4. multiple: Combination of above changes\n\nCRITICAL: ADDING CITIES vs REPLACING CITIES\n- Keywords indicating ADDING: \"add\", \"also\", \"include\", \"plus\", \"another\", \"want to visit\"\n- Keywords indicating REPLACING: \"instead\", \"change to\", \"go to ... instead\", \"replace\"\n- When adding cities, you MUST suggest extending the trip duration\n\nEXTRACTION RULES:\n- For dates: Extract explicit dates or calculate from relative terms (\"next month\", \"mid-January\")\n- For locations: Extract destination names (countries or cities)\n- For adding cities: Identify if it's addition vs replacement\n- For extensions: Extract number of additional nights/days (or auto-calculate based on new cities)\n- Current date: 2025-11-14\n- Auto-extend rule: Each new city added = +2 nights minimum\n\nCONFIDENCE LEVELS:\n- high: Explicit and clear request with specific details\n- medium: Some ambiguity but intent is clear\n- low: Vague request, needs clarification\n\nRespond with ONLY valid JSON:\n{\n  \"modification_type\": \"date_change\" | \"location_change\" | \"extend\" | \"multiple\",\n  \"new_dates\": {\n    \"start\": \"YYYY-MM-DD\",\n    \"end\": \"YYYY-MM-DD\"\n  },\n  \"new_location\": \"destination name (single city if adding/replacing)\",\n  \"is_adding_city\": true/false,\n  \"extend_nights\": number,\n  \"confidence\": \"high\" | \"medium\" | \"low\",\n  \"detected_intent\": \"Brief explanation of what was detected\",\n  \"reasoning\": \"Why this interpretation was chosen\"\n}`;\n\nconst travelMetadata = existingData.travel_metadata || {};\nconst userPrompt = `\nCustomer Request: \"${emailContent}\"\n\n${existingData.itinerary_data ? `\nCURRENT ITINERARY:\n- Destination: ${travelMetadata.destinations ? travelMetadata.destinations.join(' → ') : 'N/A'}\n- Dates: ${travelMetadata.start_date || 'N/A'} to ${travelMetadata.end_date || 'N/A'}\n- Duration: ${travelMetadata.total_nights || 'N/A'} nights\n- Adults: ${travelMetadata.adults || 'N/A'}\n- Children: ${travelMetadata.children || 0}\n` : 'This is a new itinerary request (no existing data).'}\n\nTASK: Analyze the customer request and determine what modifications they want.\n\nEXAMPLES:\n1. \"Change dates to Jan 10-17\" → date_change with new dates\n2. \"Go to Thailand instead\" → location_change (replacement), keep original dates\n3. \"Add 2 more nights\" → extend, add to end of current dates\n4. \"I also want to visit Sigiriya\" → location_change (adding city), is_adding_city=true, extend_nights=2\n5. \"Include Kandy and Ella\" → location_change (adding cities), is_adding_city=true, extend_nights=4\n6. \"Add another city like Galle\" → location_change (adding city), is_adding_city=true, extend_nights=2\n\nCRITICAL: \n- If request contains \"add\", \"also\", \"include\", \"another\" → set is_adding_city=true AND calculate extend_nights\n- If adding 1 city → suggest extend_nights=2 (minimum)\n- If adding 2 cities → suggest extend_nights=4, etc.\n\nNow analyze the customer request above.`;\n\nconst requestBody = {\n  model: \"gpt-4o\",\n  messages: [\n    { role: \"system\", content: systemPrompt },\n    { role: \"user\", content: userPrompt }\n  ],\n  temperature: 0.3\n};\n\nreturn [{\n  json: {\n    ...existingData,\n    ai_detection_request: requestBody,\n    original_email: emailContent\n  }\n}];"
+        "jsCode": "// Build GPT prompt to detect modification intent\n// ENHANCED: Better detection for adding cities vs replacing cities\nconst emailContent = $('Merge Input Sources').first().json.chatInput;\nconst existingData = $input.first().json;\n\nconst systemPrompt = `You are an expert travel modification analyzer. Your job is to understand customer requests and extract modification details.\n\nMODIFICATION TYPES:\n1. date_change: Customer wants to change travel dates\n2. location_change: Customer wants to change destination OR add new cities\n3. extend: Customer wants to add more nights/days\n4. multiple: Combination of above changes\n\nCRITICAL: ADDING CITIES vs REPLACING CITIES\n- Keywords indicating ADDING: \"add\", \"also\", \"include\", \"plus\", \"another\", \"want to visit\"\n- Keywords indicating REPLACING: \"instead\", \"change to\", \"go to ... instead\", \"replace\"\n- When adding cities, you MUST suggest extending the trip duration\n\nEXTRACTION RULES:\n- For dates: Extract explicit dates or calculate from relative terms (\"next month\", \"mid-January\")\n- For locations: Extract destination names (countries or cities)\n- For adding cities: Identify if it's addition vs replacement\n- For extensions: Extract number of additional nights/days (or auto-calculate based on new cities)\n- Current date: 2025-11-14\n- Auto-extend rule: Each new city added = +1 night\n\nCONFIDENCE LEVELS:\n- high: Explicit and clear request with specific details\n- medium: Some ambiguity but intent is clear\n- low: Vague request, needs clarification\n\nRespond with ONLY valid JSON:\n{\n  \"modification_type\": \"date_change\" | \"location_change\" | \"extend\" | \"multiple\",\n  \"new_dates\": {\n    \"start\": \"YYYY-MM-DD\",\n    \"end\": \"YYYY-MM-DD\"\n  },\n  \"new_location\": \"destination name (single city if adding/replacing)\",\n  \"is_adding_city\": true/false,\n  \"extend_nights\": number,\n  \"confidence\": \"high\" | \"medium\" | \"low\",\n  \"detected_intent\": \"Brief explanation of what was detected\",\n  \"reasoning\": \"Why this interpretation was chosen\"\n}`;\n\nconst travelMetadata = existingData.travel_metadata || {};\nconst userPrompt = `\nCustomer Request: \"${emailContent}\"\n\n${existingData.itinerary_data ? `\nCURRENT ITINERARY:\n- Destination: ${travelMetadata.destinations ? travelMetadata.destinations.join(' → ') : 'N/A'}\n- Dates: ${travelMetadata.start_date || 'N/A'} to ${travelMetadata.end_date || 'N/A'}\n- Duration: ${travelMetadata.total_nights || 'N/A'} nights\n- Adults: ${travelMetadata.adults || 'N/A'}\n- Children: ${travelMetadata.children || 0}\n` : 'This is a new itinerary request (no existing data).'}\n\nTASK: Analyze the customer request and determine what modifications they want.\n\nEXAMPLES:\n1. \"Change dates to Jan 10-17\" → date_change with new dates\n2. \"Go to Thailand instead\" → location_change (replacement), keep original dates\n3. \"Add 2 more nights\" → extend, add to end of current dates\n4. \"I also want to visit Sigiriya\" → location_change (adding city), is_adding_city=true, extend_nights=1\n5. \"Include Kandy and Ella\" → location_change (adding cities), is_adding_city=true, extend_nights=2\n6. \"Add another city like Galle\" → location_change (adding city), is_adding_city=true, extend_nights=1\n\nCRITICAL: \n- If request contains \"add\", \"also\", \"include\", \"another\" → set is_adding_city=true AND calculate extend_nights\n- If adding 1 city → suggest extend_nights=1\n- If adding 2 cities → suggest extend_nights=2, etc.\n\nNow analyze the customer request above.`;\n\nconst requestBody = {\n  model: \"gpt-4o\",\n  messages: [\n    { role: \"system\", content: systemPrompt },\n    { role: \"user\", content: userPrompt }\n  ],\n  temperature: 0.3\n};\n\nreturn [{\n  json: {\n    ...existingData,\n    ai_detection_request: requestBody,\n    original_email: emailContent\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         -2256,
-        -784
+        -800
       ],
-      "id": "bd6badd8-124e-49df-9b5d-b16290a59178",
+      "id": "a652c635-8e79-436c-acdc-7256d04b1000",
       "name": "Build Intent Detection Prompt"
     },
     {
@@ -156,9 +156,9 @@
       "typeVersion": 4.2,
       "position": [
         -2064,
-        -784
+        -800
       ],
-      "id": "3e986748-2a1a-4744-9126-09600a785784",
+      "id": "ab7afbb9-0fb1-4dff-bad3-4683b754e5aa",
       "name": "Detect Modification Intent",
       "credentials": {
         "openAiApi": {
@@ -169,15 +169,15 @@
     },
     {
       "parameters": {
-        "jsCode": "// Parse GPT intent detection response and reconstruct proper email content\n// ENHANCED: Support for adding new cities to existing itinerary with auto-extension\nconst openAIResponse = $input.first().json.choices[0].message.content;\nconst previousData = $('Load Existing Itinerary').first().json;\nconst mergeData = $('Merge Input Sources').first().json;\nconst originalRequest = mergeData.chatInput;\n\nlet detectedIntent;\ntry {\n  let jsonString = openAIResponse.trim();\n  if (jsonString.startsWith('```json')) {\n    jsonString = jsonString.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n  } else if (jsonString.startsWith('```')) {\n    jsonString = jsonString.replace(/```\\n?/g, '');\n  }\n  detectedIntent = JSON.parse(jsonString);\n} catch (error) {\n  return [{\n    json: {\n      success: false,\n      message: \"Failed to detect modification intent\",\n      error: error.message,\n      raw_response: openAIResponse\n    }\n  }];\n}\n\n// Get travel metadata from loaded itinerary\nconst travelMetadata = previousData.travel_metadata || {};\nconst existingDestinations = travelMetadata.destination || [];\nconst existingStartDate = travelMetadata.travel_dates?.start || '';\nconst existingEndDate = travelMetadata.travel_dates?.end || '';\nconst existingNights = travelMetadata.total_nights || 6;\nconst existingAdults = travelMetadata.pax?.adults || 1;\nconst existingChildren = travelMetadata.pax?.children || 0;\nconst existingChildAges = travelMetadata.pax?.child_ages || [];\nconst existingMealPlan = travelMetadata.meal_plan || 'Bed & Breakfast';\nconst existingHotelCategory = travelMetadata.hotel_category || '4-star';\n\n// CRITICAL: Detect if user is adding new cities\n// Extract city names from the request to identify new cities\nfunction extractCityNames(text) {\n  const cityKeywords = ['add', 'include', 'visit', 'want to go', 'also go to'];\n  const words = text.toLowerCase().split(/[,\\s]+/);\n  const potentialCities = [];\n  \n  // Simple city detection - capitalize first letter\n  words.forEach(word => {\n    if (word.length > 3 && word[0] === word[0].toUpperCase()) {\n      potentialCities.push(word);\n    }\n  });\n  \n  return potentialCities;\n}\n\n// Build modified email content based on modification type\nconst modificationType = detectedIntent.modification_type;\nlet modifiedEmailContent;\nlet newCitiesAdded = [];\nlet allDestinations = [...existingDestinations];\n\nif (modificationType === 'date_change' && detectedIntent.new_dates) {\n  // Date change: Keep destinations, change dates\n  const newStart = detectedIntent.new_dates.start;\n  const newEnd = detectedIntent.new_dates.end;\n  const start = new Date(newStart);\n  const end = new Date(newEnd);\n  const newNights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));\n  \n  modifiedEmailContent = `I want a ${newNights + 1}-day trip to ${existingDestinations.join(' and ')} from ${newStart} to ${newEnd}. ${existingAdults} adults${existingChildren > 0 ? ', ' + existingChildren + ' children' : ''}. ${existingMealPlan} meal plan, ${existingHotelCategory} hotels.`;\n  \n} else if (modificationType === 'location_change' && detectedIntent.new_location) {\n  // NEW CITY ADDITION LOGIC\n  // Check if this is adding a city (not replacing)\n  const isAddingCity = originalRequest.toLowerCase().match(/add|include|also|another/);\n  \n  if (isAddingCity) {\n    // ADDING NEW CITY: Combine old + new cities, extend duration\n    const newCityName = detectedIntent.new_location;\n    \n    // Add new city to existing destinations\n    if (!existingDestinations.includes(newCityName)) {\n      allDestinations.push(newCityName);\n      newCitiesAdded.push(newCityName);\n    }\n    \n    // Calculate nights needed: 2 nights per city (minimum)\n    const nightsPerCity = 2;\n    const totalCities = allDestinations.length;\n    const newTotalNights = totalCities * nightsPerCity;\n    \n    // Extend end date\n    const endDate = new Date(existingEndDate);\n    const additionalNights = newTotalNights - existingNights;\n    endDate.setDate(endDate.getDate() + additionalNights);\n    const newEndDate = endDate.toISOString().split('T')[0];\n    \n    modifiedEmailContent = `I want a ${newTotalNights + 1}-day trip to ${allDestinations.join(', ')} from ${existingStartDate} to ${newEndDate}. ${existingAdults} adults${existingChildren > 0 ? ', ' + existingChildren + ' children' : ''}. ${existingMealPlan} meal plan, ${existingHotelCategory} hotels. Please optimize the route for all ${totalCities} cities.`;\n    \n  } else {\n    // REPLACING destination: Keep dates and duration, change destination\n    modifiedEmailContent = `I want a ${existingNights + 1}-day trip to ${detectedIntent.new_location} from ${existingStartDate} to ${existingEndDate}. ${existingAdults} adults${existingChildren > 0 ? ', ' + existingChildren + ' children' : ''}. ${existingMealPlan} meal plan, ${existingHotelCategory} hotels.`;\n  }\n  \n} else if (modificationType === 'extend' && detectedIntent.extend_nights) {\n  // Extension: Keep destinations and start date, extend end date\n  const newNights = existingNights + detectedIntent.extend_nights;\n  const endDate = new Date(existingEndDate);\n  endDate.setDate(endDate.getDate() + detectedIntent.extend_nights);\n  const newEndDate = endDate.toISOString().split('T')[0];\n  \n  modifiedEmailContent = `I want a ${newNights + 1}-day trip to ${existingDestinations.join(' and ')} from ${existingStartDate} to ${newEndDate}. ${existingAdults} adults${existingChildren > 0 ? ', ' + existingChildren + ' children' : ''}. ${existingMealPlan} meal plan, ${existingHotelCategory} hotels.`;\n  \n} else if (modificationType === 'multiple') {\n  // Handle multiple modifications\n  let newDest = detectedIntent.new_location || existingDestinations.join(' and ');\n  let newStart = detectedIntent.new_dates?.start || existingStartDate;\n  let newEnd = detectedIntent.new_dates?.end || existingEndDate;\n  \n  // Check if adding cities\n  const isAddingCity = originalRequest.toLowerCase().match(/add|include|also|another/);\n  if (isAddingCity && detectedIntent.new_location) {\n    const newCityName = detectedIntent.new_location;\n    if (!existingDestinations.includes(newCityName)) {\n      allDestinations.push(newCityName);\n      newCitiesAdded.push(newCityName);\n    }\n    newDest = allDestinations.join(', ');\n  }\n  \n  if (detectedIntent.extend_nights) {\n    const endDate = new Date(newEnd);\n    endDate.setDate(endDate.getDate() + detectedIntent.extend_nights);\n    newEnd = endDate.toISOString().split('T')[0];\n  }\n  \n  const start = new Date(newStart);\n  const end = new Date(newEnd);\n  const totalNights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));\n  \n  modifiedEmailContent = `I want a ${totalNights + 1}-day trip to ${newDest} from ${newStart} to ${newEnd}. ${existingAdults} adults${existingChildren > 0 ? ', ' + existingChildren + ' children' : ''}. ${existingMealPlan} meal plan, ${existingHotelCategory} hotels. Please optimize the route for all cities.`;\n  \n} else {\n  // Fallback: use original email content\n  modifiedEmailContent = mergeData.chatInput;\n}\n\nreturn [{\n  json: {\n    chatInput: modifiedEmailContent,\n    sessionId: mergeData.sessionId,\n    request_id: mergeData.request_id,\n    cart_reference: mergeData.cart_reference,\n    request_timestamp: mergeData.request_timestamp,\n    editable: true,\n    cart_name: mergeData.cart_name,\n    modification_type: modificationType,\n    detected_intent: detectedIntent,\n    previous_itinerary: previousData,\n    ai_confidence: detectedIntent.confidence,\n    previous_destinations: existingDestinations,\n    new_destinations: allDestinations,\n    cities_added: newCitiesAdded,\n    previous_dates: { start: existingStartDate, end: existingEndDate }\n  }\n}];"
+        "jsCode": "// Parse GPT intent detection response and reconstruct proper email content\n// ENHANCED: Support for adding new cities to existing itinerary with auto-extension\nconst openAIResponse = $input.first().json.choices[0].message.content;\nconst previousData = $('Load Existing Itinerary').first().json;\nconst mergeData = $('Merge Input Sources').first().json;\nconst originalRequest = mergeData.chatInput;\n\nlet detectedIntent;\ntry {\n  let jsonString = openAIResponse.trim();\n  if (jsonString.startsWith('```json')) {\n    jsonString = jsonString.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n  } else if (jsonString.startsWith('```')) {\n    jsonString = jsonString.replace(/```\\n?/g, '');\n  }\n  detectedIntent = JSON.parse(jsonString);\n} catch (error) {\n  return [{\n    json: {\n      success: false,\n      message: \"Failed to detect modification intent\",\n      error: error.message,\n      raw_response: openAIResponse\n    }\n  }];\n}\n\n// Get travel metadata from loaded itinerary\nconst travelMetadata = previousData.travel_metadata || {};\nconst existingDestinations = travelMetadata.destination || [];\nconst existingStartDate = travelMetadata.travel_dates?.start || '';\nconst existingEndDate = travelMetadata.travel_dates?.end || '';\nconst existingNights = travelMetadata.total_nights || 6;\nconst existingAdults = travelMetadata.pax?.adults || 1;\nconst existingChildren = travelMetadata.pax?.children || 0;\nconst existingChildAges = travelMetadata.pax?.child_ages || [];\nconst existingMealPlan = travelMetadata.meal_plan || 'Bed & Breakfast';\nconst existingHotelCategory = travelMetadata.hotel_category || '4-star';\n\n// CRITICAL: Detect if user is adding new cities\n// Extract city names from the request to identify new cities\nfunction extractCityNames(text) {\n  const cityKeywords = ['add', 'include', 'visit', 'want to go', 'also go to'];\n  const words = text.toLowerCase().split(/[,\\s]+/);\n  const potentialCities = [];\n  \n  // Simple city detection - capitalize first letter\n  words.forEach(word => {\n    if (word.length > 3 && word[0] === word[0].toUpperCase()) {\n      potentialCities.push(word);\n    }\n  });\n  \n  return potentialCities;\n}\n\n// Build modified email content based on modification type\nconst modificationType = detectedIntent.modification_type;\nlet modifiedEmailContent;\nlet newCitiesAdded = [];\nlet allDestinations = [...existingDestinations];\n\nif (modificationType === 'date_change' && detectedIntent.new_dates) {\n  // Date change: Keep destinations, change dates\n  const newStart = detectedIntent.new_dates.start;\n  const newEnd = detectedIntent.new_dates.end;\n  const start = new Date(newStart);\n  const end = new Date(newEnd);\n  const newNights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));\n  \n  modifiedEmailContent = `I want a ${newNights + 1}-day trip to ${existingDestinations.join(' and ')} from ${newStart} to ${newEnd}. ${existingAdults} adults${existingChildren > 0 ? ', ' + existingChildren + ' children' : ''}. ${existingMealPlan} meal plan, ${existingHotelCategory} hotels.`;\n  \n} else if (modificationType === 'location_change' && detectedIntent.new_location) {\n  // NEW CITY ADDITION LOGIC\n  // Check if this is adding a city (not replacing)\n  const isAddingCity = originalRequest.toLowerCase().match(/add|include|also|another/);\n  \n  if (isAddingCity) {\n    // ADDING NEW CITY: Combine old + new cities, extend duration\n    const newCityName = detectedIntent.new_location;\n    \n    // Add new city to existing destinations\n    if (!existingDestinations.includes(newCityName)) {\n      allDestinations.push(newCityName);\n      newCitiesAdded.push(newCityName);\n    }\n    \n    // SIMPLE EXTENSION: Add 1 night per new city added\n    // Example: 3 cities, 3 nights → add 1 city → 4 cities, 4 nights\n    const additionalNights = newCitiesAdded.length; // 1 night per new city\n    const newTotalNights = existingNights + additionalNights;\n    \n    // Extend end date\n    const endDate = new Date(existingEndDate);\n    endDate.setDate(endDate.getDate() + additionalNights);\n    const newEndDate = endDate.toISOString().split('T')[0];\n    \n    modifiedEmailContent = `I want a ${newTotalNights + 1}-day trip to ${allDestinations.join(', ')} from ${existingStartDate} to ${newEndDate}. ${existingAdults} adults${existingChildren > 0 ? ', ' + existingChildren + ' children' : ''}. ${existingMealPlan} meal plan, ${existingHotelCategory} hotels. IMPORTANT: Include ALL ${allDestinations.length} cities: ${allDestinations.join(', ')}. Please re-optimize the travel route for these cities.`;\n    \n  } else {\n    // REPLACING destination: Keep dates and duration, change destination\n    modifiedEmailContent = `I want a ${existingNights + 1}-day trip to ${detectedIntent.new_location} from ${existingStartDate} to ${existingEndDate}. ${existingAdults} adults${existingChildren > 0 ? ', ' + existingChildren + ' children' : ''}. ${existingMealPlan} meal plan, ${existingHotelCategory} hotels.`;\n  }\n  \n} else if (modificationType === 'extend' && detectedIntent.extend_nights) {\n  // Extension: Keep destinations and start date, extend end date\n  const newNights = existingNights + detectedIntent.extend_nights;\n  const endDate = new Date(existingEndDate);\n  endDate.setDate(endDate.getDate() + detectedIntent.extend_nights);\n  const newEndDate = endDate.toISOString().split('T')[0];\n  \n  modifiedEmailContent = `I want a ${newNights + 1}-day trip to ${existingDestinations.join(' and ')} from ${existingStartDate} to ${newEndDate}. ${existingAdults} adults${existingChildren > 0 ? ', ' + existingChildren + ' children' : ''}. ${existingMealPlan} meal plan, ${existingHotelCategory} hotels.`;\n  \n} else if (modificationType === 'multiple') {\n  // Handle multiple modifications\n  let newDest = detectedIntent.new_location || existingDestinations.join(' and ');\n  let newStart = detectedIntent.new_dates?.start || existingStartDate;\n  let newEnd = detectedIntent.new_dates?.end || existingEndDate;\n  \n  // Check if adding cities\n  const isAddingCity = originalRequest.toLowerCase().match(/add|include|also|another/);\n  if (isAddingCity && detectedIntent.new_location) {\n    const newCityName = detectedIntent.new_location;\n    if (!existingDestinations.includes(newCityName)) {\n      allDestinations.push(newCityName);\n      newCitiesAdded.push(newCityName);\n    }\n    newDest = allDestinations.join(', ');\n  }\n  \n  if (detectedIntent.extend_nights) {\n    const endDate = new Date(newEnd);\n    endDate.setDate(endDate.getDate() + detectedIntent.extend_nights);\n    newEnd = endDate.toISOString().split('T')[0];\n  }\n  \n  const start = new Date(newStart);\n  const end = new Date(newEnd);\n  const totalNights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));\n  \n  modifiedEmailContent = `I want a ${totalNights + 1}-day trip to ${newDest} from ${newStart} to ${newEnd}. ${existingAdults} adults${existingChildren > 0 ? ', ' + existingChildren + ' children' : ''}. ${existingMealPlan} meal plan, ${existingHotelCategory} hotels. Please optimize the route for all cities.`;\n  \n} else {\n  // Fallback: use original email content\n  modifiedEmailContent = mergeData.chatInput;\n}\n\nreturn [{\n  json: {\n    chatInput: modifiedEmailContent,\n    sessionId: mergeData.sessionId,\n    request_id: mergeData.request_id,\n    cart_reference: mergeData.cart_reference,\n    request_timestamp: mergeData.request_timestamp,\n    editable: true,\n    cart_name: mergeData.cart_name,\n    modification_type: modificationType,\n    detected_intent: detectedIntent,\n    previous_itinerary: previousData,\n    ai_confidence: detectedIntent.confidence,\n    previous_destinations: existingDestinations,\n    new_destinations: allDestinations,\n    cities_added: newCitiesAdded,\n    previous_dates: { start: existingStartDate, end: existingEndDate }\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         -1808,
-        -784
+        -800
       ],
-      "id": "1fb4fc6f-760e-472d-96be-61233e4a8137",
+      "id": "b10cdb97-3937-4eb3-8bbf-9b46637cbbc5",
       "name": "Parse Intent & Modify Request"
     },
     {
@@ -186,9 +186,9 @@
       "typeVersion": 3,
       "position": [
         -2336,
-        -480
+        -496
       ],
-      "id": "13541bb4-51d3-49eb-81dd-0ef7626a8bc2",
+      "id": "b881a624-4df3-41a7-b646-0476e80c849d",
       "name": "Merge Edit & New Paths"
     },
     {
@@ -201,9 +201,9 @@
       "typeVersion": 2.2,
       "position": [
         -2336,
-        -240
+        -256
       ],
-      "id": "607f982c-9067-48f5-be80-e5c9792a8900",
+      "id": "82845b06-bab1-4e08-9b88-52ed3a7d4238",
       "name": "AI Agent"
     },
     {
@@ -221,7 +221,7 @@
         -2336,
         80
       ],
-      "id": "b0731b19-f6ae-45d2-bf1a-5d58d85e1c32",
+      "id": "b4ae3550-467e-4818-b8ce-006302aafe2d",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
@@ -238,7 +238,7 @@
         -2240,
         80
       ],
-      "id": "5fafb599-3abb-4b1e-bbba-df7191b6a6a7",
+      "id": "995dbeba-7e11-4734-b5d2-2addb3329926",
       "name": "Simple Memory"
     },
     {
@@ -249,9 +249,9 @@
       "typeVersion": 2,
       "position": [
         -2096,
-        -480
+        -496
       ],
-      "id": "465390e8-42bf-4992-a183-8533109b1d33",
+      "id": "502b61b2-d3e3-4959-88be-255fd42e906d",
       "name": "Format for OpenAI Parser"
     },
     {
@@ -278,9 +278,9 @@
       "typeVersion": 4.2,
       "position": [
         -1904,
-        -480
+        -496
       ],
-      "id": "5d7206de-632d-4039-8833-f388ccd33d39",
+      "id": "ddd30811-e2bc-441e-81a3-0972fe566e27",
       "name": "OpenAI Travel Parser",
       "credentials": {
         "openAiApi": {
@@ -297,9 +297,9 @@
       "typeVersion": 2,
       "position": [
         -1696,
-        -480
+        -496
       ],
-      "id": "59f617c9-d959-4b6d-abce-be8689a602af",
+      "id": "d409ca9c-af55-435f-9264-c1d2164a8927",
       "name": "Parse Travel Data"
     },
     {
@@ -310,9 +310,9 @@
       "typeVersion": 2,
       "position": [
         -1504,
-        -480
+        -496
       ],
-      "id": "8866b5db-b44d-4992-9a3c-24b4c0fedd92",
+      "id": "c75218cc-5f3b-4aa7-9c56-98e1859ff03c",
       "name": "Add Cart Metadata"
     },
     {
@@ -323,9 +323,9 @@
       "typeVersion": 2,
       "position": [
         -1392,
-        -704
+        -720
       ],
-      "id": "8ae820c6-c6b8-4899-8739-7f91bae84818",
+      "id": "d11d00b3-3eea-45f4-b00c-624222615703",
       "name": "Process Cities & Hotel Rating"
     },
     {
@@ -336,9 +336,9 @@
       "typeVersion": 2,
       "position": [
         -1760,
-        -192
+        -208
       ],
-      "id": "49c57751-5d52-488e-a94a-0552e169d43a",
+      "id": "a8287486-79c8-4526-ba53-4e10139b3bed",
       "name": "Process Cities & Activities"
     },
     {
@@ -349,9 +349,9 @@
       "typeVersion": 2,
       "position": [
         -1360,
-        -192
+        -208
       ],
-      "id": "db62b282-0696-4ecb-9462-797edbdb9eb3",
+      "id": "7ad12ff7-60cf-475a-b8a9-ed800b04e191",
       "name": "Merge Sheets Data"
     },
     {
@@ -362,9 +362,9 @@
       "typeVersion": 2,
       "position": [
         -1184,
-        -848
+        -864
       ],
-      "id": "264911dc-a478-49a9-a3b8-e752336edd65",
+      "id": "8a06276e-e399-4c96-9bee-5469a0436d60",
       "name": "Sanitize Hotels Data"
     },
     {
@@ -375,9 +375,9 @@
       "typeVersion": 2,
       "position": [
         -1152,
-        -192
+        -208
       ],
-      "id": "27dfe947-f696-46d4-b4ff-ad0dce61307b",
+      "id": "7e7a9f9a-bfbe-4dd4-ba40-613d5c5a1840",
       "name": "Sanitize Activities Data"
     },
     {
@@ -388,9 +388,9 @@
       "typeVersion": 2,
       "position": [
         -976,
-        -848
+        -864
       ],
-      "id": "0e9c6202-39ac-4a04-a8c3-2f90901fdfba",
+      "id": "43f92297-c1fe-4639-9b57-7f530ec708da",
       "name": "Build Itinerary Prompt"
     },
     {
@@ -401,9 +401,9 @@
       "typeVersion": 2,
       "position": [
         -944,
-        -192
+        -208
       ],
-      "id": "0d08de4f-905c-476a-96b0-45a37c25cbbd",
+      "id": "5e02c0a1-d89a-40c7-b671-56d0086b7d62",
       "name": "Build Activities Itinerary Prompt"
     },
     {
@@ -430,9 +430,9 @@
       "typeVersion": 4.2,
       "position": [
         -752,
-        -848
+        -864
       ],
-      "id": "324502e4-6f03-40dc-9bd3-3218c165fc67",
+      "id": "5345da0c-580b-4d58-8620-0f71c40050d3",
       "name": "Generate Hotels Itinerary",
       "credentials": {
         "openAiApi": {
@@ -465,9 +465,9 @@
       "typeVersion": 4.2,
       "position": [
         -752,
-        -192
+        -208
       ],
-      "id": "aa8a6b22-2b4f-40bc-9df1-2e0b9794c594",
+      "id": "6f2e4a9a-f6c8-4024-8ed1-40885ddae7ec",
       "name": "Generate Activities Itinerary",
       "credentials": {
         "openAiApi": {
@@ -484,9 +484,9 @@
       "typeVersion": 2,
       "position": [
         -528,
-        -848
+        -864
       ],
-      "id": "1acb3b45-1119-4a43-bf3d-f162a851923f",
+      "id": "b67f5e2a-39eb-472c-9470-ba5787510f5f",
       "name": "Parse Itinerary Response"
     },
     {
@@ -508,10 +508,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -528,
-        -992
+        -416,
+        -1008
       ],
-      "id": "f13ef98c-e82e-4f63-900c-30a6c76c94f7",
+      "id": "c9a63d21-42d6-42ac-b748-fe5c2fbcfdb6",
       "name": "Save Hotels Itinerary"
     },
     {
@@ -521,10 +521,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -352,
-        -992
+        -224,
+        -1008
       ],
-      "id": "0fed2995-2003-48e2-9252-42102f135212",
+      "id": "fc1ec112-928d-4dfc-950c-58b51046ad0c",
       "name": "Pass Through Hotels Data"
     },
     {
@@ -537,7 +537,7 @@
         -640,
         144
       ],
-      "id": "c064cd93-91fc-4f07-979b-9be9434b6ec8",
+      "id": "eafa53d5-768b-4f00-afd9-04488e710f90",
       "name": "Parse Activities Response"
     },
     {
@@ -552,10 +552,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -352,
-        -848
+        0,
+        -1008
       ],
-      "id": "30ac212f-9755-4a57-b9c0-fdd1aa85fb58",
+      "id": "270ad171-8b67-41e3-a161-64ed544d5303",
       "name": "Send to Hotels API"
     },
     {
@@ -568,7 +568,7 @@
         -416,
         144
       ],
-      "id": "7ac014fc-20e6-463a-a9fb-a0e415a44e69",
+      "id": "8aa88a1e-f026-4b5f-9991-eafbbcf00467",
       "name": "Format Activities API Payload"
     },
     {
@@ -591,9 +591,9 @@
       "typeVersion": 4.2,
       "position": [
         -464,
-        -320
+        -336
       ],
-      "id": "ffd55b19-f005-4dab-a8a5-cc721489d76b",
+      "id": "98ebc4aa-c375-4389-b9e4-cbee5d8b5b2f",
       "name": "Save Activities Itinerary"
     },
     {
@@ -604,9 +604,9 @@
       "typeVersion": 2,
       "position": [
         -192,
-        -320
+        -336
       ],
-      "id": "e64e52b5-0492-4f48-bf08-04f6ec72469b",
+      "id": "1411e4a5-6a7e-4dc3-8e00-96ea8a37180e",
       "name": "Pass Through Activities Data"
     },
     {
@@ -621,10 +621,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -304,
-        -96
+        -80,
+        -80
       ],
-      "id": "803a7aa1-7b06-49f9-bafe-741b40304327",
+      "id": "6354b7bd-a7c7-4cc6-80c3-95bcc953507e",
       "name": "Send to Activities API"
     },
     {
@@ -632,10 +632,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
       "position": [
-        -336,
-        -480
+        -272,
+        -496
       ],
-      "id": "54ccdc33-1033-4066-aea8-c537cb76ad18",
+      "id": "4c9aac16-7330-4e17-b3e7-89a6e87bdacd",
       "name": "Merge Both Responses"
     },
     {
@@ -645,10 +645,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -112,
-        -480
+        -48,
+        -496
       ],
-      "id": "35560089-9fa6-4caf-a7e9-e610bf77823d",
+      "id": "8895f685-f03f-4c92-ba75-24effdf04b05",
       "name": "Combine Final Response"
     },
     {
@@ -669,9 +669,9 @@
       "typeVersion": 4.5,
       "position": [
         -1552,
-        -192
+        -208
       ],
-      "id": "210f5a81-c0ea-478f-91d3-f944a8d49245",
+      "id": "197341aa-0592-4924-a266-ede94cacefd5",
       "name": "Get row(s) in sheet",
       "executeOnce": false,
       "credentials": {
@@ -689,9 +689,9 @@
       "typeVersion": 2,
       "position": [
         -1376,
-        -848
+        -864
       ],
-      "id": "697c2f6e-6b84-41a1-8e27-cdcaf02a1466",
+      "id": "a5b733fc-e947-40b3-8316-cb876f2a5677",
       "name": "Merge Sheets Data1"
     },
     {
@@ -712,9 +712,9 @@
       "typeVersion": 4.5,
       "position": [
         -1568,
-        -848
+        -864
       ],
-      "id": "dc592ba8-a6aa-40f5-91ca-fd8d90683c04",
+      "id": "bdbda704-6a8d-4f69-ac7b-69c29ca73a82",
       "name": "Get row(s) in sheet1",
       "executeOnce": false,
       "credentials": {
@@ -1184,11 +1184,10 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "c7b9d48a-f4dd-464a-a191-aecc59646d96",
+  "versionId": "06d8142d-e474-43a7-86c6-4b9b8a3b81d5",
   "meta": {
-    "templateCredsSetupCompleted": true,
     "instanceId": "9ba699815eee7a9b7506f6b264ee48edcb7b96a79c851198c7b7acafd2a5489c"
   },
-  "id": "3Igo9PHNyo5y3WUw",
+  "id": "T9pjdRAjqBHIsrpc",
   "tags": []
 }
