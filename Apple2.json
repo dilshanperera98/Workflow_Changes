@@ -1,17 +1,17 @@
 {
-  "name": "Travel Quotation System",
+  "name": "Apple",
   "nodes": [
     {
       "parameters": {
         "options": {}
       },
-      "id": "e8c5c6e1-9b4a-4d2e-8f3a-1a2b3c4d5e6f",
+      "id": "ccc79db8-e99a-4644-8a80-0981b2466b95",
       "name": "When chat message received",
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.1,
       "position": [
-        240,
-        300
+        -128,
+        -16
       ],
       "webhookId": "travel-quotation-chat"
     },
@@ -25,150 +25,55 @@
           "systemMessage": "=You are a professional travel quotation assistant. Create concise, formatted summaries of customer travel requests. Always use the exact format specified and calculate dates accurately."
         }
       },
-      "id": "f9d6d7f2-0c5b-4e3f-9g4b-2b3c4d5e6f7g",
+      "id": "a54e8c36-d3f0-4fd5-a4bb-4c5a42e2fc4b",
       "name": "AI Agent",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
       "position": [
-        460,
-        300
+        96,
+        -16
       ]
     },
     {
       "parameters": {
-        "modelId": "gpt-4o-mini",
         "options": {}
       },
-      "id": "a1b2c3d4-5e6f-7g8h-9i0j-k1l2m3n4o5p6",
+      "id": "bf7d1642-8bea-4bf9-b86d-acf2af24df10",
       "name": "OpenAI Chat Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1,
       "position": [
-        460,
-        460
-      ]
-    },
-    {
-      "parameters": {
-        "operation": "extractData",
-        "schema": {
-          "type": "object",
-          "properties": {
-            "country_data": {
-              "type": "object",
-              "properties": {
-                "country": {
-                  "type": "string",
-                  "description": "Destination country"
-                }
-              }
-            },
-            "genaral_data": {
-              "type": "object",
-              "properties": {
-                "arrival_date": {
-                  "type": "string",
-                  "description": "Arrival date in YYYY-MM-DD format. If not mentioned, use today + 15 days"
-                },
-                "pax": {
-                  "type": "object",
-                  "properties": {
-                    "adult": {
-                      "type": "number",
-                      "description": "Number of adults"
-                    },
-                    "cwb": {
-                      "type": "number",
-                      "description": "Children with bed (use child count)"
-                    },
-                    "cnb": {
-                      "type": "number",
-                      "description": "Children no bed (default 0)"
-                    }
-                  }
-                },
-                "market": {
-                  "type": "number",
-                  "description": "Market ID (default 1)"
-                }
-              }
-            },
-            "destination_data": {
-              "type": "object",
-              "properties": {
-                "place": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "description": "Array of places/cities to visit"
-                },
-                "meal_type": {
-                  "type": "string",
-                  "description": "Meal plan code: BB (Breakfast Only - default), HB (Breakfast and Dinner), FB (Breakfast, lunch and Dinner), RO (Room Only), or AL (All Inclusive)"
-                }
-              }
-            }
-          }
-        },
-        "options": {
-          "systemMessage": "=Extract travel quotation data from the conversation. Use these defaults:\n- arrival_date: {{ $now.plus(15, 'days').toFormat('yyyy-MM-dd') }} if not mentioned\n- meal_type: \"BB\" if not mentioned\n- market: 1\n- cnb: 0 if not mentioned\n- cwb: use the child count mentioned by user"
+        96,
+        144
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "CYHGS3KAjICCaQqY",
+          "name": "OpenAi account 2"
         }
-      },
-      "id": "b2c3d4e5-6f7g-8h9i-0j1k-l2m3n4o5p6q7",
-      "name": "Extract Data",
-      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
-      "typeVersion": 1.3,
-      "position": [
-        680,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "modelId": "gpt-4o-mini",
-        "options": {}
-      },
-      "id": "c3d4e5f6-7g8h-9i0j-1k2l-m3n4o5p6q7r8",
-      "name": "OpenAI Chat Model1",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1,
-      "position": [
-        680,
-        460
-      ]
+      }
     },
     {
       "parameters": {
         "jsCode": "// Extract data from the previous node\nconst extractedData = $input.first().json;\n\n// Get country\nconst country = extractedData.country_data?.country || 'Sri Lanka';\n\n// Get general data\nconst arrivalDate = extractedData.genaral_data?.arrival_date || new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];\nconst adult = extractedData.genaral_data?.pax?.adult || 0;\nconst cwb = extractedData.genaral_data?.pax?.cwb || 0;\nconst cnb = extractedData.genaral_data?.pax?.cnb || 0;\nconst market = extractedData.genaral_data?.market || 1;\n\n// Get destination data\nconst places = extractedData.destination_data?.place || [];\nconst mealType = extractedData.destination_data?.meal_type || 'BB';\n\n// Create the formatted output\nconst output = {\n  country_data: {\n    country: country\n  },\n  genaral_data: {\n    arrival_date: arrivalDate,\n    pax: {\n      adult: adult,\n      cwb: cwb,\n      cnb: cnb\n    },\n    market: market\n  },\n  destination_data: {\n    place: places,\n    meal_type: mealType\n  }\n};\n\nreturn { json: output };"
       },
-      "id": "d4e5f6g7-8h9i-0j1k-2l3m-n4o5p6q7r8s9",
+      "id": "a05a949e-66e7-450e-b0a8-132c66aa77b2",
       "name": "Code",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        900,
-        300
+        528,
+        -16
       ]
     }
   ],
+  "pinData": {},
   "connections": {
     "When chat message received": {
       "main": [
         [
           {
             "node": "AI Agent",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "AI Agent": {
-      "main": [
-        [
-          {
-            "node": "Extract Data",
             "type": "main",
             "index": 0
           }
@@ -186,18 +91,7 @@
         ]
       ]
     },
-    "OpenAI Chat Model1": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Extract Data",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extract Data": {
+    "AI Agent": {
       "main": [
         [
           {
@@ -209,13 +103,15 @@
       ]
     }
   },
-  "pinData": {},
+  "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "staticData": null,
-  "tags": [],
-  "triggerCount": 1,
-  "updatedAt": "2025-11-15T00:00:00.000Z",
-  "versionId": "1"
+  "versionId": "c8eae431-1a97-48c2-ac8a-92986312979a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9ba699815eee7a9b7506f6b264ee48edcb7b96a79c851198c7b7acafd2a5489c"
+  },
+  "id": "wikRw3iB39p5rLSI",
+  "tags": []
 }
