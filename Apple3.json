@@ -5,7 +5,7 @@
       "parameters": {
         "options": {}
       },
-      "id": "ccc79db8-e99a-4644-8a80-0981b2466b95",
+      "id": "591c9dab-d139-49d0-af2e-d3ae0025b4ac",
       "name": "When chat message received",
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.1,
@@ -25,7 +25,7 @@
           "systemMessage": "=You are a professional travel quotation assistant. Create concise, formatted summaries of customer travel requests. Always use the exact format specified and calculate dates accurately."
         }
       },
-      "id": "a54e8c36-d3f0-4fd5-a4bb-4c5a42e2fc4b",
+      "id": "63e1f8fc-5a54-4c28-ba9d-2dbf448837b3",
       "name": "AI Agent",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
@@ -38,13 +38,13 @@
       "parameters": {
         "options": {}
       },
-      "id": "bf7d1642-8bea-4bf9-b86d-acf2af24df10",
+      "id": "76f953b9-5093-4abc-b29a-8855a9506d7b",
       "name": "OpenAI Chat Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1,
       "position": [
         96,
-        144
+        304
       ],
       "credentials": {
         "openAiApi": {
@@ -57,7 +57,7 @@
       "parameters": {
         "jsCode": "// Get the AI Agent output text\nconst inputData = $input.first().json;\nconst text = inputData.output || '';\n\n// Parse the text to extract information\nlet country = 'Sri Lanka';\nlet arrivalDate = '';\nlet adult = 0;\nlet children = 0;\nlet places = [];\nlet mealType = 'BB';\n\n// Extract country (e.g., \"Sri Lanka multi-city tour\")\nconst countryMatch = text.match(/requesting a ([^m]+)multi-city tour/i);\nif (countryMatch) {\n  country = countryMatch[1].trim();\n}\n\n// Extract dates (e.g., \"from December 12 to December 18, 2025\")\nconst dateMatch = text.match(/from ([A-Za-z]+ \\d+) to ([A-Za-z]+ \\d+), (\\d{4})/i);\nif (dateMatch) {\n  const monthDay = dateMatch[1]; // e.g., \"December 12\"\n  const year = dateMatch[3];\n  const date = new Date(`${monthDay}, ${year}`);\n  arrivalDate = date.toISOString().split('T')[0];\n}\n\n// If no date found, use today + 15 days as default\nif (!arrivalDate) {\n  const defaultDate = new Date();\n  defaultDate.setDate(defaultDate.getDate() + 15);\n  arrivalDate = defaultDate.toISOString().split('T')[0];\n}\n\n// Extract pax (e.g., \"for 3 adults and 2 children\")\nconst adultMatch = text.match(/(\\d+)\\s+adult/i);\nif (adultMatch) {\n  adult = parseInt(adultMatch[1]);\n}\n\nconst childMatch = text.match(/(\\d+)\\s+child/i);\nif (childMatch) {\n  children = parseInt(childMatch[1]);\n}\n\n// Extract places (e.g., \"including Colombo, Kandy, Galle, and Yala\")\nconst placesMatch = text.match(/including ([^.]+)\\.?$/i);\nif (placesMatch) {\n  const placesStr = placesMatch[1];\n  // Split by comma and 'and', then clean up\n  places = placesStr\n    .split(/,|\\s+and\\s+/)\n    .map(p => p.trim())\n    .filter(p => p.length > 0);\n}\n\n// Extract meal plan\nif (text.toLowerCase().includes('bed & breakfast') || text.toLowerCase().includes('bed and breakfast')) {\n  mealType = 'BB';\n} else if (text.toLowerCase().includes('half board')) {\n  mealType = 'HB';\n} else if (text.toLowerCase().includes('full board')) {\n  mealType = 'FB';\n} else if (text.toLowerCase().includes('room only')) {\n  mealType = 'RO';\n} else if (text.toLowerCase().includes('all inclusive')) {\n  mealType = 'AL';\n}\n\n// Create the formatted output\nconst output = {\n  country_data: {\n    country: country\n  },\n  genaral_data: {\n    arrival_date: arrivalDate,\n    pax: {\n      adult: adult,\n      cwb: children,\n      cnb: 0\n    },\n    market: 1\n  },\n  destination_data: {\n    place: places,\n    meal_type: mealType\n  }\n};\n\nreturn { json: output };"
       },
-      "id": "a05a949e-66e7-450e-b0a8-132c66aa77b2",
+      "id": "93655531-30ef-44af-b058-68e35e2191fb",
       "name": "Code",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -65,6 +65,40 @@
         528,
         -16
       ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1n-xL0h9PHeOhfcpytCouV7_pkYj4BzSMZghqTsKrgYo/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Sheet1"
+        },
+        "filtersUI": {
+          "values": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        752,
+        -16
+      ],
+      "id": "a3afdbe2-7a6d-4514-8c05-bacab019948f",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4bqLa45KMMhTDuqo",
+          "name": "Google Sheets account 2"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -101,13 +135,24 @@
           }
         ]
       ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "c8eae431-1a97-48c2-ac8a-92986312979a",
+  "versionId": "d37cd475-0dcb-415d-b365-38c05e188d76",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9ba699815eee7a9b7506f6b264ee48edcb7b96a79c851198c7b7acafd2a5489c"
