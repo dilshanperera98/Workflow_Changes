@@ -1,0 +1,93 @@
+{
+  "name": "Apple",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "7b319ca5-69f1-4ccb-a1db-ebad78da089d",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        -16
+      ],
+      "webhookId": "travel-quotation-chat"
+    },
+    {
+      "parameters": {
+        "agent": "conversationalAgent",
+        "promptType": "define",
+        "text": "=You are a travel quotation assistant. Extract travel information from user messages.\n\nExtract the following information:\n1. country - the destination country\n2. arrival_date - in YYYY-MM-DD format (if not mentioned, use {{ $now.plus(15, 'days').toFormat('yyyy-MM-dd') }})\n3. pax details:\n   - adult: number of adults\n   - child: number of children (combine all children as cwb if mentioned)\n   - cwb: children with bed (use child count here)\n   - cnb: children no bed (default 0 if not specified)\n4. place - array of destinations/cities to visit\n5. meal_type - meal plan code (BB=Breakfast Only, HB=Breakfast and Dinner, FB=Breakfast, lunch and Dinner, RO=Room Only, AL=All Inclusive). If not mentioned, default to \"BB\"\n6. market - default to 1\n\nUser input: {{ $json.chatInput }}\n\nProvide a complete, well-formatted response confirming the extracted information and ask if anything needs to be adjusted.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a helpful travel quotation assistant. Extract travel details accurately and provide clear confirmations."
+        }
+      },
+      "id": "13715f63-87f7-4600-81d4-3bd75406db2a",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        320,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "11743777-f0d5-4879-aefd-9599eb451eb6",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        320,
+        208
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "CYHGS3KAjICCaQqY",
+          "name": "OpenAi account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "26217b91-a5b5-41d9-ae26-32deb2203326",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9ba699815eee7a9b7506f6b264ee48edcb7b96a79c851198c7b7acafd2a5489c"
+  },
+  "id": "wikRw3iB39p5rLSI",
+  "tags": []
+}
