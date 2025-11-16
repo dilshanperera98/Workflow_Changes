@@ -147,6 +147,34 @@
     },
     {
       "parameters": {
+        "method": "GET",
+        "url": "=https://stagev2.appletechlabs.com/api/content/place/?name={{ $json.City }}",
+        "options": {}
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Get City ID from API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -400,
+        -448
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Country name to ID mapping\nconst countryMap = {\n  \"Sri Lanka\": 62,\n  \"Malaysia\": 63,\n  \"Singapore\": 64,\n  \"India\": 149,\n  \"Vietnam\": 256,\n  \"vietnam\": 256\n};\n\n// Get the input data from Add Booking Details\nconst bookingData = $('Add Booking Details').item.json;\n\n// Get the API response with city ID\nconst apiResponse = $input.item.json;\nlet cityId = bookingData.City; // Default to original city name if not found\n\n// Extract city ID from API response\nif (apiResponse && apiResponse.body && Array.isArray(apiResponse.body) && apiResponse.body.length > 0) {\n  cityId = apiResponse.body[0].id;\n}\n\n// Get country name and map to ID\nconst countryName = bookingData.country_data.country;\nconst countryId = countryMap[countryName] || countryName; // Use ID if found, otherwise keep original\n\n// Create the output with mapped IDs\nconst output = {\n  country_data: {\n    country: countryId.toString()\n  },\n  row_number: bookingData.row_number,\n  City: cityId.toString(),\n  \"Hotel Class\": bookingData[\"Hotel Class\"],\n  \"Hotel Name\": bookingData[\"Hotel Name\"],\n  \"Apple Hotel ID\": bookingData[\"Apple Hotel ID\"],\n  \"Basic Room Categoty\": bookingData[\"Basic Room Categoty\"],\n  \"Extra1\": bookingData[\"Extra1\"] || \"\",\n  check_in: bookingData.check_in,\n  check_out: bookingData.check_out,\n  meal_type: bookingData.meal_type\n};\n\nreturn { json: output };"
+      },
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "Map IDs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        -448
+      ]
+    },
+    {
+      "parameters": {
         "documentId": {
           "__rl": true,
           "value": "https://docs.google.com/spreadsheets/d/1n-xL0h9PHeOhfcpytCouV7_pkYj4BzSMZghqTsKrgYo/edit?usp=sharing",
@@ -310,6 +338,28 @@
       ]
     },
     "Add Booking Details": {
+      "main": [
+        [
+          {
+            "node": "Get City ID from API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get City ID from API": {
+      "main": [
+        [
+          {
+            "node": "Map IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map IDs": {
       "main": [
         []
       ]
