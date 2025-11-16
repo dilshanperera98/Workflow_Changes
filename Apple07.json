@@ -238,6 +238,41 @@
     },
     {
       "parameters": {
+        "url": "=https://stagev2.appletechlabs.com/api/content/place/?name={{ $json.City }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpBearerAuth",
+        "options": {}
+      },
+      "id": "e1f2a3b4-c5d6-7890-abcd-ef1234567891",
+      "name": "Get City ID from API1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        992,
+        0
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "YT5nTLIKvTYA4CI7",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Country name to ID mapping\nconst countryMap = {\n  \"Sri Lanka\": 62,\n  \"Malaysia\": 63,\n  \"Singapore\": 64,\n  \"India\": 149,\n  \"Vietnam\": 256,\n  \"vietnam\": 256\n};\n\n// Get all API responses\nconst apiResponses = $input.all();\n\n// Get all activity data from Add Booking Details Activities\nconst activityDataItems = $('Add Booking Details Activities').all();\n\n// Process each activity item\nconst results = [];\n\nfor (let i = 0; i < apiResponses.length; i++) {\n  const apiResponse = apiResponses[i].json;\n  const activityData = activityDataItems[i].json;\n  \n  let cityId = activityData.City; // Default to original city name if not found\n  \n  // Extract city ID from API response\n  if (apiResponse && apiResponse.body && Array.isArray(apiResponse.body) && apiResponse.body.length > 0) {\n    // Find the matching city with the correct country\n    const countryName = activityData.country_data.country;\n    const countryId = countryMap[countryName] || null;\n    \n    // Find city with matching country if possible\n    let cityData = null;\n    if (countryId) {\n      cityData = apiResponse.body.find(city => city.country === countryId);\n    }\n    \n    // If no match with country, use the first result\n    if (!cityData && apiResponse.body.length > 0) {\n      cityData = apiResponse.body[0];\n    }\n    \n    if (cityData) {\n      cityId = cityData.id;\n    }\n  }\n  \n  // Get country name and map to ID\n  const countryName = activityData.country_data.country;\n  const countryId = countryMap[countryName] || countryName; // Use ID if found, otherwise keep original\n  \n  // Check if Must Do Activity and Apple Hotel ID contain commas (multiple values)\n  const mustDoActivity = activityData[\"Must Do Activity\"] || \"\";\n  const appleHotelId = activityData[\"Apple Hotel ID\"] || \"\";\n  \n  const hasMultipleActivities = mustDoActivity.includes(',');\n  \n  if (hasMultipleActivities) {\n    // Split Must Do Activity and Apple Hotel ID by comma\n    const activities = mustDoActivity.split(',').map(act => act.trim());\n    const appleIds = appleHotelId.toString().split(',').map(id => id.trim());\n    \n    // Create separate records for each activity/ID pair\n    const maxLength = Math.max(activities.length, appleIds.length);\n    \n    for (let j = 0; j < maxLength; j++) {\n      results.push({\n        json: {\n          country_data: {\n            country: countryId.toString()\n          },\n          row_number: activityData.row_number,\n          City: cityId.toString(),\n          \"Lifestyle  Category\": activityData[\"Lifestyle  Category\"],\n          \"Must Do Activity\": activities[j] || activities[0],\n          \"Apple ID\": appleIds[j] || appleIds[0],\n          check_in: activityData.check_in,\n          check_out: activityData.check_out\n        }\n      });\n    }\n  } else {\n    // Single activity - create one record\n    results.push({\n      json: {\n        country_data: {\n          country: countryId.toString()\n        },\n        row_number: activityData.row_number,\n        City: cityId.toString(),\n        \"Lifestyle  Category\": activityData[\"Lifestyle  Category\"],\n        \"Must Do Activity\": mustDoActivity,\n        \"Apple ID\": appleHotelId.toString(),\n        check_in: activityData.check_in,\n        check_out: activityData.check_out\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "id": "f2a3b4c5-d6e7-8901-bcde-f12345678902",
+      "name": "Map IDs Activities",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        0
+      ]
+    },
+    {
+      "parameters": {
         "jsCode": "// Get ALL split items\nconst items = $input.all();\nconst originalData = $('Code').first().json;\n\n// Get arrival date and calculate stays\nconst arrivalDate = originalData.genaral_data.arrival_date;\nconst totalNights = 6; // Default 7 days, 6 nights\nconst cityCount = items.length;\nconst nightsPerCity = Math.floor(totalNights / cityCount);\n\n// Get city-specific meal plans if available\nconst cityMealMap = originalData.destination_data.city_meal_map;\nconst defaultMealType = originalData.destination_data.meal_type;\n\n// Process each item and calculate check-in/check-out dates\nconst results = [];\nlet currentCheckIn = new Date(arrivalDate);\n\nfor (let i = 0; i < items.length; i++) {\n  const item = items[i];\n  const currentPlace = item.json['destination_data.place'];\n  \n  // Calculate check-out date (check-in + nights per city)\n  const checkOutDate = new Date(currentCheckIn);\n  checkOutDate.setDate(checkOutDate.getDate() + nightsPerCity);\n  \n  // Format dates as YYYY-MM-DD\n  const checkIn = currentCheckIn.toISOString().split('T')[0];\n  const checkOut = checkOutDate.toISOString().split('T')[0];\n  \n  // Determine meal type for this city\n  let mealType = defaultMealType;\n  if (cityMealMap && cityMealMap[currentPlace]) {\n    mealType = cityMealMap[currentPlace];\n  }\n  \n  results.push({\n    json: {\n      current_city: currentPlace,\n      country_data: originalData.country_data,\n      genaral_data: {\n        pax: originalData.genaral_data.pax,\n        market: originalData.genaral_data.market\n      },\n      destination_data: {\n        meal_type: mealType,\n        current_place: currentPlace,\n        check_in: checkIn,\n        check_out: checkOut\n      }\n    }\n  });\n  \n  // Next city's check-in is current city's check-out\n  currentCheckIn = checkOutDate;\n}\n\n// Add arrival_date to the first item only\nif (results.length > 0) {\n  results[0].json.genaral_data.arrival_date = arrivalDate;\n}\n\nreturn results;"
       },
       "id": "26025b81-29a2-45ab-a7a9-9b0749984bbe",
@@ -401,6 +436,33 @@
             "index": 0
           }
         ]
+      ]
+    },
+    "Add Booking Details Activities": {
+      "main": [
+        [
+          {
+            "node": "Get City ID from API1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get City ID from API1": {
+      "main": [
+        [
+          {
+            "node": "Map IDs Activities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map IDs Activities": {
+      "main": [
+        []
       ]
     }
   },
