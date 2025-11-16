@@ -5,13 +5,13 @@
       "parameters": {
         "options": {}
       },
-      "id": "9ede1981-d12b-4471-90cc-851f078f7eb9",
+      "id": "447c5646-ae6e-4992-be68-2bf6572e3fd5",
       "name": "When chat message received",
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.1,
       "position": [
-        -1600,
-        -288
+        -256,
+        -176
       ],
       "webhookId": "travel-quotation-chat"
     },
@@ -19,32 +19,32 @@
       "parameters": {
         "agent": "conversationalAgent",
         "promptType": "define",
-        "text": "=You are a travel quotation assistant. Analyze the user's travel request and create a professional summary.\n\nUser input: {{ $json.chatInput }}\n\nExtract and analyze:\n1. Destination country\n2. Arrival date (if not mentioned, use {{ $now.plus(15, 'days').toFormat('yyyy-MM-dd') }})\n3. Duration: If not mentioned, default to 7 days, 6 nights\n4. Calculate departure date: arrival_date + duration\n5. Number of adults and children\n6. Cities/places to visit\n7. Hotel star category:\n   - Check if user mentioned: \"5 star\", \"5-star\", \"five star\" → use \"5-star\"\n   - Check if user mentioned: \"4 star\", \"4-star\", \"four star\" → use \"4-star\"\n   - Check if user mentioned: \"3 star\", \"3-star\", \"three star\" → use \"3-star\"\n   - Check if user mentioned: \"2 star\", \"2-star\", \"two star\" → use \"2-star\"\n   - Check if user mentioned: \"luxury\" → use \"5-star\"\n   - Check if user mentioned: \"budget\" → use \"3-star\"\n   - If NOT mentioned → default to \"4-star\"\n8. Meal plan: \n   - If user specifies different meal plans for different cities, note each city's meal plan\n   - If user specifies one meal plan for all, apply it to all cities\n   - If NOT mentioned at all → default to \"bed & breakfast\"\n   - Meal plan types: \"half board\" (HB), \"full board\" (FB), \"room only\" (RO), \"all inclusive\" (AL), \"bed & breakfast\" (BB)\n9. Budget: If user mentioned luxury or 5-star use \"luxury budget\", if 3-star or budget use \"budget-friendly\", otherwise use \"mid-range budget\"\n\nIMPORTANT: If different cities have different meal plans, format the output to include meal plan per city:\n\nFormat your output as:\n\"Customer requesting a [Country] multi-city tour for [X] days, [Y] nights from [Month Day] to [Month Day], [Year], for [X] adults and [Y] children. [Budget type] with [X-star] hotel accommodation. Interested in visiting key cities and attractions: [City1] with [meal plan], [City2] with [meal plan], [City3] with [meal plan].\"\n\nIf all cities have the same meal plan:\n\"Customer requesting a [Country] multi-city tour for [X] days, [Y] nights from [Month Day] to [Month Day], [Year], for [X] adults and [Y] children. [Budget type] with [X-star] hotel accommodation and [meal plan] meal plan. Interested in visiting key cities and attractions including [list cities].\"\n\nExamples:\n- Different meal plans: \"Customer requesting a Sri Lanka multi-city tour for 7 days, 6 nights from December 12 to December 18, 2026, for 3 adults and 2 children. Mid-range budget with 4-star hotel accommodation. Interested in visiting key cities and attractions: Sigiriya with half board, Dambulla with room only, Bentota with full board.\"\n- Same meal plan with 5-star: \"Customer requesting a Sri Lanka multi-city tour for 7 days, 6 nights from December 12 to December 18, 2025, for 7 adults and 2 children. Luxury budget with 5-star hotel accommodation and bed & breakfast meal plan. Interested in visiting key cities and attractions including Colombo, Kandy, Galle, and Yala.\"\n- Budget 3-star: \"Customer requesting a Sri Lanka multi-city tour for 7 days, 6 nights from December 12 to December 18, 2025, for 2 adults and 1 children. Budget-friendly with 3-star hotel accommodation and bed & breakfast meal plan. Interested in visiting key cities and attractions including Colombo, Kandy, and Galle.\"",
+        "text": "=You are a travel quotation assistant. Analyze the user's travel request and create a professional summary.\n\nUser input: {{ $json.chatInput }}\n\nExtract and analyze:\n1. Destination country\n2. Arrival date (if not mentioned, use {{ $now.plus(15, 'days').toFormat('yyyy-MM-dd') }})\n3. Duration: If not mentioned, default to 7 days, 6 nights\n4. Calculate departure date: arrival_date + duration\n5. Number of adults and children\n6. Cities/places to visit\n7. Meal plan: \n   - If user specifies different meal plans for different cities, note each city's meal plan\n   - If user specifies one meal plan for all, apply it to all cities\n   - If NOT mentioned at all → default to \"bed & breakfast\"\n   - Meal plan types: \"half board\" (HB), \"full board\" (FB), \"room only\" (RO), \"all inclusive\" (AL), \"bed & breakfast\" (BB)\n8. Accommodation: Assume mid-range budget with 4-star hotel if not specified\n\nIMPORTANT: If different cities have different meal plans, format the output to include meal plan per city:\n\nFormat your output as:\n\"Customer requesting a [Country] multi-city tour for [X] days, [Y] nights from [Month Day] to [Month Day], [Year], for [X] adults and [Y] children. Mid-range budget with 4-star hotel accommodation. Interested in visiting key cities and attractions: [City1] with [meal plan], [City2] with [meal plan], [City3] with [meal plan].\"\n\nIf all cities have the same meal plan:\n\"Customer requesting a [Country] multi-city tour for [X] days, [Y] nights from [Month Day] to [Month Day], [Year], for [X] adults and [Y] children. Mid-range budget with 4-star hotel accommodation and [meal plan] meal plan. Interested in visiting key cities and attractions including [list cities].\"\n\nExamples:\n- Different meal plans: \"Customer requesting a Sri Lanka multi-city tour for 7 days, 6 nights from December 12 to December 18, 2026, for 3 adults and 2 children. Mid-range budget with 4-star hotel accommodation. Interested in visiting key cities and attractions: Sigiriya with half board, Dambulla with room only, Bentota with full board.\"\n- Same meal plan: \"Customer requesting a Sri Lanka multi-city tour for 7 days, 6 nights from December 12 to December 18, 2025, for 3 adults and 2 children. Mid-range budget with 4-star hotel accommodation and half board meal plan. Interested in visiting key cities and attractions including Colombo, Kandy, Galle, and Yala.\"",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "=You are a professional travel quotation assistant. Create concise, formatted summaries of customer travel requests. Always use the exact format specified and calculate dates accurately. Pay special attention to hotel star categories, meal plans mentioned by the user and which cities they apply to."
+          "systemMessage": "=You are a professional travel quotation assistant. Create concise, formatted summaries of customer travel requests. Always use the exact format specified and calculate dates accurately. Pay special attention to meal plans mentioned by the user and which cities they apply to."
         }
       },
-      "id": "9362ba37-eb34-4a2b-885c-a67ba8908730",
+      "id": "48d69e35-763a-4bc0-8de7-cd4e10c819f5",
       "name": "AI Agent",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
       "position": [
-        -1376,
-        -288
+        -32,
+        -176
       ]
     },
     {
       "parameters": {
         "options": {}
       },
-      "id": "4434dd3e-31d8-4b52-9ffa-2593e2edb9c0",
+      "id": "d9709c27-69cf-4c65-9664-1a1c28e9de3b",
       "name": "OpenAI Chat Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1,
       "position": [
-        -1376,
-        32
+        -32,
+        144
       ],
       "credentials": {
         "openAiApi": {
@@ -55,15 +55,15 @@
     },
     {
       "parameters": {
-        "jsCode": "// Get the AI Agent output text\nconst inputData = $input.first().json;\nconst text = inputData.output || '';\n\n// Parse the text to extract information\nlet country = 'Sri Lanka'; // Default fallback\nlet arrivalDate = '';\nlet adult = 0;\nlet children = 0;\nlet places = [];\nlet mealType = 'BB'; // Default\nlet cityMealMap = {}; // Map of city to meal type\nlet hotelStarCategory = 4; // Default 4-star\n\n// Extract country (e.g., \"Vietnam multi-city tour\" or \"Sri Lanka multi-city tour\")\nconst countryMatch = text.match(/requesting a ([A-Za-z\\s]+?)\\s+multi-city tour/i);\nif (countryMatch) {\n  country = countryMatch[1].trim();\n}\n\n// Extract dates (e.g., \"from December 12 to December 18, 2025\")\nconst dateMatch = text.match(/from ([A-Za-z]+ \\d+) to ([A-Za-z]+ \\d+), (\\d{4})/i);\nif (dateMatch) {\n  const monthDay = dateMatch[1]; // e.g., \"December 12\"\n  const year = dateMatch[3];\n  const date = new Date(`${monthDay}, ${year}`);\n  arrivalDate = date.toISOString().split('T')[0];\n}\n\n// If no date found, use today + 15 days as default\nif (!arrivalDate) {\n  const defaultDate = new Date();\n  defaultDate.setDate(defaultDate.getDate() + 15);\n  arrivalDate = defaultDate.toISOString().split('T')[0];\n}\n\n// Extract pax (e.g., \"for 3 adults and 2 children\")\nconst adultMatch = text.match(/(\\d+)\\s+adult/i);\nif (adultMatch) {\n  adult = parseInt(adultMatch[1]);\n}\n\nconst childMatch = text.match(/(\\d+)\\s+child/i);\nif (childMatch) {\n  children = parseInt(childMatch[1]);\n}\n\n// Extract hotel star category (e.g., \"5-star hotel\", \"4-star hotel\")\nconst starMatch = text.match(/(\\d)-star\\s+hotel/i);\nif (starMatch) {\n  hotelStarCategory = parseInt(starMatch[1]);\n}\n\n// Helper function to convert meal plan text to code\nfunction getMealCode(mealText) {\n  const lowerText = mealText.toLowerCase();\n  if (lowerText.includes('half board')) return 'HB';\n  if (lowerText.includes('full board')) return 'FB';\n  if (lowerText.includes('all inclusive')) return 'AL';\n  if (lowerText.includes('room only')) return 'RO';\n  if (lowerText.includes('bed & breakfast') || lowerText.includes('bed and breakfast')) return 'BB';\n  return 'BB'; // default\n}\n\n// Check if cities have individual meal plans (format: \"City1 with meal_plan, City2 with meal_plan\")\nconst cityMealPattern = /([A-Za-z]+)\\s+with\\s+(half board|full board|room only|all inclusive|bed & breakfast|bed and breakfast)/gi;\nconst cityMealMatches = text.matchAll(cityMealPattern);\nlet hasCitySpecificMeals = false;\n\nfor (const match of cityMealMatches) {\n  const cityName = match[1].trim();\n  const mealPlan = match[2].trim();\n  cityMealMap[cityName] = getMealCode(mealPlan);\n  places.push(cityName);\n  hasCitySpecificMeals = true;\n}\n\n// If no city-specific meal plans found, extract places and meal plan separately\nif (!hasCitySpecificMeals) {\n  // Extract places (e.g., \"including Colombo, Kandy, Galle, and Yala\")\n  const placesMatch = text.match(/including ([^.]+)\\.?$/i);\n  if (placesMatch) {\n    const placesStr = placesMatch[1];\n    // Split by comma and 'and', then clean up\n    places = placesStr\n      .split(/,|\\s+and\\s+/)\n      .map(p => p.trim())\n      .filter(p => p.length > 0);\n  }\n  \n  // Extract single meal plan for all cities\n  if (text.toLowerCase().includes('half board')) {\n    mealType = 'HB';\n  } else if (text.toLowerCase().includes('full board')) {\n    mealType = 'FB';\n  } else if (text.toLowerCase().includes('all inclusive')) {\n    mealType = 'AL';\n  } else if (text.toLowerCase().includes('room only')) {\n    mealType = 'RO';\n  } else if (text.toLowerCase().includes('bed & breakfast') || text.toLowerCase().includes('bed and breakfast')) {\n    mealType = 'BB';\n  }\n}\n\n// Create the formatted output\nconst output = {\n  country_data: {\n    country: country\n  },\n  genaral_data: {\n    arrival_date: arrivalDate,\n    pax: {\n      adult: adult,\n      cwb: children,\n      cnb: 0\n    },\n    market: 1,\n    hotel_star_category: hotelStarCategory\n  },\n  destination_data: {\n    place: places,\n    meal_type: mealType,\n    city_meal_map: Object.keys(cityMealMap).length > 0 ? cityMealMap : null\n  }\n};\n\nreturn { json: output };"
+        "jsCode": "// Get the AI Agent output text\nconst inputData = $input.first().json;\nconst text = inputData.output || '';\n\n// Parse the text to extract information\nlet country = 'Sri Lanka'; // Default fallback\nlet arrivalDate = '';\nlet adult = 0;\nlet children = 0;\nlet places = [];\nlet mealType = 'BB'; // Default\nlet cityMealMap = {}; // Map of city to meal type\n\n// Extract country (e.g., \"Vietnam multi-city tour\" or \"Sri Lanka multi-city tour\")\nconst countryMatch = text.match(/requesting a ([A-Za-z\\s]+?)\\s+multi-city tour/i);\nif (countryMatch) {\n  country = countryMatch[1].trim();\n}\n\n// Extract dates (e.g., \"from December 12 to December 18, 2025\")\nconst dateMatch = text.match(/from ([A-Za-z]+ \\d+) to ([A-Za-z]+ \\d+), (\\d{4})/i);\nif (dateMatch) {\n  const monthDay = dateMatch[1]; // e.g., \"December 12\"\n  const year = dateMatch[3];\n  const date = new Date(`${monthDay}, ${year}`);\n  arrivalDate = date.toISOString().split('T')[0];\n}\n\n// If no date found, use today + 15 days as default\nif (!arrivalDate) {\n  const defaultDate = new Date();\n  defaultDate.setDate(defaultDate.getDate() + 15);\n  arrivalDate = defaultDate.toISOString().split('T')[0];\n}\n\n// Extract pax (e.g., \"for 3 adults and 2 children\")\nconst adultMatch = text.match(/(\\d+)\\s+adult/i);\nif (adultMatch) {\n  adult = parseInt(adultMatch[1]);\n}\n\nconst childMatch = text.match(/(\\d+)\\s+child/i);\nif (childMatch) {\n  children = parseInt(childMatch[1]);\n}\n\n// Helper function to convert meal plan text to code\nfunction getMealCode(mealText) {\n  const lowerText = mealText.toLowerCase();\n  if (lowerText.includes('half board')) return 'HB';\n  if (lowerText.includes('full board')) return 'FB';\n  if (lowerText.includes('all inclusive')) return 'AL';\n  if (lowerText.includes('room only')) return 'RO';\n  if (lowerText.includes('bed & breakfast') || lowerText.includes('bed and breakfast')) return 'BB';\n  return 'BB'; // default\n}\n\n// Check if cities have individual meal plans (format: \"City1 with meal_plan, City2 with meal_plan\")\nconst cityMealPattern = /([A-Za-z]+)\\s+with\\s+(half board|full board|room only|all inclusive|bed & breakfast|bed and breakfast)/gi;\nconst cityMealMatches = text.matchAll(cityMealPattern);\nlet hasCitySpecificMeals = false;\n\nfor (const match of cityMealMatches) {\n  const cityName = match[1].trim();\n  const mealPlan = match[2].trim();\n  cityMealMap[cityName] = getMealCode(mealPlan);\n  places.push(cityName);\n  hasCitySpecificMeals = true;\n}\n\n// If no city-specific meal plans found, extract places and meal plan separately\nif (!hasCitySpecificMeals) {\n  // Extract places (e.g., \"including Colombo, Kandy, Galle, and Yala\")\n  const placesMatch = text.match(/including ([^.]+)\\.?$/i);\n  if (placesMatch) {\n    const placesStr = placesMatch[1];\n    // Split by comma and 'and', then clean up\n    places = placesStr\n      .split(/,|\\s+and\\s+/)\n      .map(p => p.trim())\n      .filter(p => p.length > 0);\n  }\n  \n  // Extract single meal plan for all cities\n  if (text.toLowerCase().includes('half board')) {\n    mealType = 'HB';\n  } else if (text.toLowerCase().includes('full board')) {\n    mealType = 'FB';\n  } else if (text.toLowerCase().includes('all inclusive')) {\n    mealType = 'AL';\n  } else if (text.toLowerCase().includes('room only')) {\n    mealType = 'RO';\n  } else if (text.toLowerCase().includes('bed & breakfast') || text.toLowerCase().includes('bed and breakfast')) {\n    mealType = 'BB';\n  }\n}\n\n// Create the formatted output\nconst output = {\n  country_data: {\n    country: country\n  },\n  genaral_data: {\n    arrival_date: arrivalDate,\n    pax: {\n      adult: adult,\n      cwb: children,\n      cnb: 0\n    },\n    market: 1\n  },\n  destination_data: {\n    place: places,\n    meal_type: mealType,\n    city_meal_map: Object.keys(cityMealMap).length > 0 ? cityMealMap : null\n  }\n};\n\nreturn { json: output };"
       },
-      "id": "1a34bfa7-e291-4d5c-ae48-de92bbbd03e2",
+      "id": "84cd4005-725c-4505-95d2-e5d5a0212237",
       "name": "Code",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1104,
-        -288
+        240,
+        -176
       ]
     },
     {
@@ -71,26 +71,26 @@
         "fieldToSplitOut": "=destination_data.place",
         "options": {}
       },
-      "id": "5b84593d-9bab-4844-b2a0-2d8e73385d89",
+      "id": "7057a35c-4576-44ea-b153-e862612bf480",
       "name": "Split Out Places",
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        -992,
-        -448
+        352,
+        -336
       ]
     },
     {
       "parameters": {
         "jsCode": "// Get ALL split items\nconst items = $input.all();\nconst originalData = $('Code').first().json;\n\n// Get arrival date and calculate stays\nconst arrivalDate = originalData.genaral_data.arrival_date;\nconst totalNights = 6; // Default 7 days, 6 nights\nconst cityCount = items.length;\nconst nightsPerCity = Math.floor(totalNights / cityCount);\n\n// Get city-specific meal plans if available\nconst cityMealMap = originalData.destination_data.city_meal_map;\nconst defaultMealType = originalData.destination_data.meal_type;\n\n// Process each item and calculate check-in/check-out dates\nconst results = [];\nlet currentCheckIn = new Date(arrivalDate);\n\nfor (let i = 0; i < items.length; i++) {\n  const item = items[i];\n  const currentPlace = item.json['destination_data.place'];\n  \n  // Calculate check-out date (check-in + nights per city)\n  const checkOutDate = new Date(currentCheckIn);\n  checkOutDate.setDate(checkOutDate.getDate() + nightsPerCity);\n  \n  // Format dates as YYYY-MM-DD\n  const checkIn = currentCheckIn.toISOString().split('T')[0];\n  const checkOut = checkOutDate.toISOString().split('T')[0];\n  \n  // Determine meal type for this city\n  let mealType = defaultMealType;\n  if (cityMealMap && cityMealMap[currentPlace]) {\n    mealType = cityMealMap[currentPlace];\n  }\n  \n  results.push({\n    json: {\n      current_city: currentPlace,\n      country_data: originalData.country_data,\n      genaral_data: {\n        pax: originalData.genaral_data.pax,\n        market: originalData.genaral_data.market\n      },\n      destination_data: {\n        meal_type: mealType,\n        current_place: currentPlace,\n        check_in: checkIn,\n        check_out: checkOut\n      }\n    }\n  });\n  \n  // Next city's check-in is current city's check-out\n  currentCheckIn = checkOutDate;\n}\n\n// Add arrival_date to the first item only\nif (results.length > 0) {\n  results[0].json.genaral_data.arrival_date = arrivalDate;\n}\n\nreturn results;"
       },
-      "id": "d6ee6c60-45ea-494b-9a5b-9bfec4bee33d",
+      "id": "a9555a46-eba9-4e22-a4bd-8cb9c9ce11ca",
       "name": "Prepare for Lookup",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -848,
-        -448
+        496,
+        -336
       ]
     },
     {
@@ -110,10 +110,6 @@
             {
               "lookupColumn": "City",
               "lookupValue": "={{ $json.current_city }}"
-            },
-            {
-              "lookupColumn": "Hotel Class",
-              "lookupValue": "={{ $json.genaral_data.hotel_star_category }}"
             }
           ]
         },
@@ -124,10 +120,10 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -704,
-        -448
+        640,
+        -336
       ],
-      "id": "66f96d32-00b5-447f-9dde-a7fcfb80f315",
+      "id": "24c2e2f5-25b8-454e-b057-c2f71a8b8658",
       "name": "Get row(s) in sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -140,41 +136,48 @@
       "parameters": {
         "jsCode": "// Get all hotel data from Google Sheets\nconst hotelItems = $input.all();\n\n// Get all city data from Prepare for Lookup node\nconst cityItems = $('Prepare for Lookup').all();\n\n// Create a map of city data by city name for easy lookup\nconst cityDataMap = {};\nfor (const cityItem of cityItems) {\n  const cityName = cityItem.json.current_city;\n  cityDataMap[cityName] = cityItem.json;\n}\n\n// Process each hotel and add booking details\nconst results = [];\n\nfor (const hotelItem of hotelItems) {\n  const hotelData = hotelItem.json;\n  const cityName = hotelData.City;\n  \n  // Get the corresponding city data\n  const cityData = cityDataMap[cityName];\n  \n  // Remove Aahaas Hotel ID from the data\n  const { 'Aahaas Hotel ID': removed, ...filteredHotelData } = hotelData;\n  \n  if (cityData) {\n    // Merge hotel data with country_data at the top, then other fields\n    results.push({\n      json: {\n        country_data: cityData.country_data,\n        ...filteredHotelData,\n        check_in: cityData.destination_data.check_in,\n        check_out: cityData.destination_data.check_out,\n        meal_type: cityData.destination_data.meal_type\n      }\n    });\n  } else {\n    // If no matching city data, just return filtered hotel data with default country\n    results.push({\n      json: {\n        country_data: { country: \"Sri Lanka\" },\n        ...filteredHotelData\n      }\n    });\n  }\n}\n\nreturn results;"
       },
-      "id": "59120465-7aa7-49d9-bb83-be215439798d",
+      "id": "33421eba-025b-44b3-8966-fa18b42c10cd",
       "name": "Add Booking Details",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -560,
-        -448
+        784,
+        -336
       ]
     },
     {
       "parameters": {
-        "method": "GET",
         "url": "=https://stagev2.appletechlabs.com/api/content/place/?name={{ $json.City }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpBearerAuth",
         "options": {}
       },
-      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "id": "fa028f93-00ae-432a-bc14-5d540d4ef50f",
       "name": "Get City ID from API",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -400,
-        -448
-      ]
+        944,
+        -336
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "YT5nTLIKvTYA4CI7",
+          "name": "Bearer Auth account"
+        }
+      }
     },
     {
       "parameters": {
         "jsCode": "// Country name to ID mapping\nconst countryMap = {\n  \"Sri Lanka\": 62,\n  \"Malaysia\": 63,\n  \"Singapore\": 64,\n  \"India\": 149,\n  \"Vietnam\": 256,\n  \"vietnam\": 256\n};\n\n// Meal plan to ID mapping\nconst mealPlanMap = {\n  \"BB\": 1,  // Breakfast Only\n  \"HB\": 2,  // Breakfast and Dinner\n  \"FB\": 3,  // Breakfast, lunch and Dinner\n  \"RO\": 4,  // Room Only\n  \"AL\": 5   // All Inclusive\n};\n\n// Get all API responses\nconst apiResponses = $input.all();\n\n// Get all booking data from Add Booking Details\nconst bookingDataItems = $('Add Booking Details').all();\n\n// Process each booking item\nconst results = [];\n\nfor (let i = 0; i < apiResponses.length; i++) {\n  const apiResponse = apiResponses[i].json;\n  const bookingData = bookingDataItems[i].json;\n  \n  let cityId = bookingData.City; // Default to original city name if not found\n  \n  // Extract city ID from API response\n  if (apiResponse && apiResponse.body && Array.isArray(apiResponse.body) && apiResponse.body.length > 0) {\n    // Find the matching city with the correct country\n    const countryName = bookingData.country_data.country;\n    const countryId = countryMap[countryName] || null;\n    \n    // Find city with matching country if possible\n    let cityData = null;\n    if (countryId) {\n      cityData = apiResponse.body.find(city => city.country === countryId);\n    }\n    \n    // If no match with country, use the first result\n    if (!cityData && apiResponse.body.length > 0) {\n      cityData = apiResponse.body[0];\n    }\n    \n    if (cityData) {\n      cityId = cityData.id;\n    }\n  }\n  \n  // Get country name and map to ID\n  const countryName = bookingData.country_data.country;\n  const countryId = countryMap[countryName] || countryName; // Use ID if found, otherwise keep original\n  \n  // Get meal type and map to ID\n  const mealType = bookingData.meal_type;\n  const mealTypeId = mealPlanMap[mealType] || mealType; // Use ID if found, otherwise keep original\n  \n  // Create the output with mapped IDs\n  results.push({\n    json: {\n      country_data: {\n        country: countryId.toString()\n      },\n      row_number: bookingData.row_number,\n      City: cityId.toString(),\n      \"Hotel Class\": bookingData[\"Hotel Class\"],\n      \"Hotel Name\": bookingData[\"Hotel Name\"],\n      \"Apple Hotel ID\": bookingData[\"Apple Hotel ID\"],\n      \"Basic Room Categoty\": bookingData[\"Basic Room Categoty\"],\n      \"Extra1\": bookingData[\"Extra1\"] || \"\",\n      check_in: bookingData.check_in,\n      check_out: bookingData.check_out,\n      meal_type: mealTypeId.toString()\n    }\n  });\n}\n\nreturn results;"
       },
-      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "id": "98908169-2433-4ee3-acbd-0c6cfba72903",
       "name": "Map IDs",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -240,
-        -448
+        1104,
+        -336
       ]
     },
     {
@@ -204,10 +207,10 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -672,
-        -112
+        672,
+        0
       ],
-      "id": "56f7aaaf-5839-4364-97c5-42c2587428a0",
+      "id": "04f20bd3-c799-49bb-801c-9d313548bfb9",
       "name": "Get Activities Sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -220,26 +223,26 @@
       "parameters": {
         "jsCode": "// Get all activity data from Google Sheets\nconst activityItems = $input.all();\n\n// Get all city data from Prepare for Lookup node\nconst cityItems = $('Prepare for Lookup Activities').all();\n\n// Create a map of city data by city name for easy lookup\nconst cityDataMap = {};\nfor (const cityItem of cityItems) {\n  const cityName = cityItem.json.current_city;\n  cityDataMap[cityName] = cityItem.json;\n}\n\n// Process each activity and add booking details\nconst results = [];\n\nfor (const activityItem of activityItems) {\n  const activityData = activityItem.json;\n  const cityName = activityData.City;\n  \n  // Get the corresponding city data\n  const cityData = cityDataMap[cityName];\n  \n  // Remove Aahaas ID from the data\n  const { 'Aahaas  ID': removedAahaasId, ...filteredActivityData } = activityData;\n  \n  // Check if Apple Hotel ID contains comma (multiple values)\n  const appleHotelId = filteredActivityData['Apple Hotel ID'];\n  const hasMultipleIds = typeof appleHotelId === 'string' && appleHotelId.includes(',');\n  \n  if (hasMultipleIds) {\n    // Split Apple Hotel ID and Must Do Activity by comma\n    const appleIds = appleHotelId.split(',').map(id => id.trim());\n    const activities = filteredActivityData['Must Do Activity'].split(',').map(act => act.trim());\n    \n    // Create separate records for each ID/Activity pair\n    const maxLength = Math.max(appleIds.length, activities.length);\n    \n    for (let i = 0; i < maxLength; i++) {\n      const record = {\n        country_data: cityData ? cityData.country_data : { country: \"Sri Lanka\" },\n        row_number: filteredActivityData.row_number,\n        City: filteredActivityData.City,\n        'Lifestyle  Category': filteredActivityData['Lifestyle  Category'],\n        'Must Do Activity': activities[i] || activities[0],\n        'Apple Hotel ID': appleIds[i] || appleIds[0]\n      };\n      \n      // Add city data if available\n      if (cityData) {\n        record.check_in = cityData.destination_data.check_in;\n        record.check_out = cityData.destination_data.check_out;\n        record.meal_type = cityData.destination_data.meal_type;\n      }\n      \n      results.push({ json: record });\n    }\n  } else {\n    // Single ID - keep Extra1 and Extra2, add city data\n    if (cityData) {\n      results.push({\n        json: {\n          country_data: cityData.country_data,\n          ...filteredActivityData,\n          check_in: cityData.destination_data.check_in,\n          check_out: cityData.destination_data.check_out,\n          meal_type: cityData.destination_data.meal_type\n        }\n      });\n    } else {\n      // If no matching city data, just return filtered activity data with default country\n      results.push({\n        json: {\n          country_data: { country: \"Sri Lanka\" },\n          ...filteredActivityData\n        }\n      });\n    }\n  }\n}\n\nreturn results;"
       },
-      "id": "1541af33-a1ab-4fa4-8ddb-6305beb51522",
+      "id": "d8536644-471a-48a0-ad8c-44ced1fe6ac2",
       "name": "Add Booking Details Activities",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -512,
-        -112
+        832,
+        0
       ]
     },
     {
       "parameters": {
         "jsCode": "// Get ALL split items\nconst items = $input.all();\nconst originalData = $('Code').first().json;\n\n// Get arrival date and calculate stays\nconst arrivalDate = originalData.genaral_data.arrival_date;\nconst totalNights = 6; // Default 7 days, 6 nights\nconst cityCount = items.length;\nconst nightsPerCity = Math.floor(totalNights / cityCount);\n\n// Get city-specific meal plans if available\nconst cityMealMap = originalData.destination_data.city_meal_map;\nconst defaultMealType = originalData.destination_data.meal_type;\n\n// Process each item and calculate check-in/check-out dates\nconst results = [];\nlet currentCheckIn = new Date(arrivalDate);\n\nfor (let i = 0; i < items.length; i++) {\n  const item = items[i];\n  const currentPlace = item.json['destination_data.place'];\n  \n  // Calculate check-out date (check-in + nights per city)\n  const checkOutDate = new Date(currentCheckIn);\n  checkOutDate.setDate(checkOutDate.getDate() + nightsPerCity);\n  \n  // Format dates as YYYY-MM-DD\n  const checkIn = currentCheckIn.toISOString().split('T')[0];\n  const checkOut = checkOutDate.toISOString().split('T')[0];\n  \n  // Determine meal type for this city\n  let mealType = defaultMealType;\n  if (cityMealMap && cityMealMap[currentPlace]) {\n    mealType = cityMealMap[currentPlace];\n  }\n  \n  results.push({\n    json: {\n      current_city: currentPlace,\n      country_data: originalData.country_data,\n      genaral_data: {\n        pax: originalData.genaral_data.pax,\n        market: originalData.genaral_data.market\n      },\n      destination_data: {\n        meal_type: mealType,\n        current_place: currentPlace,\n        check_in: checkIn,\n        check_out: checkOut\n      }\n    }\n  });\n  \n  // Next city's check-in is current city's check-out\n  currentCheckIn = checkOutDate;\n}\n\n// Add arrival_date to the first item only\nif (results.length > 0) {\n  results[0].json.genaral_data.arrival_date = arrivalDate;\n}\n\nreturn results;"
       },
-      "id": "850b8bb3-bec4-458c-987e-6b124f35d9c0",
+      "id": "26025b81-29a2-45ab-a7a9-9b0749984bbe",
       "name": "Prepare for Lookup Activities",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -832,
-        -112
+        512,
+        0
       ]
     },
     {
@@ -247,13 +250,13 @@
         "fieldToSplitOut": "=destination_data.place",
         "options": {}
       },
-      "id": "8295c394-a629-4a9a-93e4-f4b15f46ce28",
+      "id": "2c56c6de-27b1-44d0-a569-fdd86493dc28",
       "name": "Split Out Places Activities",
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        -992,
-        -112
+        352,
+        0
       ]
     }
   ],
@@ -363,11 +366,6 @@
         ]
       ]
     },
-    "Map IDs": {
-      "main": [
-        []
-      ]
-    },
     "Split Out Places Activities": {
       "main": [
         [
@@ -406,7 +404,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "59b2b415-1832-4567-86dc-641ac1cb1530",
+  "versionId": "e47287b5-1df1-498d-b8d4-bbd027a8a50b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9ba699815eee7a9b7506f6b264ee48edcb7b96a79c851198c7b7acafd2a5489c"
