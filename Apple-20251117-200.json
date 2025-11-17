@@ -275,6 +275,19 @@
     },
     {
       "parameters": {
+        "jsCode": "// Get all items from Map IDs Activities\nconst items = $input.all();\nconst expandedItems = [];\n\n// First pass: Expand items with comma-separated values\nfor (const item of items) {\n  const data = item.json;\n  const appleId = data['Apple ID'];\n  const mustDoActivity = data['Must Do Activity'];\n  \n  // Check if Apple ID contains comma (multiple values)\n  if (typeof appleId === 'string' && appleId.includes(',')) {\n    // Split Apple ID and Must Do Activity by comma\n    const appleIds = appleId.split(',').map(id => id.trim());\n    const activities = mustDoActivity.split(',').map(act => act.trim());\n    \n    // Create separate items for each Apple ID and Activity pair\n    const maxLength = Math.max(appleIds.length, activities.length);\n    \n    for (let i = 0; i < maxLength; i++) {\n      expandedItems.push({\n        json: {\n          country_data: data.country_data,\n          row_number: data.row_number,\n          City: data.City,\n          \"Apple ID\": appleIds[i] || appleIds[0],\n          \"Lifestyle  Category\": data[\"Lifestyle  Category\"],\n          \"Must Do Activity\": activities[i] || activities[0],\n          check_in: data.check_in,\n          check_out: data.check_out,\n          pax: data.pax\n        }\n      });\n    }\n  } else {\n    // Single Apple ID - keep as is\n    expandedItems.push(item);\n  }\n}\n\n// Second pass: Group by city and assign activity_day\nconst cityGroups = {};\n\n// Group activities by city\nfor (const item of expandedItems) {\n  const cityId = item.json.City;\n  if (!cityGroups[cityId]) {\n    cityGroups[cityId] = [];\n  }\n  cityGroups[cityId].push(item);\n}\n\n// Process each city group and assign activity days\nconst results = [];\n\nfor (const cityId in cityGroups) {\n  const cityActivities = cityGroups[cityId];\n  \n  if (cityActivities.length === 0) continue;\n  \n  // Get check-in and check-out dates from first activity\n  const checkIn = new Date(cityActivities[0].json.check_in);\n  const checkOut = new Date(cityActivities[0].json.check_out);\n  \n  // Calculate number of nights\n  const nightCount = Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24));\n  \n  // Calculate activities per day\n  const totalActivities = cityActivities.length;\n  const activitiesPerDay = Math.ceil(totalActivities / nightCount);\n  \n  // Assign activity_day to each activity\n  let currentDay = new Date(checkIn);\n  let activitiesAssignedToday = 0;\n  \n  for (let i = 0; i < cityActivities.length; i++) {\n    // If we've assigned enough activities for this day, move to next day\n    if (activitiesAssignedToday >= activitiesPerDay && i < cityActivities.length - 1) {\n      currentDay.setDate(currentDay.getDate() + 1);\n      activitiesAssignedToday = 0;\n    }\n    \n    // Format activity_day as YYYY-MM-DD\n    const activityDay = currentDay.toISOString().split('T')[0];\n    \n    results.push({\n      json: {\n        ...cityActivities[i].json,\n        activity_day: activityDay\n      }\n    });\n    \n    activitiesAssignedToday++;\n  }\n}\n\nreturn results;"
+      },
+      "id": "a5b2e3f4-c6d7-8e9f-0a1b-2c3d4e5f6a7b",
+      "name": "Expand Multiple Activities",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        0
+      ]
+    },
+    {
+      "parameters": {
         "jsCode": "// Get ALL split items\nconst items = $input.all();\nconst originalData = $('Code').first().json;\n\n// Get arrival date and calculate stays\nconst arrivalDate = originalData.genaral_data.arrival_date;\nconst totalNights = originalData.genaral_data.total_nights || 8; // Get from Code node or default to 8\nconst cityCount = items.length;\nconst nightsPerCity = Math.floor(totalNights / cityCount);\nconst remainderNights = totalNights % cityCount; // Handle remainder nights\n\n// Get city-specific meal plans if available\nconst cityMealMap = originalData.destination_data.city_meal_map;\nconst defaultMealType = originalData.destination_data.meal_type;\n\n// Process each item and calculate check-in/check-out dates\nconst results = [];\nlet currentCheckIn = new Date(arrivalDate);\n\nfor (let i = 0; i < items.length; i++) {\n  const item = items[i];\n  const currentPlace = item.json['destination_data.place'];\n  \n  // Distribute remainder nights to first cities\n  const nightsForThisCity = nightsPerCity + (i < remainderNights ? 1 : 0);\n  \n  // Calculate check-out date (check-in + nights for this city)\n  const checkOutDate = new Date(currentCheckIn);\n  checkOutDate.setDate(checkOutDate.getDate() + nightsForThisCity);\n  \n  // Format dates as YYYY-MM-DD\n  const checkIn = currentCheckIn.toISOString().split('T')[0];\n  const checkOut = checkOutDate.toISOString().split('T')[0];\n  \n  // Determine meal type for this city\n  let mealType = defaultMealType;\n  if (cityMealMap && cityMealMap[currentPlace]) {\n    mealType = cityMealMap[currentPlace];\n  }\n  \n  results.push({\n    json: {\n      current_city: currentPlace,\n      country_data: originalData.country_data,\n      genaral_data: {\n        pax: originalData.genaral_data.pax,\n        market: originalData.genaral_data.market\n      },\n      destination_data: {\n        meal_type: mealType,\n        current_place: currentPlace,\n        check_in: checkIn,\n        check_out: checkOut,\n        nights: nightsForThisCity\n      }\n    }\n  });\n  \n  // Next city's check-in is current city's check-out\n  currentCheckIn = checkOutDate;\n}\n\n// Add arrival_date to the first item only\nif (results.length > 0) {\n  results[0].json.genaral_data.arrival_date = arrivalDate;\n}\n\nreturn results;"
       },
       "id": "d956b788-04f2-46d2-91c4-3a5f0427b914",
@@ -434,6 +447,17 @@
         [
           {
             "node": "Map IDs Activities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map IDs Activities": {
+      "main": [
+        [
+          {
+            "node": "Expand Multiple Activities",
             "type": "main",
             "index": 0
           }
