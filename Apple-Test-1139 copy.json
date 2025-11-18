@@ -313,44 +313,6 @@
         352,
         16
       ]
-    },
-    {
-      "parameters": {
-        "jsCode": "// Get hotel data from Map IDs node\nconst hotelData = $('Map IDs').all();\n\n// Get activities data from Expand Multiple Activities node\nconst activitiesData = $('Expand Multiple Activities').all();\n\n// Get original data from Code node for general information\nconst originalData = $('Code').first().json;\n\n// Country mapping (using the ID directly from the data)\nconst countryId = hotelData.length > 0 ? hotelData[0].json.country_data.country : \"62\";\n\n// Get arrival date\nconst arrivalDate = originalData.genaral_data.arrival_date;\nconst arrivalDateFormatted = new Date(arrivalDate).toLocaleDateString('en-GB'); // DD/MM/YYYY format\n\n// Get pax information\nconst pax = originalData.genaral_data.pax;\n\n// Helper function to convert date from YYYY-MM-DD to DD/MM/YYYY\nfunction formatDate(dateStr) {\n  const date = new Date(dateStr);\n  const day = String(date.getDate()).padStart(2, '0');\n  const month = String(date.getMonth() + 1).padStart(2, '0');\n  const year = date.getFullYear();\n  return `${day}/${month}/${year}`;\n}\n\n// Build destination_data\nconst places = [];\nconst placePretendType = [];\nconst transportAvailability = [];\n\n// Extract unique places in order from hotel data\nconst seenPlaces = new Set();\nfor (const hotel of hotelData) {\n  const cityId = hotel.json.City;\n  if (!seenPlaces.has(cityId)) {\n    seenPlaces.add(cityId);\n    places.push(parseInt(cityId));\n    placePretendType.push(1); // Default value, adjust as needed\n  }\n}\n\n// Transportation availability (one less than places count)\nfor (let i = 0; i < places.length - 1; i++) {\n  transportAvailability.push(1);\n}\n\n// Build accommodation_data\nconst accommodations = [];\nconst hotels = [];\n\nfor (const hotel of hotelData) {\n  const hotelObj = {\n    hotel: hotel.json[\"Apple Hotel ID\"],\n    place: parseInt(hotel.json.City),\n    check_in: formatDate(hotel.json.check_in),\n    check_out: formatDate(hotel.json.check_out),\n    nights: hotel.json.night,\n    provider: \"local\",\n    room_category: hotel.json[\"Basic Room Categoty\"],\n    meal_type: parseInt(hotel.json.meal_type),\n    room_type: [\n      {\n        id: 2,\n        count: 1\n      }\n    ],\n    extrabed: 0,\n    driver_accommodation: 0\n  };\n  \n  hotels.push(hotelObj);\n  accommodations.push(1); // Assuming 1 = hotel accommodation\n}\n\n// Build tours_data from activities\nconst toursData = [];\n\nfor (const activity of activitiesData) {\n  // Calculate day number from arrival date\n  const activityDate = new Date(activity.json.activity_day);\n  const arrivalDateObj = new Date(arrivalDate);\n  const dayNumber = Math.floor((activityDate - arrivalDateObj) / (1000 * 60 * 60 * 24)) + 1;\n  \n  // Determine type based on Lifestyle Category\n  const category = activity.json[\"Lifestyle  Category\"];\n  let type = \"attraction\"; // default\n  \n  if (category && category.toLowerCase().includes('city tour')) {\n    type = \"city_tour\";\n  } else if (category && category.toLowerCase().includes('excursion')) {\n    type = \"excursion\";\n  } else if (category && category.toLowerCase().includes('attraction')) {\n    type = \"attraction\";\n  }\n  \n  const tourObj = {\n    id: parseInt(activity.json[\"Apple ID\"]),\n    day: dayNumber,\n    pax: {\n      adult: activity.json.pax.adult,\n      cwb: activity.json.pax.cwb,\n      cnb: activity.json.pax.cnb\n    },\n    type: type\n  };\n  \n  toursData.push(tourObj);\n}\n\n// Build the final API body\nconst apiBody = {\n  config: {\n    status: 1,\n    tour_session: Date.now(), // Using current timestamp\n    tour_type: 3,\n    quotation_no: Math.floor(Math.random() * 900000) + 100000 // Random 6-digit number\n  },\n  country_data: {\n    country: parseInt(countryId)\n  },\n  genaral_data: {\n    arrival_date: arrivalDateFormatted,\n    pax: {\n      adult: pax.adult,\n      cwb: pax.cwb,\n      cnb: pax.cnb\n    },\n    market: 1\n  },\n  destination_data: {\n    place: places,\n    place_pretend_type: placePretendType,\n    transport_availability: transportAvailability\n  },\n  accommodation_data: {\n    accommodation: accommodations,\n    hotel: hotels\n  },\n  tours_data: toursData,\n  markup_data: {\n    markup_amount: \"10\",\n    markup_type: \"1\",\n    markup_amount_child: \"10\",\n    markup_type_child: \"1\",\n    save_type: \"save\"\n  }\n};\n\nreturn { json: apiBody };"
-      },
-      "id": "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
-      "name": "Merge to API Body",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1440,
-        -192
-      ]
-    },
-    {
-      "parameters": {
-        "url": "https://stagev2.appletechlabs.com/api/booking/save",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "httpBearerAuth",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify($json) }}",
-        "options": {}
-      },
-      "id": "f9e8d7c6-b5a4-3c2d-1e0f-9a8b7c6d5e4f",
-      "name": "Send to Backend API",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        1640,
-        -192
-      ],
-      "credentials": {
-        "httpBearerAuth": {
-          "id": "YT5nTLIKvTYA4CI7",
-          "name": "Bearer Auth account"
-        }
-      }
     }
   ],
   "pinData": {},
@@ -459,17 +421,6 @@
         ]
       ]
     },
-    "Map IDs": {
-      "main": [
-        [
-          {
-            "node": "Merge to API Body",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Get Activities Sheet": {
       "main": [
         [
@@ -514,17 +465,6 @@
         ]
       ]
     },
-    "Expand Multiple Activities": {
-      "main": [
-        [
-          {
-            "node": "Merge to API Body",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Prepare for Lookup Activities": {
       "main": [
         [
@@ -541,17 +481,6 @@
         [
           {
             "node": "Prepare for Lookup Activities",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Merge to API Body": {
-      "main": [
-        [
-          {
-            "node": "Send to Backend API",
             "type": "main",
             "index": 0
           }
