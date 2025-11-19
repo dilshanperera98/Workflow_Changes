@@ -10,16 +10,112 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.1,
       "position": [
-        -432,
+        -640,
         128
       ],
       "webhookId": "travel-quotation-chat"
     },
     {
       "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false
+          },
+          "conditions": [
+            {
+              "id": "check_quotation",
+              "leftValue": "={{ $json.chatInput }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "regex",
+                "regex": "(quotation|quote|ref|QT)[\\s#:-]*(\\d+)"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-quotation-ref",
+      "name": "Check for Quotation Reference",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract quotation number from user input\nconst chatInput = $input.first().json.chatInput || '';\n\n// Match patterns like: quotation 123, quote #456, ref: 789, QT-101\nconst patterns = [\n  /quotation[\\s#:-]*(\\d+)/i,\n  /quote[\\s#:-]*(\\d+)/i,\n  /ref[\\s#:-]*(\\d+)/i,\n  /QT[\\s#:-]*(\\d+)/i\n];\n\nlet quotationNo = null;\n\nfor (const pattern of patterns) {\n  const match = chatInput.match(pattern);\n  if (match) {\n    quotationNo = match[1];\n    break;\n  }\n}\n\nreturn {\n  json: {\n    chatInput: chatInput,\n    quotation_no: quotationNo\n  }\n};"
+      },
+      "id": "extract-quotation-no",
+      "name": "Extract Quotation Number",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1n-xL0h9PHeOhfcpytCouV7_pkYj4BzSMZghqTsKrgYo/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "QuotationLog",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "quotation_no",
+              "lookupValue": "={{ $json.quotation_no }}"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -160,
+        16
+      ],
+      "id": "load-previous-quotation",
+      "name": "Load Previous Quotation",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4bqLa45KMMhTDuqo",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the loaded quotation data\nconst quotationData = $input.first().json;\nconst chatInput = $('Extract Quotation Number').first().json.chatInput;\n\n// Parse the request_body JSON string back to object\nlet previousRequestBody = {};\ntry {\n  previousRequestBody = JSON.parse(quotationData.request_body);\n} catch (e) {\n  // If parsing fails, return empty\n  return { json: { chatInput: chatInput, hasPreviousData: false } };\n}\n\n// Extract relevant data from previous quotation for AI context\nconst prevData = previousRequestBody;\nconst country = Object.keys({\n  \"62\": \"Sri Lanka\",\n  \"63\": \"Malaysia\",\n  \"64\": \"Singapore\",\n  \"149\": \"India\",\n  \"256\": \"Vietnam\"\n}).find(key => key === prevData.country_data.country.toString());\n\nconst countryName = {\n  \"62\": \"Sri Lanka\",\n  \"63\": \"Malaysia\",\n  \"64\": \"Singapore\",\n  \"149\": \"India\",\n  \"256\": \"Vietnam\"\n}[prevData.country_data.country.toString()] || \"Sri Lanka\";\n\nconst arrivalDate = prevData.genaral_data.arrival_date;\nconst pax = prevData.genaral_data.pax;\n\n// Get places from accommodation data\nconst places = [];\nif (prevData.accommodation_data && prevData.accommodation_data.hotel) {\n  for (const hotel of prevData.accommodation_data.hotel) {\n    if (!places.includes(hotel.place)) {\n      places.push(hotel.place);\n    }\n  }\n}\n\n// Create a summary for the AI\nconst previousSummary = `Previous Quotation #${quotationData.quotation_no}:\n- Country: ${countryName}\n- Arrival Date: ${arrivalDate}\n- Passengers: ${pax.adult} adults, ${pax.cwb} children with bed, ${pax.cnb} children no bed\n- Places: ${places.join(', ')}\n- Total Hotels: ${prevData.accommodation_data?.hotel?.length || 0}\n- Total Activities: ${prevData.tours_data?.length || 0}`;\n\n// Pass both the chat input and previous data\nreturn {\n  json: {\n    chatInput: chatInput,\n    previousQuotationNo: quotationData.quotation_no,\n    previousData: previousRequestBody,\n    previousSummary: previousSummary,\n    hasPreviousData: true\n  }\n};"
+      },
+      "id": "merge-with-chat-input",
+      "name": "Parse Previous Quotation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        16
+      ]
+    },
+    {
+      "parameters": {
         "agent": "conversationalAgent",
         "promptType": "define",
-        "text": "=You are a travel quotation assistant. Analyze the user's travel request and create a professional summary.\n\nUser input: {{ $json.chatInput }}\n\nExtract and analyze:\n1. Destination country\n2. Arrival date (if not mentioned, use {{ $now.plus(15, 'days').toFormat('yyyy-MM-dd') }})\n3. Duration: \n   - If user mentions \"X days\" → calculate nights as X-1 (e.g., 9 days = 8 nights)\n   - If user mentions \"X nights\" → calculate days as X+1\n   - If NOT mentioned → default to 9 days, 8 nights\n4. Calculate departure date: arrival_date + nights\n5. Number of adults and children (if not mentioned, default to 2 adults, 0 children)\n6. Cities/places to visit:\n   - If user mentions specific cities, use those\n   - If NOT mentioned → default to maximum 3 cities\n7. Hotel star category:\n   - Check if user mentioned: \"5 star\", \"5-star\", \"five star\" → use \"5-star\"\n   - Check if user mentioned: \"4 star\", \"4-star\", \"four star\" → use \"4-star\"\n   - Check if user mentioned: \"3 star\", \"3-star\", \"three star\" → use \"3-star\"\n   - Check if user mentioned: \"2 star\", \"2-star\", \"two star\" → use \"2-star\"\n   - Check if user mentioned: \"luxury\" → use \"5-star\"\n   - Check if user mentioned: \"budget\" → use \"3-star\"\n   - If NOT mentioned → default to \"4-star\"\n8. Meal plan: \n   - If user specifies different meal plans for different cities, note each city's meal plan\n   - If user specifies one meal plan for all, apply it to all cities\n   - If NOT mentioned at all → default to \"bed & breakfast\"\n   - Meal plan types: \"half board\" (HB), \"full board\" (FB), \"room only\" (RO), \"all inclusive\" (AL), \"bed & breakfast\" (BB)\n9. Budget: If user mentioned luxury or 5-star use \"luxury budget\", if 3-star or budget use \"budget-friendly\", otherwise use \"mid-range budget\"\n\nIMPORTANT: If different cities have different meal plans, format the output to include meal plan per city:\n\nFormat your output as:\n\"Customer requesting a [Country] multi-city tour for [X] days, [Y] nights from [Month Day] to [Month Day], [Year], for [X] adults and [Y] children. [Budget type] with [X-star] hotel accommodation. Interested in visiting key cities and attractions: [City1] with [meal plan], [City2] with [meal plan], [City3] with [meal plan].\"\n\nIf all cities have the same meal plan:\n\"Customer requesting a [Country] multi-city tour for [X] days, [Y] nights from [Month Day] to [Month Day], [Year], for [X] adults and [Y] children. [Budget type] with [X-star] hotel accommodation and [meal plan] meal plan. Interested in visiting key cities and attractions including [list cities].\"\n\nExamples:\n- Different meal plans: \"Customer requesting a Sri Lanka multi-city tour for 9 days, 8 nights from December 12 to December 20, 2026, for 3 adults and 2 children. Mid-range budget with 4-star hotel accommodation. Interested in visiting key cities and attractions: Sigiriya with half board, Dambulla with room only, Bentota with full board.\"\n- Same meal plan with 5-star: \"Customer requesting a Sri Lanka multi-city tour for 9 days, 8 nights from December 12 to December 20, 2025, for 7 adults and 2 children. Luxury budget with 5-star hotel accommodation and bed & breakfast meal plan. Interested in visiting key cities and attractions including Colombo, Kandy, Galle, and Yala.\"\n- Budget 3-star: \"Customer requesting a Sri Lanka multi-city tour for 9 days, 8 nights from December 12 to December 20, 2025, for 2 adults and 1 children. Budget-friendly with 3-star hotel accommodation and bed & breakfast meal plan. Interested in visiting key cities and attractions including Colombo, Kandy, and Galle.\"",
+        "text": "=You are a travel quotation assistant. {% if $json.hasPreviousData %}The user is modifying a previous quotation.\n\n{{ $json.previousSummary }}\n\nUser's modification request: {{ $json.chatInput }}\n\nAnalyze what changes the user wants to make and incorporate them with the existing quotation details.{% else %}Analyze the user's travel request and create a professional summary.\n\nUser input: {{ $json.chatInput }}{% endif %}\n\nExtract and analyze:\n1. Destination country\n2. Arrival date (if not mentioned, use {{ $now.plus(15, 'days').toFormat('yyyy-MM-dd') }})\n3. Duration: \n   - If user mentions \"X days\" → calculate nights as X-1 (e.g., 9 days = 8 nights)\n   - If user mentions \"X nights\" → calculate days as X+1\n   - If NOT mentioned → default to 9 days, 8 nights\n4. Calculate departure date: arrival_date + nights\n5. Number of adults and children (if not mentioned, default to 2 adults, 0 children)\n6. Cities/places to visit:\n   - If user mentions specific cities, use those\n   - If NOT mentioned → default to maximum 3 cities\n7. Hotel star category:\n   - Check if user mentioned: \"5 star\", \"5-star\", \"five star\" → use \"5-star\"\n   - Check if user mentioned: \"4 star\", \"4-star\", \"four star\" → use \"4-star\"\n   - Check if user mentioned: \"3 star\", \"3-star\", \"three star\" → use \"3-star\"\n   - Check if user mentioned: \"2 star\", \"2-star\", \"two star\" → use \"2-star\"\n   - Check if user mentioned: \"luxury\" → use \"5-star\"\n   - Check if user mentioned: \"budget\" → use \"3-star\"\n   - If NOT mentioned → default to \"4-star\"\n8. Meal plan: \n   - If user specifies different meal plans for different cities, note each city's meal plan\n   - If user specifies one meal plan for all, apply it to all cities\n   - If NOT mentioned at all → default to \"bed & breakfast\"\n   - Meal plan types: \"half board\" (HB), \"full board\" (FB), \"room only\" (RO), \"all inclusive\" (AL), \"bed & breakfast\" (BB)\n9. Budget: If user mentioned luxury or 5-star use \"luxury budget\", if 3-star or budget use \"budget-friendly\", otherwise use \"mid-range budget\"\n\nIMPORTANT: If different cities have different meal plans, format the output to include meal plan per city:\n\nFormat your output as:\n\"Customer requesting a [Country] multi-city tour for [X] days, [Y] nights from [Month Day] to [Month Day], [Year], for [X] adults and [Y] children. [Budget type] with [X-star] hotel accommodation. Interested in visiting key cities and attractions: [City1] with [meal plan], [City2] with [meal plan], [City3] with [meal plan].\"\n\nIf all cities have the same meal plan:\n\"Customer requesting a [Country] multi-city tour for [X] days, [Y] nights from [Month Day] to [Month Day], [Year], for [X] adults and [Y] children. [Budget type] with [X-star] hotel accommodation and [meal plan] meal plan. Interested in visiting key cities and attractions including [list cities].\"\n\nExamples:\n- Different meal plans: \"Customer requesting a Sri Lanka multi-city tour for 9 days, 8 nights from December 12 to December 20, 2026, for 3 adults and 2 children. Mid-range budget with 4-star hotel accommodation. Interested in visiting key cities and attractions: Sigiriya with half board, Dambulla with room only, Bentota with full board.\"\n- Same meal plan with 5-star: \"Customer requesting a Sri Lanka multi-city tour for 9 days, 8 nights from December 12 to December 20, 2025, for 7 adults and 2 children. Luxury budget with 5-star hotel accommodation and bed & breakfast meal plan. Interested in visiting key cities and attractions including Colombo, Kandy, Galle, and Yala.\"\n- Budget 3-star: \"Customer requesting a Sri Lanka multi-city tour for 9 days, 8 nights from December 12 to December 20, 2025, for 2 adults and 1 children. Budget-friendly with 3-star hotel accommodation and bed & breakfast meal plan. Interested in visiting key cities and attractions including Colombo, Kandy, and Galle.\"",
         "hasOutputParser": true,
         "options": {
           "systemMessage": "=You are a professional travel quotation assistant. Create concise, formatted summaries of customer travel requests. Always use the exact format specified and calculate dates accurately. Pay special attention to hotel star categories, meal plans mentioned by the user and which cities they apply to."
@@ -369,6 +465,43 @@
       }
     },
     {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1n-xL0h9PHeOhfcpytCouV7_pkYj4BzSMZghqTsKrgYo/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "QuotationLog",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "quotation_no": "={{ $json.body.quotation_no }}",
+            "request_body": "={{ JSON.stringify($('Build API Body').first().json) }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Store in Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1728,
+        112
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4bqLa45KMMhTDuqo",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
       "parameters": {},
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
@@ -383,6 +516,57 @@
   "pinData": {},
   "connections": {
     "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Check for Quotation Reference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check for Quotation Reference": {
+      "main": [
+        [
+          {
+            "node": "Extract Quotation Number",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Quotation Number": {
+      "main": [
+        [
+          {
+            "node": "Load Previous Quotation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Previous Quotation": {
+      "main": [
+        [
+          {
+            "node": "Parse Previous Quotation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Previous Quotation": {
       "main": [
         [
           {
@@ -608,6 +792,17 @@
       ]
     },
     "Send to Backend API": {
+      "main": [
+        [
+          {
+            "node": "Store in Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store in Google Sheet": {
       "main": [
         []
       ]
