@@ -354,7 +354,8 @@
         "options": {
           "response": {
             "response": {}
-          }
+          },
+          "timeout": 30000
         }
       },
       "id": "f88528b5-a18b-4b5f-84fa-15fdeead61fc",
