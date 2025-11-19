@@ -484,7 +484,8 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "request_body": "="
+            "quotation_no": "={{ $json.body.quotation_no }}",
+            "request_body": "={{ JSON.stringify($('Wait for Both').first().json) }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -519,8 +520,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -576,
-        -576
+        -288,
+        -304
       ],
       "alwaysOutputData": true,
       "credentials": {
@@ -792,11 +793,6 @@
         [
           {
             "node": "Build API Body",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Store in Google Sheet",
             "type": "main",
             "index": 0
           }
