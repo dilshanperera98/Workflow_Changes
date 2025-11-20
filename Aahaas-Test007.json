@@ -1,0 +1,1247 @@
+{
+  "name": "Aahaas-Test",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -3088,
+        -496
+      ],
+      "id": "2d102ce2-f8b8-434c-9c0a-f1f37214b4bd",
+      "name": "When chat message received",
+      "webhookId": "9d2612f3-b699-4bee-bda6-52b98551f2cf"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "127e3f0a-4469-48c8-996c-ab7c16ec18ce",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -3088,
+        -240
+      ],
+      "id": "024c185d-5542-4f48-9104-4048d13d4c96",
+      "name": "Webhook API Trigger",
+      "webhookId": "127e3f0a-4469-48c8-996c-ab7c16ec18ce"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract email_content, user_id, editable, and cart_name from webhook body\nconst body = $input.first().json.body || $input.first().json;\n\nconst emailContent = body.email_content || '';\nconst userId = body.user_id || 'default-user';\nconst editable = body.editable === true || body.editable === 'true';\nconst cartName = body.cart_name || null;\n\n// Validation\nif (editable && !cartName) {\n  throw new Error('cart_name is required when editable=true');\n}\n\nif (!emailContent) {\n  throw new Error('email_content is required');\n}\n\nreturn [{\n  json: {\n    chatInput: emailContent,\n    sessionId: userId,\n    editable: editable,\n    cart_name: cartName,\n    email_content: emailContent,\n    user_id: userId\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2848,
+        -240
+      ],
+      "id": "2bd952c4-ea9a-42bd-9d6c-53fe60438769",
+      "name": "Extract Webhook Data"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        -496
+      ],
+      "id": "be626f8a-a408-4084-a931-a21496c6136c",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge data from chat trigger (direct) or webhook (via Extract Webhook Data)\nconst inputData = $input.first().json;\nconst chatInput = inputData.chatInput;\nlet sessionId = inputData.sessionId;\nconst editable = inputData.editable || false;\nconst cartName = inputData.cart_name || null;\n\n// ============================================\n// 🔧 SESSION ID CONFIGURATION (Applied to BOTH Hotels and Activities)\n// ============================================\n// OPTION 1: To test with specific ID, UNCOMMENT the line below and change the value:\n  sessionId = \"655\";  // Change this to \"1\", \"43\", \"655\", \"1234\", etc.\n\n// OPTION 2: To use actual input sessionId from webhook/chat, keep the line above COMMENTED\n// ============================================\n// Current behavior: Uses actual input sessionId (from webhook or chat)\n// ============================================\n\n// Ensure sessionId is an integer\nif (!sessionId || sessionId === 'chat-session-' + Date.now()) {\n  sessionId = 1;  // Default sessionId if none provided\n} else if (typeof sessionId === 'string') {\n  const parsed = parseInt(sessionId);\n  sessionId = isNaN(parsed) ? 1 : parsed;\n} else if (typeof sessionId !== 'number') {\n  sessionId = 1;\n}\n\n// CRITICAL: Generate unique request ID and cart reference for EACH request\n// This ensures both hotels and activities go into the SAME cart\nconst timestamp = Date.now();\nconst randomSuffix = Math.random().toString(36).substring(2, 9).toUpperCase();\nconst requestId = `REQ_${timestamp}_${randomSuffix}`;\nconst cartReference = `CART_${timestamp}_${randomSuffix}`;\n\nreturn [{\n  json: {\n    chatInput: chatInput,\n    sessionId: sessionId,  // SAME sessionId used for both Hotels and Activities workflows\n    request_id: requestId,\n    cart_reference: cartReference,  // SAME cart reference for both branches\n    request_timestamp: new Date().toISOString(),\n    editable: editable,\n    cart_name: cartName\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2832,
+        -496
+      ],
+      "id": "82da2b07-b0e6-47b7-9b0a-04506c22a2fc",
+      "name": "Merge Input Sources"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "editable_check",
+              "leftValue": "={{ $json.editable }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -2672,
+        -496
+      ],
+      "id": "dcada014-0665-42b1-808b-381031fb4196",
+      "name": "Check If Editable"
+    },
+    {
+      "parameters": {
+        "url": "=https://dev-gateway.aahaas.com/api/automate/itinerary/load?user_id={{ $json.sessionId }}&cart_name={{ encodeURIComponent($json.cart_name) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2560,
+        -800
+      ],
+      "id": "495b1718-ee42-4515-8183-979b738f5464",
+      "name": "Load Existing Itinerary"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build GPT prompt to detect modification intent\n// ENHANCED: Better detection for adding cities vs replacing cities\nconst emailContent = $('Merge Input Sources').first().json.chatInput;\nconst existingData = $input.first().json;\n\nconst systemPrompt = `You are an expert travel modification analyzer. Your job is to understand customer requests and extract modification details.\n\nMODIFICATION TYPES:\n1. date_change: Customer wants to change travel dates\n2. location_change: Customer wants to change destination OR add new cities\n3. extend: Customer wants to add more nights/days\n4. multiple: Combination of above changes\n\nCRITICAL: ADDING CITIES vs REPLACING CITIES\n- Keywords indicating ADDING: \"add\", \"also\", \"include\", \"plus\", \"another\", \"want to visit\", \"as well\"\n- Keywords indicating REPLACING: \"instead\", \"change to\", \"go to ... instead\", \"replace\"\n- When adding cities, you MUST suggest extending the trip duration\n- DEFAULT: If city is mentioned with \"add\" or \"another\", it's an ADDITION, not replacement\n\nEXTRACTION RULES:\n- For dates: Extract explicit dates or calculate from relative terms (\"next month\", \"mid-January\")\n- For locations: Extract destination names (countries or cities)\n- For adding cities: Identify if it's addition vs replacement\n- For extensions: Extract number of additional nights/days (or auto-calculate based on new cities)\n- Current date: 2025-11-15\n- Auto-extend rule: Each new city added = +1 to +2 nights (based on city importance)\n\nCONFIDENCE LEVELS:\n- high: Explicit and clear request with specific details\n- medium: Some ambiguity but intent is clear\n- low: Vague request, needs clarification\n\nRespond with ONLY valid JSON:\n{\n  \"modification_type\": \"date_change\" | \"location_change\" | \"extend\" | \"multiple\",\n  \"new_dates\": {\n    \"start\": \"YYYY-MM-DD\",\n    \"end\": \"YYYY-MM-DD\"\n  },\n  \"new_location\": \"destination name (single city if adding/replacing)\",\n  \"is_adding_city\": true/false,\n  \"extend_nights\": number,\n  \"confidence\": \"high\" | \"medium\" | \"low\",\n  \"detected_intent\": \"Brief explanation of what was detected\",\n  \"reasoning\": \"Why this interpretation was chosen\"\n}`;\n\nconst travelMetadata = existingData.travel_metadata || {};\nconst userPrompt = `\nCustomer Request: \"${emailContent}\"\n\n${existingData.itinerary_data ? `\nCURRENT ITINERARY:\n- Destination: ${travelMetadata.destinations ? travelMetadata.destinations.join(' → ') : 'N/A'}\n- Dates: ${travelMetadata.start_date || 'N/A'} to ${travelMetadata.end_date || 'N/A'}\n- Duration: ${travelMetadata.total_nights || 'N/A'} nights\n- Adults: ${travelMetadata.adults || 'N/A'}\n- Children: ${travelMetadata.children || 0}\n` : 'This is a new itinerary request (no existing data).'}\n\nTASK: Analyze the customer request and determine what modifications they want.\n\nEXAMPLES:\n1. \"Change dates to Jan 10-17\" → date_change with new dates\n2. \"Go to Thailand instead\" → location_change (replacement), keep original dates\n3. \"Add 2 more nights\" → extend, add to end of current dates\n4. \"I also want to visit Sigiriya\" → location_change (adding city), is_adding_city=true, extend_nights=1\n5. \"Include Kandy and Ella\" → location_change (adding cities), is_adding_city=true, extend_nights=2\n6. \"Add another city like Galle\" → location_change (adding city), is_adding_city=true, extend_nights=1\n7. \"I want to add another city as Yala\" → location_change (adding city), is_adding_city=true, extend_nights=1\n\nCRITICAL: \n- If request contains \"add\", \"also\", \"include\", \"another\", \"as well\" → set is_adding_city=true AND calculate extend_nights\n- If adding 1 city → suggest extend_nights=1 to 2 (based on city importance)\n- If adding 2 cities → suggest extend_nights=2 to 3, etc.\n- DEFAULT: Assume \"add\" means addition, not replacement\n\nNow analyze the customer request above.`;\n\nconst requestBody = {\n  model: \"gpt-4o\",\n  messages: [\n    { role: \"system\", content: systemPrompt },\n    { role: \"user\", content: userPrompt }\n  ],\n  temperature: 0.3\n};\n\nreturn [{\n  json: {\n    ...existingData,\n    ai_detection_request: requestBody,\n    original_email: emailContent\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2368,
+        -800
+      ],
+      "id": "edefa96b-261f-4954-b3c8-523e952a1d70",
+      "name": "Build Intent Detection Prompt"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.ai_detection_request) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2176,
+        -800
+      ],
+      "id": "e0ab024e-dda7-42b5-89bf-aa62f5cf38ee",
+      "name": "Detect Modification Intent",
+      "credentials": {
+        "openAiApi": {
+          "id": "CYHGS3KAjICCaQqY",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse GPT intent detection response and reconstruct proper email content\n// ENHANCED: Support for adding new cities to existing itinerary with auto-extension\nconst openAIResponse = $input.first().json.choices[0].message.content;\nconst previousData = $('Load Existing Itinerary').first().json;\nconst mergeData = $('Merge Input Sources').first().json;\nconst originalRequest = mergeData.chatInput;\n\nlet detectedIntent;\ntry {\n  let jsonString = openAIResponse.trim();\n  if (jsonString.startsWith('```json')) {\n    jsonString = jsonString.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n  } else if (jsonString.startsWith('```')) {\n    jsonString = jsonString.replace(/```\\n?/g, '');\n  }\n  detectedIntent = JSON.parse(jsonString);\n} catch (error) {\n  return [{\n    json: {\n      success: false,\n      message: \"Failed to detect modification intent\",\n      error: error.message,\n      raw_response: openAIResponse\n    }\n  }];\n}\n\n// Get travel metadata from loaded itinerary\nconst travelMetadata = previousData.travel_metadata || {};\nconst existingDestinations = travelMetadata.destination || [];\nconst existingStartDate = travelMetadata.travel_dates?.start || '';\nconst existingEndDate = travelMetadata.travel_dates?.end || '';\nconst existingNights = travelMetadata.total_nights || 6;\nconst existingAdults = travelMetadata.pax?.adults || 1;\nconst existingChildren = travelMetadata.pax?.children || 0;\nconst existingChildAges = travelMetadata.pax?.child_ages || [];\nconst existingMealPlan = travelMetadata.meal_plan || 'Bed & Breakfast';\nconst existingHotelCategory = travelMetadata.hotel_category || '4-star';\n\n// CRITICAL: Detect if user is adding new cities\n// Extract city names from the request to identify new cities\nfunction extractCityNames(text) {\n  const cityKeywords = ['add', 'include', 'visit', 'want to go', 'also go to'];\n  const words = text.toLowerCase().split(/[,\\s]+/);\n  const potentialCities = [];\n  \n  // Simple city detection - capitalize first letter\n  words.forEach(word => {\n    if (word.length > 3 && word[0] === word[0].toUpperCase()) {\n      potentialCities.push(word);\n    }\n  });\n  \n  return potentialCities;\n}\n\n// Build modified email content based on modification type\nconst modificationType = detectedIntent.modification_type;\nlet modifiedEmailContent;\nlet newCitiesAdded = [];\nlet allDestinations = [...existingDestinations];\n\nif (modificationType === 'date_change' && detectedIntent.new_dates) {\n  // Date change: Keep destinations, change dates\n  const newStart = detectedIntent.new_dates.start;\n  const newEnd = detectedIntent.new_dates.end;\n  const start = new Date(newStart);\n  const end = new Date(newEnd);\n  const newNights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));\n  \n  modifiedEmailContent = `I want a ${newNights + 1}-day trip to ${existingDestinations.join(' and ')} from ${newStart} to ${newEnd}. ${existingAdults} adults${existingChildren > 0 ? ', ' + existingChildren + ' children' : ''}. ${existingMealPlan} meal plan, ${existingHotelCategory} hotels.`;\n  \n} else if (modificationType === 'location_change' && detectedIntent.new_location) {\n  // NEW CITY ADDITION LOGIC\n  // Check if this is adding a city (not replacing)\n  const isAddingCity = detectedIntent.is_adding_city === true || originalRequest.toLowerCase().match(/add|include|also|another|as well/);\n  \n  if (isAddingCity) {\n    // ADDING NEW CITY: Combine old + new cities, extend duration\n    const newCityName = detectedIntent.new_location;\n    \n    // Add new city to existing destinations\n    if (!existingDestinations.includes(newCityName)) {\n      allDestinations.push(newCityName);\n      newCitiesAdded.push(newCityName);\n    }\n    \n    // ENHANCED EXTENSION: Use detected extend_nights or calculate based on cities\n    // Default: 1-2 nights per city depending on importance\n    let additionalNights = detectedIntent.extend_nights || newCitiesAdded.length;\n    if (additionalNights === 0) {\n      additionalNights = 1; // Minimum 1 night per city\n    }\n    \n    const newTotalNights = existingNights + additionalNights;\n    \n    // Extend end date\n    const endDate = new Date(existingEndDate);\n    endDate.setDate(endDate.getDate() + additionalNights);\n    const newEndDate = endDate.toISOString().split('T')[0];\n    \n    modifiedEmailContent = `I want a ${newTotalNights + 1}-day trip (${newTotalNights} nights) visiting ${allDestinations.length} cities: ${allDestinations.join(', ')} from ${existingStartDate} to ${newEndDate}. ${existingAdults} adults${existingChildren > 0 ? ', ' + existingChildren + ' children' : ''}. ${existingMealPlan} meal plan, ${existingHotelCategory} hotels. CRITICAL: Must visit ALL ${allDestinations.length} cities (${allDestinations.join(', ')}). Calculate route for exactly ${allDestinations.length} cities and distribute ${newTotalNights} nights across these ${allDestinations.length} cities. Re-optimize the travel route for all ${allDestinations.length} cities.`;\n    \n  } else {\n    // REPLACING destination: Keep dates and duration, change destination\n    modifiedEmailContent = `I want a ${existingNights + 1}-day trip to ${detectedIntent.new_location} from ${existingStartDate} to ${existingEndDate}. ${existingAdults} adults${existingChildren > 0 ? ', ' + existingChildren + ' children' : ''}. ${existingMealPlan} meal plan, ${existingHotelCategory} hotels.`;\n  }\n  \n} else if (modificationType === 'extend' && detectedIntent.extend_nights) {\n  // Extension: Keep destinations and start date, extend end date\n  const newNights = existingNights + detectedIntent.extend_nights;\n  const endDate = new Date(existingEndDate);\n  endDate.setDate(endDate.getDate() + detectedIntent.extend_nights);\n  const newEndDate = endDate.toISOString().split('T')[0];\n  \n  modifiedEmailContent = `I want a ${newNights + 1}-day trip to ${existingDestinations.join(' and ')} from ${existingStartDate} to ${newEndDate}. ${existingAdults} adults${existingChildren > 0 ? ', ' + existingChildren + ' children' : ''}. ${existingMealPlan} meal plan, ${existingHotelCategory} hotels.`;\n  \n} else if (modificationType === 'multiple') {\n  // Handle multiple modifications\n  let newDest = detectedIntent.new_location || existingDestinations.join(' and ');\n  let newStart = detectedIntent.new_dates?.start || existingStartDate;\n  let newEnd = detectedIntent.new_dates?.end || existingEndDate;\n  \n  // Check if adding cities\n  const isAddingCity = detectedIntent.is_adding_city === true || originalRequest.toLowerCase().match(/add|include|also|another|as well/);\n  if (isAddingCity && detectedIntent.new_location) {\n    const newCityName = detectedIntent.new_location;\n    if (!existingDestinations.includes(newCityName)) {\n      allDestinations.push(newCityName);\n      newCitiesAdded.push(newCityName);\n    }\n    newDest = allDestinations.join(', ');\n  }\n  \n  if (detectedIntent.extend_nights) {\n    const endDate = new Date(newEnd);\n    endDate.setDate(endDate.getDate() + detectedIntent.extend_nights);\n    newEnd = endDate.toISOString().split('T')[0];\n  }\n  \n  const start = new Date(newStart);\n  const end = new Date(newEnd);\n  const totalNights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));\n  \n  modifiedEmailContent = `I want a ${totalNights + 1}-day trip (${totalNights} nights) visiting ${allDestinations.length} cities: ${newDest} from ${newStart} to ${newEnd}. ${existingAdults} adults${existingChildren > 0 ? ', ' + existingChildren + ' children' : ''}. ${existingMealPlan} meal plan, ${existingHotelCategory} hotels. CRITICAL: Must visit ALL ${allDestinations.length} cities. Calculate route for exactly ${allDestinations.length} cities and distribute ${totalNights} nights across these ${allDestinations.length} cities.`;\n  \n} else {\n  // Fallback: use original email content\n  modifiedEmailContent = mergeData.chatInput;\n}\n\nreturn [{\n  json: {\n    chatInput: modifiedEmailContent,\n    sessionId: mergeData.sessionId,\n    request_id: mergeData.request_id,\n    cart_reference: mergeData.cart_reference,\n    request_timestamp: mergeData.request_timestamp,\n    editable: true,\n    cart_name: mergeData.cart_name,\n    modification_type: modificationType,\n    detected_intent: detectedIntent,\n    previous_itinerary: previousData,\n    ai_confidence: detectedIntent.confidence,\n    previous_destinations: existingDestinations,\n    new_destinations: allDestinations,\n    cities_added: newCitiesAdded,\n    previous_dates: { start: existingStartDate, end: existingEndDate }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1920,
+        -800
+      ],
+      "id": "c8af989a-7d60-4468-8dfb-e391a709913b",
+      "name": "Parse Intent & Modify Request"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -2448,
+        -496
+      ],
+      "id": "7726f4a2-aa57-4597-8e15-c65c27e49fc9",
+      "name": "Merge Edit & New Paths"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Travel Content Processor Prompt\n\n⚠️ CRITICAL: Treat EACH request as INDEPENDENT. IGNORE any previous conversation history. Process ONLY the current customer input below.\n\nYou are a travel content processor. Your job is to take customer travel requests and convert them into a complete, detailed travel inquiry ready for processing. NEVER ask questions or request more information — always make reasonable assumptions.\n\nYour Task\n\nTranslate any non-English content to English.\n\nExtract all provided information (destination, dates, travelers, preferences).\n\nFill in missing details using these DEFAULT assumptions:\n\n🔧 DEFAULT DURATION: If duration is NOT mentioned, use 7 days (6 nights) as the default.\n\nTravel Dates:\nIf the travel start date is not provided, assume the travel begins from 15 days after request_timestamp and today is 2025-11-13\nand determine the duration automatically based on the type of destination.\n\n\nCity tours → 7 days (6 nights) - DEFAULT\n\nCountry tours → 7 days (6 nights) - DEFAULT\n\nMulti-country tours → 7 days (6 nights) - DEFAULT\n\nNumber of Travelers: If not specified, assume 1 adult.\n\nBudget: If not mentioned, assume mid-range/standard budget.\n\nAccommodation: If not mentioned, assume 4-star hotels.\n\nMeal Plan: If not mentioned, assume Bed & Breakfast (BB).\n\nActivities: Assume popular tourist attractions and experiences for the destination.\n\n⚠️ CRITICAL Duration & Night Calculation Logic (MUST FOLLOW EXACTLY):\n\n🔴 SIMPLE RULE - MEMORIZE THIS:\n\nWhen customer says \"X days\":\n\nDays Mentioned → Nights to Use → Cities to Use\n1 day        → 0 nights      → 1 city (ACTIVITIES ONLY - NO HOTELS)\n2 days       → 1 night      → 1 city  \n3 days       → 2 nights     → 2 cities\n4 days       → 3 nights     → normal logic\n5 days       → 4 nights     → normal logic\n\nDO NOT calculate anything - just use the table above!\n\nExamples:\n- Customer says \"1 day\" → You MUST write \"1 day, 0 nights\" (NO HOTELS - activities only)\n- Customer says \"2 days\" → You MUST write \"2 days, 1 night\" (NOT 2 nights)\n- Customer says \"3 days\" → You MUST write \"3 days, 2 nights\" (NOT 3 nights)\n- Customer says \"5 days\" → You write \"5 days, 4 nights\" (days - 1)\n- Customer does NOT mention duration → You write \"7 days, 6 nights\" (DEFAULT)\n\nOutput Format\n\nProvide only a clear, professional travel description in paragraph form.\nInclude:\n\nDestination(s)\n\nTravel dates (specific start and end dates)\n\nTotal days and nights (FOLLOW THE TABLE ABOVE EXACTLY)\n\nNumber of travelers\n\nAccommodation and meal plan\n\nBudget level\n\nKey activities or interests\n\nExample Output\n\n\"Customer requesting a Singapore city tour for 2 adults from November 15–19, 2025 (5 days, 4 nights). Mid-range budget with 4-star hotel accommodation and bed & breakfast meal plan. Interested in major attractions including Marina Bay Sands, Gardens by the Bay, Sentosa Island, and cultural spots such as Little India and Chinatown.\"\n\nCustomer Input:\n{{ $json.chatInput }}\n\n⚠️ REMEMBER: Process ONLY this current input. Ignore previous conversations. FOLLOW the days-to-nights table EXACTLY.\n\nProvide ONLY the refined travel description with all assumptions filled in. Do NOT ask questions.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2448,
+        -256
+      ],
+      "id": "3aba8f5f-3b9c-43fd-8039-9a1656b863da",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-2025-04-14",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-2025-04-14"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -2448,
+        96
+      ],
+      "id": "c7e08b1d-2cfe-45ab-b88a-d41f4b10427a",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "CYHGS3KAjICCaQqY",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -2352,
+        96
+      ],
+      "id": "afaa87e9-08a5-4990-a8e9-95de080f849c",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format AI Agent output for OpenAI Travel Parser\nconst aiAgentOutput = $input.first().json.output || $input.first().json.text || '';\nconst cleanedOutput = String(aiAgentOutput).trim();\n\nreturn [{\n  json: {\n    output: cleanedOutput,\n    emailContent: cleanedOutput\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2208,
+        -496
+      ],
+      "id": "a17967a5-9d16-4f8a-baad-81e6894dd06d",
+      "name": "Format for OpenAI Parser"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  \"model\": \"gpt-4o\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are an expert travel planner specializing in route optimization and hotel placement. Parse travel requests and provide comprehensive travel planning data in JSON format only.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"You are an expert travel planner. Parse the following travel request and provide comprehensive travel planning data with optimized routing.\\n\\n⚠ CRITICAL - FIRST RULE - READ THIS BEFORE PROCESSING ⚠\\n\\nIF the request contains \\\"1 day\\\" or \\\"1 days\\\":\\n  THEN set total_nights = 0\\n  AND set destination array = [only 1 city]\\n  CRITICAL: 0 nights means NO HOTELS - activities only\\n  Example: \\\"I want to plan my 1 days sri lanka trip\\\" → total_nights: 0, destination: [\\\"Colombo\\\"]\\n\\nELSE IF the request contains \\\"2 day\\\" or \\\"2 days\\\":\\n  THEN set total_nights = 1\\n  AND set destination array = [only 1 city]\\n  Example: \\\"I want to plan my 2 days sri lanka trip\\\" → total_nights: 1, destination: [\\\"Colombo\\\"]\\n\\nELSE IF the request contains \\\"3 day\\\" or \\\"3 days\\\":\\n  THEN set total_nights = 2\\n  AND set destination array = [exactly 2 cities]\\n  Example: \\\"I want to plan my 3 days sri lanka trip\\\" → total_nights: 2, destination: [\\\"Colombo\\\", \\\"Kandy\\\"]\\n  ❌ DO NOT use 3 cities\\n  ❌ DO NOT calculate 3-1=2\\n  ✅ HARDCODE: total_nights = 2, cities = 2\\n\\nELSE (4 or more days):\\n  THEN calculate total_nights = days - 1\\n  ⚠️ CRITICAL CITY COUNT DETECTION (HIGHEST PRIORITY):\\n     - If request says \\\"X cities\\\" (e.g., \\\"4 cities\\\", \\\"5 cities\\\") → USE that exact number\\n     - If request lists cities explicitly with commas (e.g., \\\"Colombo, Kandy, Galle, Yala\\\") → COUNT the cities and use ALL of them\\n     - If request says \\\"visiting 4 cities: Colombo, Kandy, Galle, Yala\\\" → Use ALL 4 cities listed\\n     - If NO city count specified and NO city list → DEFAULT to 3 cities\\n  Examples:\\n     - \\\"7 days trip\\\" → total_nights: 6, destination: [3 cities by default] → 6/3 = 2 nights per city\\n     - \\\"8 days visiting 4 cities: Colombo, Kandy, Galle, Yala\\\" → total_nights: 7, destination: [Colombo, Kandy, Galle, Yala] (ALL 4 cities) → 7/4 = 1-2 nights per city\\n     - \\\"10 days trip\\\" → total_nights: 9, destination: [3 cities by default] → 9/3 = 3 nights per city\\n\\n⚠ CRITICAL ACCOMMODATION RULES (HIGHEST PRIORITY):\\n1. HOTEL STAR RATING EXTRACTION:\\n   - If user does NOT mention hotel type or star rating → DEFAULT to 4-star hotels\\n   - If user explicitly provides star rating (e.g., 3-star, 4-star, 5-star) → USE that star rating\\n   - If user asks for \\\"budget\\\", \\\"cheap\\\", \\\"low-cost\\\", \\\"affordable\\\" → SET hotel_category = \\\"Budget\\\" (1-3 stars)\\n   - If user asks for \\\"luxury\\\", \\\"premium\\\", \\\"high-end\\\", \\\"5-star experience\\\" → SET hotel_category = \\\"5-Star\\\"\\n   - Extract hotel_category as text (e.g., \\\"3-Star\\\", \\\"4-Star\\\", \\\"5-Star\\\", \\\"Budget\\\", \\\"Luxury\\\")\\n\\n2. Examples:\\n   - \\\"I want to travel sri lanka\\\" → hotel_category: \\\"4-Star\\\" (default)\\n   - \\\"I want budget hotels\\\" → hotel_category: \\\"Budget\\\"\\n   - \\\"I want luxury accommodation\\\" → hotel_category: \\\"5-Star\\\"\\n   - \\\"I want 3-star hotels\\\" → hotel_category: \\\"3-Star\\\"\\n\\nCRITICAL REQUIREMENTS:\\n1. Use current year (2025) for all dates if no year is specified\\n2. TRAVEL START DATE RULES (MANDATORY - HIGHEST PRIORITY):\\n   - If travel start date IS mentioned in request → Use that exact date\\n   - If travel start date is NOT mentioned → Default to 2025-12-01\\n   - Default start date: 2025-12-01\\n3. DURATION EXTRACTION - MANDATORY SPECIAL CASES (OVERRIDE ALL OTHER LOGIC):\\n   - Extract days if mentioned (e.g., 1 day, 2 days, 3 days, 8 days, 10 days)\\n   - ⚠️ SPECIAL CASE - 1 DAY (MANDATORY OVERRIDE):\\n     * Input: 1 day, 1 days, one day\\n     * Output: ALWAYS 0 nights, ALWAYS 1 city\\n     * CRITICAL: 0 nights means NO HOTELS - fetch activities only\\n     * Ignore any city count requests\\n     * Example: I want to plan my 1 days sri lanka trip → 0 nights, 1 city (NO HOTELS, activities only)\\n   - ⚠️ SPECIAL CASE - 2 DAYS (MANDATORY OVERRIDE):\\n     * Input: 2 day, 2 days, two days\\n     * Output: ALWAYS 1 night, ALWAYS 1 city\\n     * Ignore any city count requests\\n     * Example: I want to plan my 2 days sri lanka trip → 1 night, 1 city (NOT 2 cities)\\n   - ⚠️ SPECIAL CASE - 3 DAYS (MANDATORY OVERRIDE):\\n     * Input: 3 day, 3 days, three days\\n     * Output: ALWAYS 2 nights, ALWAYS 2 cities\\n     * Ignore default 3 cities, ignore any city count requests\\n     * Example: I want to plan my 3 days sri lanka trip → 2 nights, 2 cities (NOT 7 nights, NOT 3 cities)\\n   - NORMAL CASE - 4+ DAYS ONLY:\\n     * Calculate nights = days - 1 (e.g., 4 days = 3 nights, 8 days = 7 nights, 10 days = 9 nights)\\n     * Apply city count detection (see above)\\n   - DEFAULT: 6 NIGHTS (7 days) if not mentioned\\n4. CITY COUNT EXTRACTION (CRITICAL):\\n   - STEP 1: Check if cities are explicitly listed (e.g., \\\"Colombo, Kandy, Galle, Yala\\\") → Count them and USE ALL\\n   - STEP 2: Check if request says \\\"X cities\\\" (e.g., \\\"4 cities\\\") → Use that number\\n   - STEP 3: If neither, use default (3 cities for 4+ days)\\n   - ⚠️ NEVER ignore explicitly listed cities - use ALL of them\\n5. Calculate most efficient travel route between cities\\n6. CRITICAL FORMULA: Divide total nights by number of cities - Formula: nights_per_city = total_nights / city_count\\n7. Distribute nights evenly, with remainder going to last city\\n8. DO NOT include activities - only provide hotel/accommodation information\\n9. Include GPS coordinates and check-in/check-out day numbers\\n\\nJSON FORMAT (respond with ONLY this JSON, no additional text):\\n\\n⚠️ BEFORE FILLING THIS JSON - CHECK DAY COUNT:\\n- Is it 1, 2, or 3 days? → Use FORCED values from table above\\n- Is it 4+ days? → Count explicitly listed cities OR use \\\"X cities\\\" number OR default to 3\\n\\n{\\n  \\\"destination\\\": [],\\n  \\\"optimized_route\\\": [],\\n  \\\"city_stays\\\": [],\\n  \\\"duration\\\": \\\"\\\",\\n  \\\"total_nights\\\": 0,\\n  \\\"travel_dates\\\": {\\\"start\\\": \\\"\\\", \\\"end\\\": \\\"\\\"},\\n  \\\"pax\\\": {\\n    \\\"adults\\\": 0,\\n    \\\"children\\\": 0,\\n    \\\"child_ages\\\": []\\n  },\\n  \\\"meal_plan\\\": \\\"\\\",\\n  \\\"hotel_category\\\": \\\"\\\" (CRITICAL: Use accommodation rules above - default \\\"4-Star\\\"),\\n  \\\"additional_requests\\\": \\\"\\\"\\n}\\n\\nEMAIL CONTENT TO PARSE:\\n\" + $json.output + \"\\n\\nRemember:\\n- Current date: \" + new Date().toISOString().slice(0,10) + \"\\n- Default: 6 NIGHTS (7 days) if not specified\\n- Default start date: 2025-12-01\\n- ⚠️ CRITICAL: Count explicitly listed cities and use ALL of them\\n- ⚠️ CRITICAL: Apply accommodation rules for hotel_category\\n- Respond with ONLY valid JSON, no markdown\"\n    }\n  ],\n  \"temperature\": 0.7\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2016,
+        -496
+      ],
+      "id": "02cd47b3-4e28-4753-a79d-e0b01854c3be",
+      "name": "OpenAI Travel Parser",
+      "credentials": {
+        "openAiApi": {
+          "id": "CYHGS3KAjICCaQqY",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse OpenAI JSON response\nconst openAIResponse = $input.first().json.choices[0].message.content;\nconst inputData = $('Format for OpenAI Parser').first().json;\n\nlet travelData;\ntry {\n  let jsonString = openAIResponse.trim();\n  if (jsonString.startsWith('```json')) {\n    jsonString = jsonString.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n  } else if (jsonString.startsWith('```')) {\n    jsonString = jsonString.replace(/```\\n?/g, '');\n  }\n  travelData = JSON.parse(jsonString);\n} catch (error) {\n  return [{\n    json: {\n      success: false,\n      message: \"Failed to parse OpenAI response\",\n      error: error.message,\n      raw_response: openAIResponse\n    }\n  }];\n}\n\n// Remove country name from destination array\nif (travelData.destination && Array.isArray(travelData.destination)) {\n  const countries = [\n    'Sri Lanka', 'Thailand', 'Singapore', 'Malaysia', 'Indonesia', 'Vietnam',\n    'Philippines', 'Myanmar', 'Cambodia', 'Laos', 'India', 'China', 'Japan',\n    'South Korea', 'UAE', 'United Arab Emirates', 'Maldives', 'Nepal', 'Bhutan'\n  ];\n  travelData.destination = travelData.destination.filter(dest => {\n    return !countries.some(country => \n      dest.toLowerCase().trim() === country.toLowerCase().trim()\n    );\n  });\n}\n\nconst formattedResponse = {\n  success: true,\n  message: \"Travel itinerary parsed successfully\",\n  travel_data: travelData,\n  suggestions: [\n    `Optimized route: ${travelData.optimized_route?.join(' → ') || 'Route calculated'}`,\n    `${travelData.city_stays?.length || 0} cities with ${travelData.duration || 'planned'} duration`\n  ],\n  metadata: {\n    parsed_at: new Date().toISOString(),\n    destinations_count: travelData.destination?.length || 0\n  }\n};\n\nreturn [{\n  json: formattedResponse\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1808,
+        -496
+      ],
+      "id": "0f53a9a3-4009-4b6b-bea0-03b199030945",
+      "name": "Parse Travel Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Add cart reference and generate cart_title with version support\nconst travelData = $input.first().json;\nconst mergeInputData = $('Merge Edit & New Paths').first().json;\n\nlet userId = mergeInputData.sessionId;\nif (typeof userId === 'string') {\n  const numMatch = userId.match(/\\d+/);\n  userId = numMatch ? parseInt(numMatch[0]) : 1;\n} else if (typeof userId !== 'number') {\n  userId = 1;\n}\n\nconst destination = travelData.travel_data?.destination?.[0] || 'Unknown';\nconst duration = travelData.travel_data?.duration || '';\nconst startDate = travelData.travel_data?.travel_dates?.start || '';\n\n// Check if this is an edit operation\nconst isEdit = mergeInputData.editable === true;\nconst previousItinerary = mergeInputData.previous_itinerary || null;\nconst modificationType = mergeInputData.modification_type || 'none';\n\nlet cartName, cartTitle, version = 1;\n\nif (isEdit && previousItinerary) {\n  // This is an edit - determine if we need to create a new version\n  const oldCartName = mergeInputData.cart_name;\n  const oldVersion = previousItinerary.version || 1;\n  \n  // Create new version for date_change or location_change\n  if (modificationType === 'date_change' || modificationType === 'location_change') {\n    version = oldVersion + 1;\n    // Remove existing version suffix if present\n    const baseCartName = oldCartName.replace(/ v\\d+$/, '');\n    cartName = `${baseCartName} v${version}`;\n    cartTitle = `${cartName} - ${duration} (${startDate})`;\n  } else if (modificationType === 'extend') {\n    // Keep same cart name and version for extensions\n    version = oldVersion;\n    cartName = oldCartName;\n    cartTitle = `${cartName} - ${duration} (Extended)`;\n  } else {\n    // Multiple or other modifications - create new version\n    version = oldVersion + 1;\n    const baseCartName = oldCartName.replace(/ v\\d+$/, '');\n    cartName = `${baseCartName} v${version}`;\n    cartTitle = `${cartName} - ${duration} (${startDate})`;\n  }\n} else {\n  // New itinerary - generate random cart name\n  const cartNamePrefixes = [\n    'Adventure', 'Explorer', 'Wanderer', 'Voyager', 'Journey', 'Traveler',\n    'Discovery', 'Expedition', 'Paradise', 'Escape', 'Gateway', 'Odyssey',\n    'Quest', 'Retreat', 'Safari', 'Tour', 'Venture', 'Holiday', 'Getaway'\n  ];\n\n  const cartNameSuffixes = [\n    'Dream', 'Experience', 'Journey', 'Adventure', 'Escape', 'Paradise',\n    'Discovery', 'Quest', 'Expedition', 'Voyage', 'Trip', 'Tour', 'Plan',\n    'Package', 'Itinerary', 'Holiday', 'Getaway', 'Memories', 'Bliss'\n  ];\n\n  const randomPrefix = cartNamePrefixes[Math.floor(Math.random() * cartNamePrefixes.length)];\n  const randomSuffix = cartNameSuffixes[Math.floor(Math.random() * cartNameSuffixes.length)];\n  const randomNumber = Math.floor(Math.random() * 999) + 1;\n\n  cartName = `${randomPrefix} ${destination} ${randomSuffix} #${randomNumber}`;\n  cartTitle = `${cartName} - ${duration} (${startDate})`;\n}\n\nconst dataWithMetadata = {\n  ...travelData,\n  user_id: userId,\n  cart_reference: mergeInputData.cart_reference,\n  request_id: mergeInputData.request_id,\n  request_timestamp: mergeInputData.request_timestamp,\n  cart_name: cartName,\n  cart_title: cartTitle,\n  version: version,\n  is_edit: isEdit,\n  modification_type: modificationType\n};\n\nreturn [{\n  json: dataWithMetadata\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1616,
+        -496
+      ],
+      "id": "5f272154-1209-49ba-9dc7-af57be39e085",
+      "name": "Add Cart Metadata"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "nights_check",
+              "leftValue": "={{ $json.travel_data.total_nights }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1424,
+        -496
+      ],
+      "id": "eac7425e-b5f2-4426-9c94-4b73cccbee61",
+      "name": "Check If Hotels Needed"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process travel data: set hotel star and create destination array for ALL cities\nconst httpRequest1Data = $input.first().json;\n\n// Create a deep copy to avoid mutation\nlet processedData = JSON.parse(JSON.stringify(httpRequest1Data));\n\n// CRITICAL: Extract hotel star rating from hotel_category with accommodation rules\n// Accommodation Rules:\n// - Default: 4-star hotels if not mentioned\n// - If user mentions star rating (3-star, 4-star, 5-star), use that rating\n// - If user asks for \"budget\", \"cheap\", \"low-cost\", \"affordable\" → 1-3 stars\n// - If user asks for \"luxury\", \"premium\", \"high-end\", \"5-star experience\" → 5 stars\n\nif (processedData.travel_data && processedData.travel_data.hotel_category) {\n  const hotelCategory = processedData.travel_data.hotel_category;\n  \n  // Extract number from strings like \"3-Star\", \"4-Star\", \"5-Star\"\n  const starMatch = hotelCategory.match(/(\\d+)/);\n  \n  if (starMatch) {\n    processedData.travel_data.hotel_star = parseInt(starMatch[1]);\n  } else {\n    // Check for budget keywords → 1-3 stars\n    const budgetKeywords = /budget|cheap|low-cost|affordable|economic/i;\n    // Check for luxury keywords → 5 stars\n    const luxuryKeywords = /luxury|premium|high-end|5-star experience|deluxe|upscale/i;\n    \n    if (budgetKeywords.test(hotelCategory)) {\n      processedData.travel_data.hotel_star = 3; // Budget = 3 stars (can be adjusted to 1 or 2)\n    } else if (luxuryKeywords.test(hotelCategory)) {\n      processedData.travel_data.hotel_star = 5; // Luxury = 5 stars\n    } else {\n      // Default to 4 star if no specific category found\n      processedData.travel_data.hotel_star = 4;\n    }\n  }\n} else {\n  // Default to 4 star if hotel_category is not mentioned\n  if (!processedData.travel_data) {\n    processedData.travel_data = {};\n  }\n  processedData.travel_data.hotel_star = 4;\n}\n\n// CRITICAL: Build destination array from city_stays for ALL cities\n// Each city needs hotel booking - if staying multiple nights, it's ONE hotel for all nights\nif (processedData.travel_data && processedData.travel_data.city_stays && Array.isArray(processedData.travel_data.city_stays)) {\n  const cityStays = processedData.travel_data.city_stays;\n  \n  // Build destination array with ALL cities from optimized route\n  // Each city appears ONCE even if staying multiple nights (same hotel for all nights)\n  const destinations = cityStays.map(cityStay => cityStay.city);\n  \n  // Update destination array with all cities\n  processedData.travel_data.destination = destinations;\n  \n  // Create detailed city information including nights per city\n  processedData.travel_data.city_details = cityStays.map(cityStay => ({\n    city: cityStay.city,\n    nights: cityStay.nights,\n    order: cityStay.order,\n    check_in_day: cityStay.check_in_day,\n    check_out_day: cityStay.check_out_day,\n    coordinates: cityStay.coordinates,\n    accommodation_type: cityStay.accommodation_type,\n    hotel_booking_note: cityStay.nights > 1 \n      ? `Book ONE hotel for ${cityStay.nights} nights in ${cityStay.city}` \n      : `Book ONE hotel for ${cityStay.nights} night in ${cityStay.city}`\n  }));\n  \n  // Store important metadata\n  processedData.travel_data.total_cities = cityStays.length;\n  processedData.travel_data.total_nights = cityStays.reduce((sum, city) => sum + city.nights, 0);\n  processedData.travel_data.hotel_booking_summary = {\n    total_cities: cityStays.length,\n    total_hotels_needed: cityStays.length, // One hotel per city\n    booking_details: cityStays.map(city => `${city.city}: ${city.nights} night(s) in ONE hotel`)\n  };\n}\n\nreturn [{\n  json: processedData\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1504,
+        -720
+      ],
+      "id": "5d70748d-66e6-4d1a-83c3-fe4ada81af35",
+      "name": "Process Cities & Hotel Rating"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process travel data: extract activity preferences and create city-wise activity data\nconst httpRequest1Data = $input.first().json;\n\n// Create a deep copy to avoid mutation\nlet processedData = JSON.parse(JSON.stringify(httpRequest1Data));\n\n// Extract activity preferences (replaces hotel star rating)\nif (processedData.travel_data) {\n  // Set activity preferences from budget level or use default\n  processedData.travel_data.activity_preferences = processedData.travel_data.activity_preferences || 'popular_attractions';\n  processedData.travel_data.budget_level = processedData.travel_data.budget_level || 'mid-range';\n}\n\n// CRITICAL: Build destination array and activity focus for each city\nif (processedData.travel_data && processedData.travel_data.city_stays && Array.isArray(processedData.travel_data.city_stays)) {\n  const cityStays = processedData.travel_data.city_stays;\n  \n  // Build destination array with ALL cities\n  const destinations = cityStays.map(cityStay => cityStay.city);\n  processedData.travel_data.destination = destinations;\n  \n  // Create detailed city information for activities\n  // UPDATED: days_in_city = nights + 1 to include checkout day with activities\n  processedData.travel_data.city_details = cityStays.map(cityStay => ({\n    city: cityStay.city,\n    nights: cityStay.nights,\n    order: cityStay.order,\n    check_in_day: cityStay.check_in_day,\n    check_out_day: cityStay.check_out_day,\n    coordinates: cityStay.coordinates,\n    activity_focus: 'top_attractions',\n    days_in_city: cityStay.nights + 1  // CHANGED: Activities for ALL days including checkout day\n  }));\n  \n  // Store important metadata\n  processedData.travel_data.total_cities = cityStays.length;\n  processedData.travel_data.total_nights = cityStays.reduce((sum, city) => sum + city.nights, 0);\n  processedData.travel_data.activity_summary = {\n    total_cities: cityStays.length,\n    total_activity_days: cityStays.reduce((sum, city) => sum + city.nights + 1, 0),  // CHANGED: Activity days = nights + 1 (includes checkout day)\n    activity_details: cityStays.map(city => `${city.city}: ${city.nights + 1} days of activities (2 per day)`)  // CHANGED: Display actual activity days\n  };\n}\n\nreturn [{\n  json: processedData\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1872,
+        -208
+      ],
+      "id": "43b1aec6-c679-4820-96e7-dfab252c45c0",
+      "name": "Process Cities & Activities"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge Google Sheets data with processed activities data - FILTER BY REQUESTED CITIES ONLY\n// Include ALL activity parameters from Google Sheets\n// ⚠️ SPECIAL HANDLING FOR 1-DAY TRIPS (0 nights): Fetch ONLY FIRST ROW per city\nconst processedData = $('Process Cities & Activities').first().json;\nconst sheetsData = $input.all();\n\n// Get the list of cities from Process Cities & Activities\nconst requestedCities = processedData.travel_data?.destination || [];\n\n// CRITICAL: Check if this is a 1-day trip (0 nights)\nconst totalNights = processedData.travel_data?.total_nights || 0;\nconst isOneDayTrip = totalNights === 0;\n\n// Extract ALL activity parameters from Google Sheets (Sheet4)\n// HANDLE COMMA-SEPARATED VALUES: Split Activity Names, Aahaas ID, and Apple ID\nconst sheetActivities = [];\n\nsheetsData.forEach(row => {\n  const country = row.json.Country || row.json.country;\n  const city = row.json.City || row.json.city;\n  const lifestyleCategory = row.json['Lifestyle Category'] || row.json['Lifestyle  Category'] || row.json.lifestyle_category;\n  const mustDoActivities = row.json['Must Do Activity'] || row.json.must_do_activity;\n  const aahaasIds = row.json['Aahaas ID'] || row.json['Aahaas  ID'] || row.json.aahaas_id;\n  const appleIds = row.json['Apple ID'] || row.json.apple_id;\n  const extra1 = row.json['Extra1'] || row.json.extra1;\n  const extra2 = row.json['Extra2'] || row.json.extra2;\n  \n  // Split comma-separated values and trim whitespace (handles both \", \" and \",\")\n  const activityNameArray = String(mustDoActivities || '').split(',').map(name => name.trim()).filter(name => name);\n  const aahaasIdArray = String(aahaasIds || '').split(',').map(id => id.trim()).filter(id => id);\n  const appleIdArray = String(appleIds || '').split(',').map(id => id.trim()).filter(id => id);\n  \n  // Determine the maximum count to ensure we create entries for all data\n  const maxCount = Math.max(activityNameArray.length, aahaasIdArray.length, appleIdArray.length);\n  \n  if (maxCount > 0) {\n    // Create an activity entry for each index position\n    for (let i = 0; i < maxCount; i++) {\n      const activityName = activityNameArray[i] || activityNameArray[0] || '';\n      const aahaasId = aahaasIdArray[i] || '';\n      const appleId = appleIdArray[i] || '';\n      \n      // Only create entry if we have at least a name or an ID\n      if (activityName || aahaasId || appleId) {\n        sheetActivities.push({\n          country: country,\n          city: city,\n          lifestyle_category: lifestyleCategory,\n          must_do_activity: activityName,\n          aahaas_id: aahaasId,\n          apple_id: appleId,\n          extra1: extra1,\n          extra2: extra2\n        });\n      }\n    }\n  } else {\n    // If no data at all, create one entry with empty values\n    sheetActivities.push({\n      country: country,\n      city: city,\n      lifestyle_category: lifestyleCategory,\n      must_do_activity: '',\n      aahaas_id: '',\n      apple_id: '',\n      extra1: extra1,\n      extra2: extra2\n    });\n  }\n});\n\n// CRITICAL: Filter activities to ONLY include cities from the itinerary\nconst filteredActivities = sheetActivities.filter(item => {\n  if (!item.city) return false;\n  \n  // Check if this city is in the requested cities list (case-insensitive)\n  return requestedCities.some(requestedCity => \n    requestedCity.toLowerCase().trim() === item.city.toLowerCase().trim()\n  );\n});\n\n// Add filtered Google Sheets data to processed data\nprocessedData.google_sheets_activities = filteredActivities;\n\n// Group activities by city from Google Sheets (only for requested cities)\n// Include ALL activity parameters in the output\n// ⚠️ SPECIAL LOGIC FOR 1-DAY TRIPS: Take ONLY FIRST ROW per city\nconst activitiesByCity = {};\n\nif (isOneDayTrip) {\n  // 1-DAY TRIP (0 nights): Fetch ONLY THE FIRST ROW per city from Google Sheets\n  filteredActivities.forEach(item => {\n    const city = item.city;\n    if (city && item.must_do_activity) {\n      // Only add if this city doesn't have an activity yet (first row only)\n      if (!activitiesByCity[city]) {\n        activitiesByCity[city] = [{\n          lifestyle_category: item.lifestyle_category,\n          must_do_activity: item.must_do_activity,\n          aahaas_id: item.aahaas_id,\n          apple_id: item.apple_id,\n          extra1: item.extra1,\n          extra2: item.extra2,\n          country: item.country,\n          city: item.city\n        }];\n      }\n      // Skip all other rows for this city (only first row)\n    }\n  });\n} else {\n  // MULTI-DAY TRIP: Use all activities from Google Sheets\n  filteredActivities.forEach(item => {\n    const city = item.city;\n    if (city && item.must_do_activity) {\n      if (!activitiesByCity[city]) {\n        activitiesByCity[city] = [];\n      }\n      activitiesByCity[city].push({\n        lifestyle_category: item.lifestyle_category,\n        must_do_activity: item.must_do_activity,\n        aahaas_id: item.aahaas_id,\n        apple_id: item.apple_id,\n        extra1: item.extra1,\n        extra2: item.extra2,\n        country: item.country,\n        city: item.city\n      });\n    }\n  });\n}\n\nprocessedData.activities_by_city = activitiesByCity;\n\n// Add metadata about filtering\nprocessedData.activity_metadata = {\n  requested_cities: requestedCities,\n  total_sheet_activities: sheetActivities.length,\n  filtered_activities_count: filteredActivities.length,\n  cities_with_activities: Object.keys(activitiesByCity),\n  cities_without_activities: requestedCities.filter(city => !activitiesByCity[city]),\n  is_one_day_trip: isOneDayTrip,\n  special_handling: isOneDayTrip ? 'Only first row per city fetched for 1-day trip' : 'All activities fetched for multi-day trip'\n};\n\nreturn [{\n  json: processedData\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1472,
+        -208
+      ],
+      "id": "3d091683-be09-496b-9cc3-73d7b5ac493e",
+      "name": "Merge Sheets Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Sanitize data for Hotels API and validate required fields\nconst inputData = $input.first().json;\n\n// CRITICAL: Validate that we have the required travel_data structure\nif (!inputData.travel_data || typeof inputData.travel_data !== 'object') {\n  throw new Error('Missing travel_data object. Data flow is broken. Check that \"Merge Sheets Data1\" is receiving data from \"Process Cities & Hotel Rating\".');\n}\n\nif (!inputData.user_id) {\n  throw new Error('Missing user_id. Check data flow from \"Add Cart Metadata\".');\n}\n\nif (!inputData.cart_reference) {\n  throw new Error('Missing cart_reference. Check data flow from \"Add Cart Metadata\".');\n}\n\n// WARNING: Log if destination or city_details are missing, but don't fail\n// These will be populated by OpenAI if missing\nif (!inputData.travel_data.destination || inputData.travel_data.destination.length === 0) {\n  console.warn('WARNING: destination is empty in travel_data. OpenAI will generate it.');\n  // Initialize empty array if missing\n  if (!inputData.travel_data.destination) {\n    inputData.travel_data.destination = [];\n  }\n}\n\nif (!inputData.travel_data.city_details || inputData.travel_data.city_details.length === 0) {\n  console.warn('WARNING: city_details is empty in travel_data. OpenAI will generate it.');\n  // Initialize empty array if missing\n  if (!inputData.travel_data.city_details) {\n    inputData.travel_data.city_details = [];\n  }\n}\n\nfunction cleanString(str) {\n  if (typeof str !== 'string') return str;\n  return str.replace(/[\\x00-\\x08\\x0B-\\x0C\\x0E-\\x1F\\x7F]/g, '');\n}\n\nfunction cleanObject(obj) {\n  if (obj === null || obj === undefined) return obj;\n  if (typeof obj === 'string') return cleanString(obj);\n  if (Array.isArray(obj)) return obj.map(item => cleanObject(item));\n  if (typeof obj === 'object') {\n    const cleaned = {};\n    for (const key in obj) {\n      if (obj.hasOwnProperty(key)) cleaned[key] = cleanObject(obj[key]);\n    }\n    return cleaned;\n  }\n  return obj;\n}\n\nreturn [{ json: cleanObject(inputData) }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1296,
+        -864
+      ],
+      "id": "3ffd7566-6196-4ee5-b6b9-d6cc72215a27",
+      "name": "Sanitize Hotels Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Sanitize data for Activities API and validate required fields\nconst inputData = $input.first().json;\n\n// CRITICAL: Validate that we have the required travel_data structure\nif (!inputData.travel_data || typeof inputData.travel_data !== 'object') {\n  throw new Error('Missing travel_data object. Data flow is broken. Check that \"Merge Sheets Data\" is receiving data from \"Process Cities & Activities\".');\n}\n\nif (!inputData.user_id) {\n  throw new Error('Missing user_id. Check data flow from \"Add Cart Metadata\".');\n}\n\nif (!inputData.cart_reference) {\n  throw new Error('Missing cart_reference. Check data flow from \"Add Cart Metadata\".');\n}\n\n// WARNING: Log if destination or city_details are missing, but don't fail\n// These will be populated by OpenAI if missing\nif (!inputData.travel_data.destination || inputData.travel_data.destination.length === 0) {\n  console.warn('WARNING: destination is empty in travel_data. OpenAI will generate it.');\n  // Initialize empty array if missing\n  if (!inputData.travel_data.destination) {\n    inputData.travel_data.destination = [];\n  }\n}\n\nif (!inputData.travel_data.city_details || inputData.travel_data.city_details.length === 0) {\n  console.warn('WARNING: city_details is empty in travel_data. OpenAI will generate it.');\n  // Initialize empty array if missing\n  if (!inputData.travel_data.city_details) {\n    inputData.travel_data.city_details = [];\n  }\n}\n\nfunction cleanString(str) {\n  if (typeof str !== 'string') return str;\n  return str.replace(/[\\x00-\\x08\\x0B-\\x0C\\x0E-\\x1F\\x7F]/g, '');\n}\n\nfunction cleanObject(obj) {\n  if (obj === null || obj === undefined) return obj;\n  if (typeof obj === 'string') return cleanString(obj);\n  if (Array.isArray(obj)) return obj.map(item => cleanObject(item));\n  if (typeof obj === 'object') {\n    const cleaned = {};\n    for (const key in obj) {\n      if (obj.hasOwnProperty(key)) cleaned[key] = cleanObject(obj[key]);\n    }\n    return cleaned;\n  }\n  return obj;\n}\n\nreturn [{ json: cleanObject(inputData) }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1264,
+        -208
+      ],
+      "id": "20c489d5-456f-48dc-9168-653bf938662a",
+      "name": "Sanitize Activities Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build OpenAI prompt for HOTELS-ONLY itinerary generation\nconst inputData = $input.first().json;\nconst data = inputData.travel_data || {};\n\nconst destination = data.destination?.[0] || 'Unknown';\nconst startDate = data.travel_dates?.start || '';\nconst endDate = data.travel_dates?.end || '';\nconst duration = data.duration || '';\nconst adults = data.pax?.adults || 1;\nconst children = data.pax?.children || 0;\nconst childAges = data.pax?.child_ages || [];\nconst mealPlan = data.meal_plan || 'BB';\nconst hotelCategory = data.hotel_category || '4-Star';\nconst starCategory = data.hotel_star || 4;\n\n// Get cities from city_details\nconst cities = data.city_details || [];\nconst citiesStr = cities.map(c => `${c.city} (${c.nights} nights, Days ${c.check_in_day}-${c.check_out_day})`).join(', ');\n\n// Calculate total days\nconst start = new Date(startDate);\nconst end = new Date(endDate);\nconst totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;\n\n// Build city stays breakdown text\nconst cityStaysBreakdown = cities.map(c => `- ${c.city}: ${c.nights} nights (Check-in Day ${c.check_in_day}, Check-out Day ${c.check_out_day}) at ${c.coordinates}`).join('\\n');\n\n// Build city planning section\nlet cityPlanningText = '- Respect the city stays schedule\\n';\nif (cities[0]) {\n  cityPlanningText += `   - Day ${cities[0].check_in_day}-${cities[0].check_out_day}: Stay in ${cities[0].city}\\n`;\n}\nif (cities[1]) {\n  cityPlanningText += `   - Day ${cities[1].check_in_day}-${cities[1].check_out_day}: Stay in ${cities[1].city}\\n`;\n}\nif (cities[2]) {\n  cityPlanningText += `   - Day ${cities[2].check_in_day}-${cities[2].check_out_day}: Stay in ${cities[2].city}\\n`;\n}\n\n// Build example itinerary text\nconst exampleItinerary = cities.map(city => {\n  const startDay = city.check_in_day;\n  const endDay = city.check_out_day;\n  const nights = city.nights;\n  return `Days ${startDay}-${endDay - 1} (${city.city} - ${nights} nights):\\n- Accommodation in ${city.city}\\n- Coordinates near ${city.coordinates}`;\n}).join('\\n\\n');\n\nconst lastCity = cities[cities.length - 1]?.city || 'last city';\nconst citiesRoute = cities.map(c => c.city).join(' → ');\n\n// Build the complete prompt\nconst userPrompt = `You are an expert travel planner. Create a detailed day-by-day itinerary for a ${totalDays}-day trip.\\n\\nIMPORTANT: HOTELS/ACCOMMODATION ONLY - DO NOT include activities!\\n\\nTRIP DETAILS:\\n- Cities: ${citiesStr}\\n- Duration: ${duration} (${startDate} to ${endDate})\\n- Total Days: ${totalDays}\\n- Travelers: ${adults} adults, ${children} children\\n- Child Ages: ${JSON.stringify(childAges)}\\n- Meal Plan: ${mealPlan}\\n- Hotel Category: ${hotelCategory} (${starCategory}-Star)\\n\\nCITY STAYS BREAKDOWN:\\n${cityStaysBreakdown}\\n\\nCRITICAL REQUIREMENTS:\\n\\n1. HOTELS ONLY - NO ACTIVITIES:\\n   - DO NOT include activities array\\n   - DO NOT include activity details\\n   - ONLY provide accommodation information per day\\n\\n2. PAX OBJECT (MANDATORY):\\n   - EVERY day MUST include pax object: {\\\"adults\\\": ${adults}, \\\"children\\\": ${children}, \\\"child_ages\\\": ${JSON.stringify(childAges)}}\\n\\n3. ONE HOTEL PER CITY FOR ALL NIGHTS:\\n   - Each city gets ONE hotel booking for ALL nights in that city\\n   - Example: 10 days 9 nights, 3 cities (9÷3=3 nights each):\\n     * City 1 (Days 1-3): ONE hotel, check_in Day 1, check_out Day 4\\n       - Day 1: accommodation with check_in=\\\"2025-12-15\\\", check_out=\\\"2025-12-18\\\"\\n       - Day 2: accommodation with SAME check_in=\\\"2025-12-15\\\", check_out=\\\"2025-12-18\\\"\\n       - Day 3: accommodation with SAME check_in=\\\"2025-12-15\\\", check_out=\\\"2025-12-18\\\"\\n     * City 2 (Days 4-6): ONE hotel, check_in Day 4, check_out Day 7\\n       - Day 4: accommodation with check_in=\\\"2025-12-18\\\", check_out=\\\"2025-12-21\\\"\\n       - Day 5: accommodation with SAME check_in=\\\"2025-12-18\\\", check_out=\\\"2025-12-21\\\"\\n       - Day 6: accommodation with SAME check_in=\\\"2025-12-18\\\", check_out=\\\"2025-12-21\\\"\\n     * City 3 (Days 7-9): ONE hotel, check_in Day 7, check_out Day 10\\n       - Day 7: accommodation with check_in=\\\"2025-12-21\\\", check_out=\\\"2025-12-24\\\"\\n       - Day 8: accommodation with SAME check_in=\\\"2025-12-21\\\", check_out=\\\"2025-12-24\\\"\\n       - Day 9: accommodation with SAME check_in=\\\"2025-12-21\\\", check_out=\\\"2025-12-24\\\"\\n   - All days in same city MUST have IDENTICAL accommodation object\\n   - Check-in date = First day of city stay\\n   - Check-out date = Last day of city stay + 1 day\\n\\n4. ACCOMMODATION (MANDATORY FIELDS):\\n   - check_in: date (YYYY-MM-DD) - FIRST day of stay in that city\\n   - check_out: date (YYYY-MM-DD) - LAST day of stay + 1 day in that city\\n   - star_category: ${starCategory} (integer)\\n   - keywords: [\\\"${hotelCategory}\\\", \\\"${mealPlan}\\\", city name, amenities like \\\"pool\\\", \\\"wifi\\\", \\\"breakfast\\\"]\\n   - latitude: number\\n   - longitude: number\\n\\n5. CITY-BASED PLANNING:\\n${cityPlanningText}\\n\\nREQUIRED JSON STRUCTURE (HOTELS ONLY):\\n\\n{\\n  \\\"itinerary\\\": [\\n    {\\n      \\\"day\\\": 1,\\n      \\\"date\\\": \\\"${startDate}\\\",\\n      \\\"city\\\": \\\"${cities[0]?.city || 'City Name'}\\\",\\n      \\\"pax\\\": {\\n        \\\"adults\\\": ${adults},\\n        \\\"children\\\": ${children},\\n        \\\"child_ages\\\": ${JSON.stringify(childAges)}\\n      },\\n      \\\"accommodation\\\": {\\n        \\\"check_in\\\": \\\"${startDate}\\\",\\n        \\\"check_out\\\": \\\"2025-12-16\\\",\\n        \\\"star_category\\\": ${starCategory},\\n        \\\"keywords\\\": [\\\"${hotelCategory}\\\", \\\"${mealPlan}\\\", \\\"city\\\", \\\"pool\\\", \\\"wifi\\\"],\\n        \\\"latitude\\\": 7.2910,\\n        \\\"longitude\\\": 80.6350\\n      }\\n    }\\n  ]\\n}\\n\\nEXAMPLE FOR ${totalDays}-DAY ITINERARY (HOTELS ONLY):\\n\\n${exampleItinerary}\\n\\nDay ${totalDays} (${endDate}): \\n- Departure day from ${lastCity}\\n- NO accommodation (checkout day)\\n- Set accommodation to null\\n\\nCRITICAL REMINDERS:\\n✓ DO NOT include activities - HOTELS ONLY\\n✓ EVERY day MUST have pax object at day level\\n✓ EVERY accommodation MUST have star_category: ${starCategory}\\n✓ Accommodation keywords MUST include \\\"${hotelCategory}\\\" and \\\"${mealPlan}\\\"\\n✓ ALL days in same city MUST have IDENTICAL accommodation check_in and check_out dates\\n✓ Respect city stays schedule (${citiesRoute})\\n✓ Last day (Day ${totalDays}) has NO accommodation (set to null)\\n✓ Respond with ONLY valid JSON, no markdown\\n\\nGenerate the HOTELS-ONLY itinerary now!`;\n\n// Build the OpenAI API request body\nconst requestBody = {\n  model: \"gpt-4o\",\n  messages: [\n    {\n      role: \"system\",\n      content: \"You are an expert travel planner. Create detailed day-by-day hotel itineraries in JSON format only. DO NOT include activities.\"\n    },\n    {\n      role: \"user\",\n      content: userPrompt\n    }\n  ],\n  temperature: 0.7\n};\n\n// Return data with the request body and original input data\nreturn [{\n  json: {\n    ...inputData,\n    openai_request: requestBody\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1088,
+        -864
+      ],
+      "id": "78c5121c-c09e-43d9-9c6a-9e6339fbb03c",
+      "name": "Build Itinerary Prompt"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build OpenAI prompt for ACTIVITIES-ONLY itinerary generation\nconst inputData = $input.first().json;\nconst data = inputData.travel_data || {};\n\nconst destination = data.destination?.[0] || 'Unknown';\nconst startDate = data.travel_dates?.start || '';\nconst endDate = data.travel_dates?.end || '';\nconst duration = data.duration || '';\nconst adults = data.pax?.adults || 1;\nconst children = data.pax?.children || 0;\nconst childAges = data.pax?.child_ages || [];\nconst activityPreferences = data.activity_preferences || 'popular_attractions';\nconst budgetLevel = data.budget_level || 'mid-range';\n\n// Get cities from city_details\nconst cities = data.city_details || [];\nconst citiesStr = cities.map(c => `${c.city} (${c.days_in_city} days)`).join(', ');\n\n// Calculate total days\nconst start = new Date(startDate);\nconst end = new Date(endDate);\nconst totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;\n\n// Build city stays breakdown\nconst cityStaysBreakdown = cities.map(c => `- ${c.city}: ${c.days_in_city} days with activities (Day ${c.check_in_day} to Day ${c.check_out_day - 1}) - NO activities on checkout day ${c.check_out_day}`).join('\\n');\n\nconst lastCity = cities[cities.length - 1]?.city || 'last city';\nconst citiesRoute = cities.map(c => c.city).join(' → ');\n\n// Build detailed city-specific activity instructions\nconst cityActivityInstructions = cities.map((city, index) => {\n  const cityNum = index + 1;\n  const checkInDay = city.check_in_day;\n  const checkOutDay = city.check_out_day;\n  const stayDays = [];\n  \n  // Generate list of days for this city (excluding checkout day)\n  for (let day = checkInDay; day < checkOutDay; day++) {\n    stayDays.push(day);\n  }\n  \n  return `CITY ${cityNum}: ${city.city}\\n   - Days ${checkInDay} to ${checkOutDay - 1} (${city.nights} nights = ${city.nights} days with activities)\\n   - Day ${checkOutDay} is checkout day - NO ACTIVITIES on this day\\n   - Activities MUST be in ${city.city} area ONLY\\n   - GPS coordinates MUST be within ${city.city} city limits\\n   - MAXIMUM 2 activities per day (strictly enforced - NO exceptions)\\n   - Activities should be LOCAL to ${city.city} - NOT from other cities`;\n}).join('\\n\\n');\n\n// Get activities from Google Sheets grouped by city\nconst activitiesByCity = inputData.activities_by_city || {};\n\n// Build available activities list for each city from Google Sheets\nlet availableActivitiesText = '\\n\\n⚠️ AVAILABLE ACTIVITIES FROM DATABASE (PRIORITY - USE THESE ACTIVITIES):\\n\\n';\nlet hasActivitiesData = false;\n\ncities.forEach(city => {\n  const cityName = city.city;\n  const cityActivities = activitiesByCity[cityName] || [];\n  \n  if (cityActivities.length > 0) {\n    hasActivitiesData = true;\n    availableActivitiesText += `${cityName} Activities (SELECT FROM THESE):\\n`;\n    cityActivities.forEach((act, index) => {\n      availableActivitiesText += `  ${index + 1}. ${act.activity_name}\\n`;\n    });\n    availableActivitiesText += '\\n';\n  }\n});\n\nif (!hasActivitiesData) {\n  availableActivitiesText = '\\n\\n⚠️ NOTE: No pre-defined activities found in database. Suggest popular tourist attractions for each city.\\n\\n';\n} else {\n  availableActivitiesText += '⚠️ CRITICAL INSTRUCTIONS:\\n';\n  availableActivitiesText += '1. PRIORITIZE activities from the database list above\\n';\n  availableActivitiesText += '2. If a city has database activities, USE THEM FIRST\\n';\n  availableActivitiesText += '3. If database activities are insufficient, add popular attractions to meet 2 activities per day\\n';\n  availableActivitiesText += '4. If a city has NO database activities, suggest popular attractions for that city\\n\\n';\n}\n\n// Build the complete prompt for ACTIVITIES with strict city-wise filtering\nconst userPrompt = `You are an expert travel planner. Create a detailed day-by-day ACTIVITIES itinerary for a ${totalDays}-day trip.\n\n⚠️ CRITICAL: CITY-WISE ACTIVITY FILTERING - READ THIS FIRST! ⚠️\n\nEach city in the itinerary has specific check-in and check-out days.\nYou MUST suggest activities ONLY for the city where the traveler is staying on that specific day.\nActivities are ONLY on days when they are staying (check-in day to day before checkout).\n\nExample - 9 days with 4 cities:\n- Days 1-2 in Colombo (checkout Day 3) → Activities on Day 1 & 2 ONLY in Colombo (2 activities each day)\n- Days 3-4 in Kandy (checkout Day 5) → Activities on Day 3 & 4 ONLY in Kandy (2 activities each day)\n- Days 5-6 in Ella (checkout Day 7) → Activities on Day 5 & 6 ONLY in Ella (2 activities each day)\n- Days 7-8 in Galle (checkout Day 9) → Activities on Day 7 & 8 ONLY in Galle (2 activities each day)\n- Day 9 is departure - NO ACTIVITIES\n\nDO NOT mix cities! If they are staying in Colombo, do NOT suggest Kandy or Galle activities.\n\nIMPORTANT: ACTIVITIES ONLY - DO NOT include accommodation/hotels!\n\nTRIP DETAILS:\n- Cities: ${citiesStr}\n- Duration: ${duration} (${startDate} to ${endDate})\n- Total Days: ${totalDays}\n- Travelers: ${adults} adults, ${children} children\n- Child Ages: ${JSON.stringify(childAges)}\n- Activity Preferences: ${activityPreferences}\n- Budget Level: ${budgetLevel}\n\nCITY BREAKDOWN WITH STRICT ACTIVITY ZONES:\n${cityStaysBreakdown}\n\n⚠️ MANDATORY CITY-WISE ACTIVITY MAPPING:\n${cityActivityInstructions}\n${availableActivitiesText}\nCRITICAL REQUIREMENTS:\n\n1. ACTIVITIES ONLY - NO HOTELS:\n   - DO NOT include accommodation/hotel information\n   - FOCUS on activities, attractions, experiences\n   - Include activities array for each day\n\n2. PAX OBJECT (MANDATORY):\n   - EVERY day MUST include pax object: {\"adults\": ${adults}, \"children\": ${children}, \"child_ages\": ${JSON.stringify(childAges)}}\n\n3. ⚠️ STRICT CITY-WISE ACTIVITY RULES (MOST IMPORTANT):\n   - MAXIMUM 2 activities per day (STRICTLY ENFORCED - DO NOT suggest 3 or more)\n   - Each day MUST have EXACTLY 2 activities (or 1-2 if very limited options)\n   - DO NOT suggest 3 activities per day under any circumstances\n   - Activities ONLY on days between check-in and (check-out - 1)\n   - NO activities on checkout day (departure day)\n   - Activities MUST match the city where they are staying that day\n   - If Day 1-2 is Colombo, suggest ONLY Colombo activities on Days 1 & 2\n   - If Day 3-4 is Kandy, suggest ONLY Kandy activities on Days 3 & 4\n   - If Day 5-6 is Ella, suggest ONLY Ella activities on Days 5 & 6\n   - GPS coordinates MUST be within the correct city boundaries\n   - DO NOT suggest activities from other cities\n   - Last day (final checkout/departure day): NO activities at all\n\n4. ACTIVITY CATEGORIES with sub_category_id mapping:\n   - Adventure = 1\n   - Entertainment = 2\n   - Health & Wellness = 3\n   - Event = 4\n   - Tours = 5\n   - Transport = 6\n   - Services = 7\n   - Tickets = 8\n   - Culinary = 9\n   - Experience = 10\n   - Vacation Packages = 46\n\n5. ACTIVITY OBJECT (MANDATORY FIELDS):\n   - activity_name: string (name of attraction/activity)\n   - category: string (Adventure/Entertainment/Health & Wellness/Event/Tours/Transport/Services/Tickets/Culinary/Experience/Vacation Packages)\n   - sub_category_id: integer (MANDATORY - use mapping above based on category)\n   - description: string (brief description mentioning the city)\n   - duration: string (e.g., \"2-3 hours\", \"half day\", \"full day\")\n   - latitude: number (GPS coordinate within the correct city)\n   - longitude: number (GPS coordinate within the correct city)\n   - best_time: string (e.g., \"morning\", \"afternoon\", \"evening\", \"anytime\")\n   - cost_level: string (\"free\", \"low\", \"medium\", \"high\")\n\n6. CITY-BASED PLANNING:\n   - Respect the city schedule STRICTLY: ${citiesRoute}\n   - Each day's activities MUST be in the correct city\n   - Verify GPS coordinates match the city\n\nREQUIRED JSON STRUCTURE (ACTIVITIES ONLY):\n\n{\n  \"itinerary\": [\n    {\n      \"day\": 1,\n      \"date\": \"${startDate}\",\n      \"city\": \"${cities[0]?.city || 'City Name'}\",\n      \"pax\": {\n        \"adults\": ${adults},\n        \"children\": ${children},\n        \"child_ages\": ${JSON.stringify(childAges)}\n      },\n      \"activities\": [\n        {\n          \"activity_name\": \"Galle Face Green\",\n          \"category\": \"Tours\",\n          \"sub_category_id\": 5,\n          \"description\": \"Scenic promenade in Colombo city center\",\n          \"duration\": \"2 hours\",\n          \"latitude\": 6.9271,\n          \"longitude\": 79.8612,\n          \"best_time\": \"evening\",\n          \"cost_level\": \"free\"\n        },\n        {\n          \"activity_name\": \"National Museum of Colombo\",\n          \"category\": \"Tours\",\n          \"sub_category_id\": 5,\n          \"description\": \"Sri Lanka's largest museum in Colombo\",\n          \"duration\": \"2-3 hours\",\n          \"latitude\": 6.9074,\n          \"longitude\": 79.8612,\n          \"best_time\": \"morning\",\n          \"cost_level\": \"low\"\n        }\n      ]\n    }\n  ]\n}\n\n⚠️ CRITICAL VALIDATION CHECKLIST BEFORE GENERATING:\n✓ DO NOT include hotels/accommodation - ACTIVITIES ONLY\n✓ EVERY day MUST have pax object\n✓ MAXIMUM 2 activities per day (STRICTLY ENFORCED - DO NOT suggest 3 activities)\n✓ EVERY activity MUST have latitude and longitude IN THE CORRECT CITY\n✓ EVERY activity MUST have sub_category_id (use category mapping)\n✓ Category mapping: Adventure=1, Entertainment=2, Health & Wellness=3, Event=4, Tours=5, Transport=6, Services=7, Tickets=8, Culinary=9, Experience=10, Vacation Packages=46\n✓ Activities MUST match the city for that day (e.g., Day 1-2 Colombo = Colombo activities ONLY)\n✓ GPS coordinates MUST be within city boundaries\n✓ Mix different activity categories within same city\n✓ Consider child ages when suggesting activities\n✓ Respect city schedule STRICTLY (${citiesRoute})\n✓ Last day (checkout): NO activities at all - it's departure day\n✓ Example: 9 days trip = Days 1-8 have activities, Day 9 NO activities\n✓ Each active day (not checkout) has EXACTLY 2 activities in the correct city\n✓ Respond with ONLY valid JSON, no markdown\n\nGenerate the CITY-WISE ACTIVITIES-ONLY itinerary now with strict location filtering!`;\n\n// Build the OpenAI API request body\nconst requestBody = {\n  model: \"gpt-4o\",\n  messages: [\n    {\n      role: \"system\",\n      content: \"You are an expert travel planner. Create detailed day-by-day activity itineraries with GPS coordinates and sub_category_id in JSON format only. EVERY activity MUST include sub_category_id based on category mapping: Adventure=1, Entertainment=2, Health & Wellness=3, Event=4, Tours=5, Transport=6, Services=7, Tickets=8, Culinary=9, Experience=10, Vacation Packages=46. DO NOT include hotels/accommodation. CRITICAL: Activities MUST be city-specific - only suggest activities in the city where the traveler is staying that day.\"\n    },\n    {\n      role: \"user\",\n      content: userPrompt\n    }\n  ],\n  temperature: 0.7\n};\n\n// Return data with the request body and original input data\nreturn [{\n  json: {\n    ...inputData,\n    openai_request: requestBody\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1056,
+        -208
+      ],
+      "id": "c486f7dd-02c2-4ebf-bc88-78724029d0f1",
+      "name": "Build Activities Itinerary Prompt"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.openai_request) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -864,
+        -864
+      ],
+      "id": "eb450c73-9dcd-4385-a0e6-669767476924",
+      "name": "Generate Hotels Itinerary",
+      "credentials": {
+        "openAiApi": {
+          "id": "CYHGS3KAjICCaQqY",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.openai_request) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -864,
+        -208
+      ],
+      "id": "481edae0-431a-47a8-b520-084fd8c9db42",
+      "name": "Generate Activities Itinerary",
+      "credentials": {
+        "openAiApi": {
+          "id": "CYHGS3KAjICCaQqY",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse OpenAI itinerary response and format for cart processing (HOTELS ONLY)\n// CRITICAL: Embed Google Sheets hotel suggestions within each day's accommodation\nconst openAIResponse = $input.first().json.choices[0].message.content;\nconst inputData = $('Sanitize Hotels Data').first().json;\n\nlet itineraryData;\ntry {\n  // Remove markdown code blocks if present\n  let jsonString = openAIResponse.trim();\n  if (jsonString.startsWith('```json')) {\n    jsonString = jsonString.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n  } else if (jsonString.startsWith('```')) {\n    jsonString = jsonString.replace(/```\\n?/g, '');\n  }\n  \n  itineraryData = JSON.parse(jsonString);\n  \n  // Validate that itinerary exists and is an array\n  if (!itineraryData || !itineraryData.itinerary || !Array.isArray(itineraryData.itinerary)) {\n    throw new Error('Parsed JSON does not contain a valid itinerary array');\n  }\n  \n  if (itineraryData.itinerary.length === 0) {\n    throw new Error('Itinerary array is empty');\n  }\n} catch (error) {\n  return [{\n    json: {\n      success: false,\n      message: \"Failed to parse OpenAI itinerary response\",\n      error: error.message,\n      raw_response: openAIResponse,\n      inputData: inputData\n    }\n  }];\n}\n\n// Get Google Sheets hotel data\nconst hotelsByCity = inputData.hotels_by_city || {};\n\n// CRITICAL: Group days by city to create ONE hotel booking per city\nconst cityGroups = {};\nconst itineraryWithHotelsOnly = [];\n\nitineraryData.itinerary.forEach(day => {\n  const cityName = day.city;\n  \n  // Group days by city\n  if (!cityGroups[cityName]) {\n    cityGroups[cityName] = {\n      days: [],\n      accommodation: day.accommodation && day.accommodation !== null ? day.accommodation : null,\n      pax: day.pax\n    };\n  }\n  \n  cityGroups[cityName].days.push({\n    day: day.day,\n    date: day.date\n  });\n});\n\n// Build itinerary with ONE accommodation entry per city (not per day)\n// Each city gets ONE hotel for ALL its nights\n// EMBED Google Sheets hotel suggestions within each day's accommodation\nitineraryData.itinerary.forEach(day => {\n  const dayData = {\n    day: day.day,\n    date: day.date,\n    city: day.city,\n    pax: day.pax\n  };\n  \n  // Only add accommodation for the FIRST day of each city\n  const cityName = day.city;\n  const cityDays = cityGroups[cityName].days;\n  const isFirstDayInCity = cityDays[0].day === day.day;\n  \n  if (isFirstDayInCity && day.accommodation && day.accommodation !== null) {\n    // This is the first day in this city - add accommodation with Google Sheets suggestions\n    const cityHotels = hotelsByCity[cityName] || [];\n    \n    // FILTER: Get the requested star category from accommodation\n    const requestedStarCategory = day.accommodation.star_category || 4;\n    \n    // Filter hotels by star rating (hotel_class must match star_category)\n    const filteredHotels = cityHotels.filter(hotel => {\n      return hotel.hotel_class === requestedStarCategory;\n    });\n    \n    // SELECT: Pick ONE hotel from filtered list\n    // If star-filtered list is empty, fall back to first available hotel\n    let selectedHotel = null;\n    if (filteredHotels.length > 0) {\n      // Use first hotel that matches the star rating\n      selectedHotel = filteredHotels[0];\n    } else if (cityHotels.length > 0) {\n      // Fallback: pick first available hotel if no star match\n      selectedHotel = cityHotels[0];\n    }\n    \n    dayData.accommodation = {\n      ...day.accommodation,\n      // Add ONLY ONE selected hotel (not all hotels)\n      google_sheets_hotels: selectedHotel ? [selectedHotel] : []\n    };\n  } else if (!day.accommodation || day.accommodation === null) {\n    // Last day - no accommodation\n    dayData.accommodation = [];\n  }\n  // Other days in the same city: NO accommodation field (will be handled by Laravel)\n  \n  itineraryWithHotelsOnly.push(dayData);\n});\n\n// Get the unique cart_reference, cart_name, and cart_title generated at the start of the flow\n// Use fallbacks if data is missing\nconst cartReference = inputData.cart_reference || `CART_${Date.now()}_FALLBACK`;\nconst requestId = inputData.request_id || `REQ_${Date.now()}_FALLBACK`;\nconst cartName = inputData.cart_name || 'Travel Cart';\nconst cartTitle = inputData.cart_title || 'Your Travel Itinerary';\nconst userId = inputData.user_id || 1;\nconst travelData = inputData.travel_data || {};\n\n// Use the shared cart title as itinerary title\nconst itineraryTitle = cartTitle;\n\n// Format response to match Laravel API structure\n// Google Sheets data is now embedded in each day's accommodation\nconst formattedResponse = {\n  success: true,\n  message: \"Day-wise hotel itinerary generated successfully\",\n  itinerary_title: itineraryTitle,\n  cart_name: cartName,\n  cart_reference: cartReference,\n  request_id: requestId,\n  itinerary: itineraryWithHotelsOnly,\n  travel_data: travelData,\n  user_id: userId,\n  force_new_cart: true,\n  metadata: {\n    total_days: itineraryWithHotelsOnly.length,\n    total_hotels: itineraryWithHotelsOnly.filter(day => day.accommodation && Array.isArray(day.accommodation) && day.accommodation.length === 0 ? false : day.accommodation).length,\n    generated_at: new Date().toISOString(),\n    generation_method: \"OpenAI GPT-4o\",\n    note: \"Hotels with embedded Google Sheets suggestions - no activities included\",\n    cart_reference: cartReference,\n    cart_name: cartName,\n    request_id: requestId\n  }\n};\n\nreturn [{\n  json: formattedResponse\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        -864
+      ],
+      "id": "e9538b58-e64f-4cfc-91a4-a39724b9fec7",
+      "name": "Parse Itinerary Response"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev-gateway.aahaas.com/api/automate/itinerary/save",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  user_id: $json.user_id,\n  cart_name: $json.cart_name,\n  type: 'hotels',\n  itinerary_title: $json.itinerary_title,\n  cart_reference: $json.cart_reference,\n  request_id: $json.request_id,\n  itinerary: $json.itinerary,\n  travel_data: $json.travel_data,\n  user_id: $json.user_id,\n  version: $json.metadata?.version || 1,\n  force_new_cart: $json.force_new_cart,\n  itinerary_data: $json.itinerary,\n  travel_metadata: $json.travel_data,\n  hotels_by_city: $json.travel_data?.hotels_by_city || {},\n  metadata: $json.metadata\n}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -528,
+        -1008
+      ],
+      "id": "a302fcec-a85c-44e7-8e47-9db34b686e81",
+      "name": "Save Hotels Itinerary"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pass through the original itinerary data (not the save response)\nconst originalData = $('Parse Itinerary Response').first().json;\nconst saveResponse = $input.first().json;\n\n// Add save confirmation to metadata\nconst dataWithSaveConfirmation = {\n  ...originalData,\n  saved_to_cache: saveResponse.success || true,\n  cache_key: saveResponse.cache_key || null\n};\n\nreturn [{ json: dataWithSaveConfirmation }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        -1008
+      ],
+      "id": "7beec51e-6945-4903-97b1-1f2b3cce66b1",
+      "name": "Pass Through Hotels Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse OpenAI itinerary response and format for cart processing (ACTIVITIES ONLY)\n// CRITICAL: Embed Google Sheets activity suggestions within each day's activities\n// FEATURE: Limit maximum activities per day (configurable)\n// ANTI-DUPLICATE: Distribute different activities across days in the same city\n\n// ============================================\n// 🔧 ACTIVITY LIMIT CONFIGURATION\n// ============================================\nconst MAX_ACTIVITIES_PER_DAY = 2;  // Change this value to limit activities per day (e.g., 1, 2, 3, etc.)\n// ============================================\n\nconst openAIResponse = $input.first().json.choices[0].message.content;\nconst inputData = $('Sanitize Activities Data').first().json;\n\nlet itineraryData;\ntry {\n  // Remove markdown code blocks if present\n  let jsonString = openAIResponse.trim();\n  if (jsonString.startsWith('```json')) {\n    jsonString = jsonString.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n  } else if (jsonString.startsWith('```')) {\n    jsonString = jsonString.replace(/```\\n?/g, '');\n  }\n  \n  itineraryData = JSON.parse(jsonString);\n  \n  // Validate that itinerary exists and is an array\n  if (!itineraryData.itinerary || !Array.isArray(itineraryData.itinerary)) {\n    throw new Error('Parsed JSON does not contain a valid itinerary array');\n  }\n  \n  if (itineraryData.itinerary.length === 0) {\n    throw new Error('Itinerary array is empty');\n  }\n} catch (error) {\n  return [{\n    json: {\n      success: false,\n      message: \"Failed to parse OpenAI itinerary response\",\n      error: error.message,\n      raw_response: openAIResponse,\n      inputData: inputData\n    }\n  }];\n}\n\n// Get the unique cart_reference, cart_name, and cart_title generated at the start of the flow\n// Use fallbacks if data is missing\nconst cartReference = inputData.cart_reference || `CART_${Date.now()}_FALLBACK`;\nconst requestId = inputData.request_id || `REQ_${Date.now()}_FALLBACK`;\nconst cartName = inputData.cart_name || 'Travel Cart';\nconst cartTitle = inputData.cart_title || 'Your Travel Itinerary';\nconst userId = inputData.user_id || 1;\nconst travelData = inputData.travel_data || {};\n\n// Get Google Sheets activities by city\nconst activitiesByCity = inputData.activities_by_city || {};\n\n// Get start date from travel_data to calculate dates for each day\nconst startDate = travelData.travel_dates?.start || new Date().toISOString().split('T')[0];\n\n// Function to calculate date for a specific day\nfunction calculateDate(dayNumber, startDateStr) {\n  const start = new Date(startDateStr);\n  const targetDate = new Date(start);\n  targetDate.setDate(start.getDate() + (dayNumber - 1));\n  return targetDate.toISOString().split('T')[0];\n}\n\n// CRITICAL: Track activity usage per city to avoid duplicates\n// This ensures different activities are assigned to different days in the same city\nconst cityActivityTracker = {};\n\n// Build itinerary with activities (no accommodation) and calculate dates\n// CRITICAL: Limit activities per day to MAX_ACTIVITIES_PER_DAY\n// ANTI-DUPLICATE: Assign different Google Sheets activities to each day in the same city\nlet totalActivitiesBeforeLimit = 0;\nlet totalActivitiesAfterLimit = 0;\n\nconst itineraryWithActivities = itineraryData.itinerary.map(day => {\n  const activities = day.activities || [];\n  totalActivitiesBeforeLimit += activities.length;\n  \n  // LIMIT: Take only first MAX_ACTIVITIES_PER_DAY activities\n  const limitedActivities = activities.slice(0, MAX_ACTIVITIES_PER_DAY);\n  totalActivitiesAfterLimit += limitedActivities.length;\n  \n  // Get Google Sheets activity suggestions for this city\n  const cityName = day.city;\n  const cityActivities = activitiesByCity[cityName] || [];\n  \n  // ANTI-DUPLICATE LOGIC: Track which activities have been used for this city\n  if (!cityActivityTracker[cityName]) {\n    cityActivityTracker[cityName] = {\n      usedIndices: [],\n      currentIndex: 0\n    };\n  }\n  \n  // Get unique activities for this day (not used in previous days of the same city)\n  const uniqueActivitiesForThisDay = [];\n  const tracker = cityActivityTracker[cityName];\n  \n  // Try to assign MAX_ACTIVITIES_PER_DAY unique activities from Google Sheets\n  let assignedCount = 0;\n  while (assignedCount < MAX_ACTIVITIES_PER_DAY && tracker.currentIndex < cityActivities.length) {\n    const activity = cityActivities[tracker.currentIndex];\n    \n    // Check if this activity has already been used\n    if (!tracker.usedIndices.includes(tracker.currentIndex)) {\n      uniqueActivitiesForThisDay.push(activity);\n      tracker.usedIndices.push(tracker.currentIndex);\n      assignedCount++;\n    }\n    \n    tracker.currentIndex++;\n  }\n  \n  // If we've exhausted all activities, reset the tracker for cycling\n  if (tracker.currentIndex >= cityActivities.length && assignedCount < MAX_ACTIVITIES_PER_DAY) {\n    tracker.currentIndex = 0;\n    tracker.usedIndices = [];\n  }\n  \n  return {\n    day: day.day,\n    date: day.date || calculateDate(day.day, startDate),\n    city: day.city,\n    pax: day.pax,\n    activities: limitedActivities,\n    // Add UNIQUE Google Sheets activity suggestions for THIS day (no duplicates across days)\n    google_sheets_activities: uniqueActivitiesForThisDay\n  };\n});\n\n// Use the shared cart title as itinerary title\nconst itineraryTitle = cartTitle;\n\n// Count total activities (after limiting)\nconst totalActivities = itineraryWithActivities.reduce((sum, day) => sum + (day.activities?.length || 0), 0);\n\n// Format response for Laravel API\n// Google Sheets data is now embedded in each day\nconst formattedResponse = {\n  success: true,\n  message: \"Day-wise activities itinerary generated successfully\",\n  itinerary_title: itineraryTitle,\n  cart_name: cartName,\n  cart_reference: cartReference,\n  request_id: requestId,\n  itinerary: itineraryWithActivities,\n  travel_data: travelData,\n  user_id: userId,\n  force_new_cart: false,\n  metadata: {\n    total_days: itineraryWithActivities.length,\n    total_activities: totalActivities,\n    max_activities_per_day: MAX_ACTIVITIES_PER_DAY,\n    activities_before_limit: totalActivitiesBeforeLimit,\n    activities_after_limit: totalActivitiesAfterLimit,\n    activities_removed: totalActivitiesBeforeLimit - totalActivitiesAfterLimit,\n    generated_at: new Date().toISOString(),\n    generation_method: \"OpenAI GPT-4o\",\n    note: `Activities with unique Google Sheets suggestions per day (limited to ${MAX_ACTIVITIES_PER_DAY} per day, no duplicates) - no hotels included`,\n    cart_reference: cartReference,\n    cart_name: cartName,\n    request_id: requestId\n  }\n};\n\nreturn [{\n  json: formattedResponse\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -752,
+        160
+      ],
+      "id": "3acda538-a85b-4dc4-851c-b3143177ba9d",
+      "name": "Parse Activities Response"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev-gateway.aahaas.com/api/automate/cart_process/hotels",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -112,
+        -1008
+      ],
+      "id": "c652e6fd-6488-477d-8dcf-776e8e54d55c",
+      "name": "Send to Hotels API"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract and format data for Activities API with proper field mapping and validation\nconst data = $input.first().json;\n\n// CRITICAL: Check if the input is an error from Parse Activities Response\nif (data.success === false || data.error === true) {\n  // This is an error response - skip sending to API\n  // Return empty itinerary to prevent API call\n  throw new Error(`Cannot process activities: ${data.message || data.error || 'Unknown error'}`);\n}\n\n// Check if we have the required data\nif (!data) {\n  throw new Error('No input data received from Parse Activities Response');\n}\n\n// Validate required fields\nconst missingFields = [];\nif (!data.user_id) missingFields.push('user_id');\nif (!data.itinerary_title) missingFields.push('itinerary_title');\nif (!data.itinerary || !Array.isArray(data.itinerary) || data.itinerary.length === 0) {\n  missingFields.push('itinerary (must be non-empty array)');\n}\n\nif (missingFields.length > 0) {\n  throw new Error(`Missing required fields for Activities API: ${missingFields.join(', ')}`);\n}\n\n// Count total activities to verify we have data\nconst totalActivities = data.itinerary.reduce((sum, day) => {\n  return sum + (day.activities?.length || 0);\n}, 0);\n\nif (totalActivities === 0) {\n  throw new Error('No activities found in the itinerary');\n}\n\n// CRITICAL: Pass through the 5 parameters from Google Sheets activities data\n// Extract from google_sheets_activities and activities_by_city\nconst googleSheetsActivities = data.google_sheets_activities || [];\nconst activitiesByCity = data.activities_by_city || {};\n\n// Ensure all required fields are present at root level\nconst payload = {\n  user_id: data.user_id,\n  itinerary_title: data.itinerary_title,\n  cart_name: data.cart_name,\n  cart_reference: data.cart_reference,\n  request_id: data.request_id,\n  itinerary: data.itinerary,\n  travel_data: data.travel_data,\n  force_new_cart: data.force_new_cart,\n  // PASS THROUGH: Google Sheets activity parameters\n  google_sheets_activities: googleSheetsActivities,\n  activities_by_city: activitiesByCity,\n  metadata: {\n    ...data.metadata,\n    total_activities: totalActivities,\n    validated: true,\n    validation_time: new Date().toISOString()\n  }\n};\n\nreturn [{\n  json: payload\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -528,
+        160
+      ],
+      "id": "d836fab7-fcd2-4c88-a8e6-b91d26a3a924",
+      "name": "Format Activities API Payload"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev-gateway.aahaas.com/api/automate/itinerary/save",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  user_id: $json.user_id,\n  cart_name: $json.cart_name,\n  type: 'activities',\n  itinerary_title: $json.itinerary_title,\n  cart_reference: $json.cart_reference,\n  request_id: $json.request_id,\n  itinerary: $json.itinerary,\n  travel_data: $json.travel_data,\n  version: $json.metadata?.version || 1,\n  force_new_cart: $json.force_new_cart,\n  itinerary_data: $json.itinerary,\n  travel_metadata: $json.travel_data,\n  activities_by_city: $json.activities_by_city || {},\n  google_sheets_activities: $json.google_sheets_activities || [],\n  metadata: $json.metadata\n}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -576,
+        -336
+      ],
+      "id": "62f7dbca-79b0-4991-8f14-f1b8c138054a",
+      "name": "Save Activities Itinerary"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pass through the original activities data (not the save response)\nconst originalData = $('Format Activities API Payload').first().json;\nconst saveResponse = $input.first().json;\n\n// Add save confirmation to metadata\nconst dataWithSaveConfirmation = {\n  ...originalData,\n  saved_to_cache: saveResponse.success || true,\n  cache_key: saveResponse.cache_key || null\n};\n\nreturn [{ json: dataWithSaveConfirmation }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        -336
+      ],
+      "id": "9069d852-90d2-40db-bbb9-60e46ded30f3",
+      "name": "Pass Through Activities Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev-gateway.aahaas.com/api/automate/cart_process",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -192,
+        -80
+      ],
+      "id": "c35f9f70-6745-4dc3-add6-0b95f119b4a8",
+      "name": "Send to Activities API"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -384,
+        -496
+      ],
+      "id": "9e2afb46-0882-4406-8d2d-9f41b3f2ec06",
+      "name": "Merge Both Responses"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine hotels and activities responses\n// Handle case where we might only have activities (0 nights = no hotels)\nconst inputs = $input.all();\nconst hotelsResponse = inputs.find(i => i.json.cart?.cart_title && i.json.cart?.items_count > 0);\nconst activitiesResponse = inputs.find(i => i.json.cart && i !== hotelsResponse) || inputs[inputs.length - 1];\n\nconst hasHotels = hotelsResponse ? true : false;\nconst hasActivities = activitiesResponse ? true : false;\n\nconst cartTitle = hotelsResponse?.json.cart?.cart_title || activitiesResponse?.json.cart?.cart_title || 'Your Travel Cart';\nconst cartId = hotelsResponse?.json.cart?.id || activitiesResponse?.json.cart?.id;\n\nlet message;\nif (hasHotels && hasActivities) {\n  message = `\"${cartTitle}\" has been created with both hotels and activities. Check your itinerary.`;\n} else if (hasActivities && !hasHotels) {\n  message = `\"${cartTitle}\" has been created with activities only (1-day trip, no hotels needed). Check your itinerary.`;\n} else if (hasHotels && !hasActivities) {\n  message = `\"${cartTitle}\" has been created with hotels only. Check your itinerary.`;\n} else {\n  message = `\"${cartTitle}\" has been created. Check your itinerary.`;\n}\n\nreturn [{\n  json: {\n    message: message,\n    cart_id: cartId,\n    hotels_added: hasHotels,\n    activities_added: hasActivities,\n    success: true,\n    hotels_response: hotelsResponse?.json || {},\n    activities_response: activitiesResponse?.json || {}\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        -496
+      ],
+      "id": "e6501327-c784-4996-98a5-8ddb88d97bbe",
+      "name": "Combine Final Response"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1n-xL0h9PHeOhfcpytCouV7_pkYj4BzSMZghqTsKrgYo/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet4",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1664,
+        -208
+      ],
+      "id": "d10161cd-8934-42be-a3b8-3366f0df9925",
+      "name": "Get row(s) in sheet",
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4bqLa45KMMhTDuqo",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge Google Sheets hotel data with processed travel data\n// Filter by cities from 'Get row(s) in sheet1' input side and include ALL hotel parameters\nconst processedData = $('Process Cities & Hotel Rating').first().json;\nconst sheetsData = $input.all();\n\n// Get the list of cities from 'Get row(s) in sheet1' input (from Process Cities & Hotel Rating)\nconst requestedCities = processedData.travel_data?.destination || [];\n\n// Extract ALL hotel parameters from Google Sheets (Sheet3)\n// HANDLE COMMA-SEPARATED VALUES: Split Hotel Names, Aahaas Hotel ID, and Apple Hotel ID\nconst sheetHotels = [];\n\nsheetsData.forEach(row => {\n  const country = row.json.Country || row.json.country;\n  const city = row.json.City || row.json.city;\n  const hotelClass = row.json['Hotel Class'] || row.json.hotel_class;\n  const hotelNames = row.json['Hotel Name'] || row.json.hotel_name;\n  const aahaasIds = row.json['Aahaas Hotel ID'] || row.json.aahaas_hotel_id;\n  const appleIds = row.json['Apple Hotel ID'] || row.json.apple_hotel_id;\n  const basicRoomCategory = row.json['Basic Room Category'] || row.json.basic_room_category || row.json['Basic Room Categoty'];\n  const deluxe = row.json['Deluxe'] || row.json.deluxe;\n  \n  // Split comma-separated values and trim whitespace (handles both \", \" and \",\")\n  const hotelNameArray = String(hotelNames || '').split(',').map(name => name.trim()).filter(name => name);\n  const aahaasIdArray = String(aahaasIds || '').split(',').map(id => id.trim()).filter(id => id);\n  const appleIdArray = String(appleIds || '').split(',').map(id => id.trim()).filter(id => id);\n  \n  // Determine the maximum count to ensure we create entries for all data\n  const maxCount = Math.max(hotelNameArray.length, aahaasIdArray.length, appleIdArray.length);\n  \n  if (maxCount > 0) {\n    // Create a hotel entry for each index position\n    for (let i = 0; i < maxCount; i++) {\n      const hotelName = hotelNameArray[i] || hotelNameArray[0] || '';\n      const aahaasId = aahaasIdArray[i] || '';\n      const appleId = appleIdArray[i] || '';\n      \n      // Only create entry if we have at least a name or an ID\n      if (hotelName || aahaasId || appleId) {\n        sheetHotels.push({\n          country: country,\n          city: city,\n          hotel_class: hotelClass,\n          hotel_name: hotelName,\n          aahaas_hotel_id: aahaasId,\n          apple_hotel_id: appleId,\n          basic_room_category: basicRoomCategory,\n          deluxe: deluxe\n        });\n      }\n    }\n  } else {\n    // If no data at all, create one entry with empty values\n    sheetHotels.push({\n      country: country,\n      city: city,\n      hotel_class: hotelClass,\n      hotel_name: '',\n      aahaas_hotel_id: '',\n      apple_hotel_id: '',\n      basic_room_category: basicRoomCategory,\n      deluxe: deluxe\n    });\n  }\n});\n\n// CRITICAL: Filter hotels to ONLY include cities that are in the city array from input\nconst filteredHotels = sheetHotels.filter(item => {\n  if (!item.city) return false;\n  \n  // Check if this city is in the requested cities list (case-insensitive)\n  return requestedCities.some(requestedCity => \n    requestedCity.toLowerCase().trim() === item.city.toLowerCase().trim()\n  );\n});\n\n// Add filtered Google Sheets hotel data to processed data\nprocessedData.google_sheets_hotels = filteredHotels;\n\n// Group hotels by city from Google Sheets (only for requested cities)\n// Include ALL hotel parameters in the output\nconst hotelsByCity = {};\nfilteredHotels.forEach(item => {\n  const city = item.city;\n  if (city && item.hotel_name) {\n    if (!hotelsByCity[city]) {\n      hotelsByCity[city] = [];\n    }\n    hotelsByCity[city].push({\n      hotel_class: item.hotel_class,\n      hotel_name: item.hotel_name,\n      aahaas_hotel_id: item.aahaas_hotel_id,\n      apple_hotel_id: item.apple_hotel_id,\n      basic_room_category: item.basic_room_category,\n      deluxe: item.deluxe,\n      country: item.country,\n      city: item.city\n    });\n  }\n});\n\nprocessedData.hotels_by_city = hotelsByCity;\n\n// Add metadata about filtering\nprocessedData.hotel_metadata = {\n  requested_cities: requestedCities,\n  total_sheet_hotels: sheetHotels.length,\n  filtered_hotels_count: filteredHotels.length,\n  cities_with_hotels: Object.keys(hotelsByCity),\n  cities_without_hotels: requestedCities.filter(city => !hotelsByCity[city])\n};\n\nreturn [{\n  json: processedData\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1488,
+        -864
+      ],
+      "id": "b69f54b4-d551-4a5c-bf5e-ff66537def6d",
+      "name": "Merge Sheets Data1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1n-xL0h9PHeOhfcpytCouV7_pkYj4BzSMZghqTsKrgYo/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet3",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1680,
+        -864
+      ],
+      "id": "5ea57c8e-f840-4d21-8076-4d2145d7a99d",
+      "name": "Get row(s) in sheet1",
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4bqLa45KMMhTDuqo",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Merge Input Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook API Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract Webhook Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Webhook Data": {
+      "main": [
+        [
+          {
+            "node": "Merge Input Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Input Sources": {
+      "main": [
+        [
+          {
+            "node": "Check If Editable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Editable": {
+      "main": [
+        [
+          {
+            "node": "Load Existing Itinerary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge Edit & New Paths",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Load Existing Itinerary": {
+      "main": [
+        [
+          {
+            "node": "Build Intent Detection Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Intent Detection Prompt": {
+      "main": [
+        [
+          {
+            "node": "Detect Modification Intent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Modification Intent": {
+      "main": [
+        [
+          {
+            "node": "Parse Intent & Modify Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Intent & Modify Request": {
+      "main": [
+        [
+          {
+            "node": "Merge Edit & New Paths",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Edit & New Paths": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Format for OpenAI Parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format for OpenAI Parser": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Travel Parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Travel Parser": {
+      "main": [
+        [
+          {
+            "node": "Parse Travel Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Travel Data": {
+      "main": [
+        [
+          {
+            "node": "Add Cart Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Activities Itinerary": {
+      "main": [
+        [
+          {
+            "node": "Parse Activities Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Activities Response": {
+      "main": [
+        [
+          {
+            "node": "Format Activities API Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Activities API Payload": {
+      "main": [
+        [
+          {
+            "node": "Save Activities Itinerary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Activities Itinerary": {
+      "main": [
+        [
+          {
+            "node": "Pass Through Activities Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pass Through Activities Data": {
+      "main": [
+        [
+          {
+            "node": "Send to Activities API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Hotels API": {
+      "main": [
+        [
+          {
+            "node": "Merge Both Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Activities API": {
+      "main": [
+        [
+          {
+            "node": "Merge Both Responses",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Both Responses": {
+      "main": [
+        [
+          {
+            "node": "Combine Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Final Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Cart Metadata": {
+      "main": [
+        [
+          {
+            "node": "Check If Hotels Needed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Hotels Needed": {
+      "main": [
+        [
+          {
+            "node": "Process Cities & Activities",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Process Cities & Hotel Rating",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Process Cities & Activities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Cities & Hotel Rating": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sanitize Hotels Data": {
+      "main": [
+        [
+          {
+            "node": "Build Itinerary Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Cities & Activities": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Sheets Data": {
+      "main": [
+        [
+          {
+            "node": "Sanitize Activities Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sanitize Activities Data": {
+      "main": [
+        [
+          {
+            "node": "Build Activities Itinerary Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Itinerary Prompt": {
+      "main": [
+        [
+          {
+            "node": "Generate Hotels Itinerary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Activities Itinerary Prompt": {
+      "main": [
+        [
+          {
+            "node": "Generate Activities Itinerary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Hotels Itinerary": {
+      "main": [
+        [
+          {
+            "node": "Parse Itinerary Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Itinerary Response": {
+      "main": [
+        [
+          {
+            "node": "Save Hotels Itinerary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Hotels Itinerary": {
+      "main": [
+        [
+          {
+            "node": "Pass Through Hotels Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pass Through Hotels Data": {
+      "main": [
+        [
+          {
+            "node": "Send to Hotels API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Merge Sheets Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Merge Sheets Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Sheets Data1": {
+      "main": [
+        [
+          {
+            "node": "Sanitize Hotels Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "742d17ca-c9cb-4bb8-95f5-73d2002481cf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9ba699815eee7a9b7506f6b264ee48edcb7b96a79c851198c7b7acafd2a5489c"
+  },
+  "id": "eJu8ruXVHXBsE66L",
+  "tags": []
+}
