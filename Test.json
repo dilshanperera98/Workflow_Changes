@@ -395,7 +395,8 @@
           "value": {
             "quotation_no": "={{ $json.quotation_no }}",
             "hotel_body": "={{ $json.hotel_body }}",
-            "activity_body": "={{ $json.activity_body }}"
+            "activity_body": "={{ $json.activity_body }}",
+            "pax_data": "={{ $json.pax_data }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -422,6 +423,16 @@
             {
               "id": "activity_body",
               "displayName": "activity_body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "pax_data",
+              "displayName": "pax_data",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -481,7 +492,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Get the AI agent's output\nconst aiOutput = $input.first().json.output || $input.first().json.chatInput || '';\n\n// Extract quotation_no from the message\nlet quotationNo = '';\n\n// Pattern 1: \"quotation_no 291179\" or \"quotation_no: 291179\"\nconst quotePattern1 = /quotation[_\\s-]*no[:\\s]+(\\d+)/i;\nconst match1 = aiOutput.match(quotePattern1);\nif (match1) {\n  quotationNo = match1[1].trim();\n}\n\n// Pattern 2: If not found, try \"under this quotation_no\" or just numbers after \"quotation\"\nif (!quotationNo) {\n  const quotePattern2 = /(?:quotation|booking|quote)[_\\s-]*(?:no)?[:\\s]*([A-Z0-9-]+)/i;\n  const match2 = aiOutput.match(quotePattern2);\n  if (match2) {\n    quotationNo = match2[1].trim();\n  }\n}\n\n// Extract what needs to be changed\nlet changeType = '';\nlet newValue = '';\n\n// Check for passenger/pax changes\nif (aiOutput.toLowerCase().includes('passenger') || aiOutput.toLowerCase().includes('adults') || aiOutput.toLowerCase().includes('child')) {\n  changeType = 'passengers';\n  // Extract passenger counts\n  const adultPattern = /(\\d+)\\s*adult/i;\n  const childPattern = /(\\d+)\\s*child/i;\n  const adultMatch = aiOutput.match(adultPattern);\n  const childMatch = aiOutput.match(childPattern);\n  \n  let paxDetails = {};\n  if (adultMatch) paxDetails.adults = parseInt(adultMatch[1]);\n  if (childMatch) paxDetails.children = parseInt(childMatch[1]);\n  \n  newValue = JSON.stringify(paxDetails);\n}\n\n// Check for duration/nights changes\nif (aiOutput.toLowerCase().includes('night') || aiOutput.toLowerCase().includes('duration')) {\n  if (!changeType) changeType = 'duration';\n  const nightPattern = /(\\d+)\\s*night/i;\n  const nightMatch = aiOutput.match(nightPattern);\n  if (nightMatch && !newValue) {\n    newValue = nightMatch[1];\n  }\n}\n\n// Check for date changes\nif (aiOutput.toLowerCase().includes('start date') || aiOutput.toLowerCase().includes('arrival date') || aiOutput.toLowerCase().includes('check-in')) {\n  changeType = 'start_date';\n  // Extract date in format YYYY-MM-DD\n  const datePattern = /(\\d{4})[-\\/](\\d{1,2})[-\\/](\\d{1,2})/;\n  const dateMatch = aiOutput.match(datePattern);\n  if (dateMatch) {\n    newValue = `${dateMatch[1]}-${dateMatch[2].padStart(2, '0')}-${dateMatch[3].padStart(2, '0')}`;\n  }\n}\n\n// Check for hotel changes\nif (aiOutput.toLowerCase().includes('hotel') && (aiOutput.toLowerCase().includes('change') || aiOutput.toLowerCase().includes('update'))) {\n  if (!changeType) changeType = 'hotel';\n  const hotelPattern = /hotel[:\\s]+([A-Za-z\\s]+?)(?:in|for|to|,|$)/i;\n  const hotelMatch = aiOutput.match(hotelPattern);\n  if (hotelMatch && !newValue) {\n    newValue = hotelMatch[1].trim();\n  }\n}\n\n// Check for city changes\nif (aiOutput.toLowerCase().includes('city') || aiOutput.toLowerCase().includes('destination')) {\n  if (!changeType) changeType = 'city';\n  const cityPattern = /(?:city|destination)[:\\s]+([A-Za-z\\s]+?)(?:to|,|$)/i;\n  const cityMatch = aiOutput.match(cityPattern);\n  if (cityMatch && !newValue) {\n    newValue = cityMatch[1].trim();\n  }\n}\n\nreturn {\n  json: {\n    quotation_no: quotationNo,\n    change_type: changeType,\n    new_value: newValue,\n    original_message: aiOutput\n  }\n};"
+        "jsCode": "// Get the AI agent's output\nconst aiOutput = $input.first().json.output || $input.first().json.chatInput || '';\n\n// Extract quotation_no from the message\nlet quotationNo = '';\n\n// Pattern 1: \"quotation_no 291179\" or \"quotation no 291179\" or \"quotation_no: 291179\"\nconst quotePattern1 = /quotation[_\\s-]*no[:\\s]+(\\d+)/i;\nconst match1 = aiOutput.match(quotePattern1);\nif (match1) {\n  quotationNo = match1[1].trim();\n}\n\n// Pattern 2: If not found, try \"booking 12345\" or \"quote 12345\"\nif (!quotationNo) {\n  const quotePattern2 = /(?:booking|quote)[:\\s]+(\\d+)/i;\n  const match2 = aiOutput.match(quotePattern2);\n  if (match2) {\n    quotationNo = match2[1].trim();\n  }\n}\n\n// Pattern 3: Look for numbers after \"under\" or standalone numbers\nif (!quotationNo) {\n  const quotePattern3 = /under[:\\s]+([A-Z0-9-]+)/i;\n  const match3 = aiOutput.match(quotePattern3);\n  if (match3) {\n    quotationNo = match3[1].trim();\n  }\n}\n\n// Initialize changes object\nconst changes = {};\n\n// Extract PASSENGERS (Pax)\n// Pattern: \"Passengers: 3 adults, 1 children\" or \"3 adults 1 child\"\nconst paxPattern1 = /Passengers:\\s*(\\d+)\\s*adults?,\\s*(\\d+)\\s*child/i;\nconst paxMatch1 = aiOutput.match(paxPattern1);\n\nif (paxMatch1) {\n  changes.passengers = {\n    adults: parseInt(paxMatch1[1]),\n    children: parseInt(paxMatch1[2])\n  };\n} else {\n  // Alternative pattern: \"3 adults 1 child\" or \"5 adults\"\n  const adultPattern = /(\\d+)\\s*adult/i;\n  const childPattern = /(\\d+)\\s*child/i;\n  const adultMatch = aiOutput.match(adultPattern);\n  const childMatch = aiOutput.match(childPattern);\n  \n  if (adultMatch || childMatch) {\n    changes.passengers = {\n      adults: adultMatch ? parseInt(adultMatch[1]) : 2,\n      children: childMatch ? parseInt(childMatch[1]) : 0\n    };\n  }\n}\n\n// Extract DURATION (Nights)\n// Pattern: \"Duration: 5 nights\" or \"5 nights\" or \"7 days\"\nconst durationPattern1 = /Duration:\\s*(\\d+)\\s*night/i;\nconst durationMatch1 = aiOutput.match(durationPattern1);\n\nif (durationMatch1) {\n  changes.duration = parseInt(durationMatch1[1]);\n} else {\n  // Alternative patterns\n  const nightPattern = /(\\d+)\\s*night/i;\n  const dayPattern = /(\\d+)\\s*day/i;\n  \n  const nightMatch = aiOutput.match(nightPattern);\n  const dayMatch = aiOutput.match(dayPattern);\n  \n  if (nightMatch) {\n    changes.duration = parseInt(nightMatch[1]);\n  } else if (dayMatch) {\n    // Convert days to nights (days - 1)\n    changes.duration = parseInt(dayMatch[1]) - 1;\n  }\n}\n\n// Extract START DATE\n// Pattern: \"Start Date: 2025-12-24\" or date in various formats\nconst startDatePattern1 = /Start Date:\\s*(\\d{4})[-\\/](\\d{1,2})[-\\/](\\d{1,2})/i;\nconst startDateMatch1 = aiOutput.match(startDatePattern1);\n\nif (startDateMatch1) {\n  changes.start_date = `${startDateMatch1[1]}-${startDateMatch1[2].padStart(2, '0')}-${startDateMatch1[3].padStart(2, '0')}`;\n} else {\n  // Try to find date in format YYYY-MM-DD anywhere\n  const datePattern = /(\\d{4})[-\\/](\\d{1,2})[-\\/](\\d{1,2})/;\n  const dateMatch = aiOutput.match(datePattern);\n  if (dateMatch && aiOutput.toLowerCase().includes('date')) {\n    changes.start_date = `${dateMatch[1]}-${dateMatch[2].padStart(2, '0')}-${dateMatch[3].padStart(2, '0')}`;\n  }\n}\n\n// Extract HOTEL changes\nif (aiOutput.toLowerCase().includes('hotel') && (aiOutput.toLowerCase().includes('change') || aiOutput.toLowerCase().includes('upgrade'))) {\n  const hotelPattern = /hotel[:\\s]+([A-Za-z\\s]+?)(?:in|for|to|with|,|$)/i;\n  const hotelMatch = aiOutput.match(hotelPattern);\n  if (hotelMatch) {\n    changes.hotel = hotelMatch[1].trim();\n  }\n  \n  // Check for star rating\n  const starPattern = /(\\d)-star/i;\n  const starMatch = aiOutput.match(starPattern);\n  if (starMatch) {\n    changes.hotel_star = parseInt(starMatch[1]);\n  }\n}\n\n// Extract MEAL PLAN changes\nconst mealPatterns = [\n  { pattern: /half board/i, value: 'HB' },\n  { pattern: /full board/i, value: 'FB' },\n  { pattern: /all inclusive/i, value: 'AL' },\n  { pattern: /room only/i, value: 'RO' },\n  { pattern: /bed & breakfast|bed and breakfast/i, value: 'BB' }\n];\n\nfor (const mealPattern of mealPatterns) {\n  if (mealPattern.pattern.test(aiOutput)) {\n    changes.meal_plan = mealPattern.value;\n    break;\n  }\n}\n\n// Extract CITY changes\nif (aiOutput.toLowerCase().includes('city') || aiOutput.toLowerCase().includes('add') || aiOutput.toLowerCase().includes('remove')) {\n  const cityPattern = /(?:city|add|remove)[:\\s]+([A-Za-z\\s]+?)(?:to|,|$)/i;\n  const cityMatch = aiOutput.match(cityPattern);\n  if (cityMatch) {\n    changes.city = cityMatch[1].trim();\n  }\n}\n\n// Determine change_type based on what was found\nlet changeType = '';\nlet newValue = '';\n\nif (Object.keys(changes).length > 1) {\n  changeType = 'multiple';\n  newValue = JSON.stringify(changes);\n} else if (changes.passengers) {\n  changeType = 'passengers';\n  newValue = JSON.stringify(changes.passengers);\n} else if (changes.duration) {\n  changeType = 'duration';\n  newValue = changes.duration.toString();\n} else if (changes.start_date) {\n  changeType = 'start_date';\n  newValue = changes.start_date;\n} else if (changes.hotel || changes.hotel_star) {\n  changeType = 'hotel';\n  newValue = JSON.stringify({ hotel: changes.hotel, star: changes.hotel_star });\n} else if (changes.meal_plan) {\n  changeType = 'meal_plan';\n  newValue = changes.meal_plan;\n} else if (changes.city) {\n  changeType = 'city';\n  newValue = changes.city;\n}\n\nreturn {\n  json: {\n    quotation_no: quotationNo,\n    change_type: changeType,\n    new_value: newValue,\n    changes: changes,\n    original_message: aiOutput,\n    has_valid_quotation: quotationNo.length > 0,\n    has_valid_changes: Object.keys(changes).length > 0\n  }\n};"
       },
       "id": "09670a50-b411-4639-bb1e-a375d45972b3",
       "name": "Parse Update Request",
@@ -489,6 +500,43 @@
       "typeVersion": 2,
       "position": [
         -464,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.has_valid_quotation }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            },
+            {
+              "leftValue": "={{ $json.has_valid_changes }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "validate123-4567-89ab-cdef-012345678901",
+      "name": "Validate Update Request",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -336,
         -32
       ]
     },
@@ -504,7 +552,17 @@
           "value": "Sheet1",
           "mode": "name"
         },
-        "options": {}
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "quotation_no",
+              "lookupValue": "={{ $json.quotation_no }}"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
       },
       "id": "7335b772-0482-46d2-92b3-10c0e56a97ae",
       "name": "Get Booking from Sheets",
@@ -523,7 +581,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Get the booking data from Google Sheets\nconst bookingData = $input.first().json;\nconst updateRequest = $('Parse Update Request').first().json;\n\n// Parse hotel_body, activity_body, and pax_data from JSON strings\nlet hotelBody = [];\nlet activityBody = [];\nlet paxData = { adult: 2, cwb: 0, cnb: 0 }; // Default\n\ntry {\n  hotelBody = JSON.parse(bookingData.hotel_body || '[]');\n  activityBody = JSON.parse(bookingData.activity_body || '[]');\n  if (bookingData.pax_data) {\n    paxData = JSON.parse(bookingData.pax_data);\n  }\n} catch (error) {\n  return { json: { error: 'Failed to parse booking data' } };\n}\n\n// Apply the changes based on change_type\nconst changeType = updateRequest.change_type;\nconst newValue = updateRequest.new_value;\n\nif (changeType === 'start_date' && newValue) {\n  // Calculate the difference in days\n  const oldDate = new Date(hotelBody[0]?.check_in || '');\n  const newDate = new Date(newValue);\n  const dayDiff = Math.floor((newDate - oldDate) / (1000 * 60 * 60 * 24));\n  \n  // Update all check-in and check-out dates in hotel_body\n  hotelBody = hotelBody.map(hotel => {\n    const oldCheckIn = new Date(hotel.check_in);\n    const oldCheckOut = new Date(hotel.check_out);\n    \n    const newCheckIn = new Date(oldCheckIn);\n    newCheckIn.setDate(newCheckIn.getDate() + dayDiff);\n    \n    const newCheckOut = new Date(oldCheckOut);\n    newCheckOut.setDate(newCheckOut.getDate() + dayDiff);\n    \n    return {\n      ...hotel,\n      check_in: newCheckIn.toISOString().split('T')[0],\n      check_out: newCheckOut.toISOString().split('T')[0],\n      pax: paxData\n    };\n  });\n  \n  // Update all dates in activity_body\n  activityBody = activityBody.map(activity => {\n    const oldCheckIn = new Date(activity.check_in);\n    const oldCheckOut = new Date(activity.check_out);\n    \n    const newCheckIn = new Date(oldCheckIn);\n    newCheckIn.setDate(newCheckIn.getDate() + dayDiff);\n    \n    const newCheckOut = new Date(oldCheckOut);\n    newCheckOut.setDate(newCheckOut.getDate() + dayDiff);\n    \n    return {\n      ...activity,\n      check_in: newCheckIn.toISOString().split('T')[0],\n      check_out: newCheckOut.toISOString().split('T')[0]\n    };\n  });\n}\n\n// Create output structure that mimics the original workflow\nconst output = {\n  hotel_data: hotelBody,\n  activity_data: activityBody,\n  pax_data: paxData,\n  quotation_no: bookingData.quotation_no,\n  change_applied: {\n    type: changeType,\n    value: newValue\n  }\n};\n\nreturn { json: output };"
+        "jsCode": "// Get the booking data from Google Sheets\nconst bookingData = $input.first().json;\nconst updateRequest = $('Parse Update Request').first().json;\n\n// Parse hotel_body, activity_body, and pax_data from JSON strings\nlet hotelBody = [];\nlet activityBody = [];\nlet paxData = { adult: 2, cwb: 0, cnb: 0 }; // Default\n\ntry {\n  hotelBody = JSON.parse(bookingData.hotel_body || '[]');\n  activityBody = JSON.parse(bookingData.activity_body || '[]');\n  if (bookingData.pax_data) {\n    paxData = JSON.parse(bookingData.pax_data);\n  }\n} catch (error) {\n  return { json: { error: 'Failed to parse booking data' } };\n}\n\n// Get changes from the update request\nconst changes = updateRequest.changes || {};\nconst changeType = updateRequest.change_type;\n\n// Apply PASSENGER changes\nif (changes.passengers) {\n  paxData = {\n    adult: changes.passengers.adults || paxData.adult,\n    cwb: changes.passengers.children || paxData.cwb,\n    cnb: 0\n  };\n}\n\n// Apply START DATE changes\nif (changes.start_date) {\n  const oldDate = new Date(hotelBody[0]?.check_in || '');\n  const newDate = new Date(changes.start_date);\n  const dayDiff = Math.floor((newDate - oldDate) / (1000 * 60 * 60 * 24));\n  \n  // Update all check-in and check-out dates in hotel_body\n  hotelBody = hotelBody.map(hotel => {\n    const oldCheckIn = new Date(hotel.check_in);\n    const oldCheckOut = new Date(hotel.check_out);\n    \n    const newCheckIn = new Date(oldCheckIn);\n    newCheckIn.setDate(newCheckIn.getDate() + dayDiff);\n    \n    const newCheckOut = new Date(oldCheckOut);\n    newCheckOut.setDate(newCheckOut.getDate() + dayDiff);\n    \n    return {\n      ...hotel,\n      check_in: newCheckIn.toISOString().split('T')[0],\n      check_out: newCheckOut.toISOString().split('T')[0],\n      pax: paxData\n    };\n  });\n  \n  // Update all dates in activity_body\n  activityBody = activityBody.map(activity => {\n    const oldCheckIn = new Date(activity.check_in);\n    const oldCheckOut = new Date(activity.check_out);\n    \n    const newCheckIn = new Date(oldCheckIn);\n    newCheckIn.setDate(newCheckIn.getDate() + dayDiff);\n    \n    const newCheckOut = new Date(oldCheckOut);\n    newCheckOut.setDate(newCheckOut.getDate() + dayDiff);\n    \n    return {\n      ...activity,\n      check_in: newCheckIn.toISOString().split('T')[0],\n      check_out: newCheckOut.toISOString().split('T')[0]\n    };\n  });\n}\n\n// Apply DURATION changes\nif (changes.duration) {\n  const newTotalNights = changes.duration;\n  const cityCount = hotelBody.length;\n  const nightsPerCity = Math.floor(newTotalNights / cityCount);\n  const remainderNights = newTotalNights % cityCount;\n  \n  // Get the first hotel's check-in date as starting point\n  let currentCheckIn = new Date(hotelBody[0]?.check_in || '');\n  \n  // Recalculate all hotel dates based on new duration\n  hotelBody = hotelBody.map((hotel, index) => {\n    const nightsForThisCity = nightsPerCity + (index < remainderNights ? 1 : 0);\n    \n    const checkOutDate = new Date(currentCheckIn);\n    checkOutDate.setDate(checkOutDate.getDate() + nightsForThisCity);\n    \n    const result = {\n      ...hotel,\n      check_in: currentCheckIn.toISOString().split('T')[0],\n      check_out: checkOutDate.toISOString().split('T')[0],\n      pax: paxData\n    };\n    \n    // Next city's check-in is this city's check-out\n    currentCheckIn = checkOutDate;\n    \n    return result;\n  });\n  \n  // Update activity dates to match hotel dates\n  // Map activities to their cities\n  const cityToHotelMap = {};\n  hotelBody.forEach(hotel => {\n    cityToHotelMap[hotel.City] = {\n      check_in: hotel.check_in,\n      check_out: hotel.check_out\n    };\n  });\n  \n  activityBody = activityBody.map(activity => {\n    const cityDates = cityToHotelMap[activity.City];\n    if (cityDates) {\n      return {\n        ...activity,\n        check_in: cityDates.check_in,\n        check_out: cityDates.check_out\n      };\n    }\n    return activity;\n  });\n}\n\n// Apply MEAL PLAN changes\nif (changes.meal_plan) {\n  hotelBody = hotelBody.map(hotel => ({\n    ...hotel,\n    meal_type: changes.meal_plan\n  }));\n}\n\n// Apply HOTEL STAR changes\nif (changes.hotel_star) {\n  hotelBody = hotelBody.map(hotel => ({\n    ...hotel,\n    'Hotel Class': changes.hotel_star\n  }));\n}\n\n// Create output structure that mimics the original workflow\nconst output = {\n  hotel_data: hotelBody,\n  activity_data: activityBody,\n  pax_data: paxData,\n  quotation_no: bookingData.quotation_no,\n  change_applied: {\n    type: changeType,\n    changes: changes\n  }\n};\n\nreturn { json: output };"
       },
       "id": "18df892e-d7b2-4c84-9ff2-064a4fb5d6ec",
       "name": "Apply Changes",
@@ -575,10 +633,10 @@
       "parameters": {
         "agent": "conversationalAgent",
         "promptType": "define",
-        "text": "=You are a travel quotation update assistant. Analyze the user's update request and extract the specific changes they want to make.\n\nUser input: {{ $json.chatInput }}\n\nExtract and identify:\n1. **Quotation Number**: Look for patterns like \"quotation_no 291179\", \"booking 291179\", \"quote 291179\", or \"under quotation_no\"\n2. **What to Change**: Identify what the user wants to modify:\n   - **Dates**: \"change start date to 2025-12-24\", \"arrival date\", \"check-in date\"\n   - **Passengers (Pax)**: \"change to 3 adults 1 child\", \"5 adults\", \"2 children\"\n   - **Duration**: \"change to 5 nights\", \"extend to 7 nights\", \"reduce to 4 nights\"\n   - **Hotels**: \"change hotel to [hotel name]\", \"upgrade to 5-star\"\n   - **Cities**: \"add Ella\", \"remove Kandy\", \"change cities\"\n   - **Meal Plan**: \"change to half board\", \"full board\", \"all inclusive\"\n3. **New Values**: Extract the specific new values for each change\n\nIMPORTANT: If the user mentions a quotation number, this is an UPDATE request, not a new booking.\n\nFormat your output as:\n\"UPDATE REQUEST for quotation_no [NUMBER]: Change [FIELD] to [NEW VALUE]\"\n\nExamples:\n- Input: \"Change the 3 adults 1 child in 5 nights under quotation_no 291179\"\n  Output: \"UPDATE REQUEST for quotation_no 291179: Change passengers to 3 adults and 1 child, change duration to 5 nights\"\n\n- Input: \"I want to change start date to 2025-12-24 for booking 12345\"\n  Output: \"UPDATE REQUEST for quotation_no 12345: Change arrival date to December 24, 2025\"\n\n- Input: \"Update quotation 98765 to 5-star hotels with half board\"\n  Output: \"UPDATE REQUEST for quotation_no 98765: Change hotel category to 5-star, change meal plan to half board\"\n\n- Input: \"Extend the trip to 7 nights for quote 55555\"\n  Output: \"UPDATE REQUEST for quotation_no 55555: Change duration to 7 nights\"\n\nIf no quotation number is found, respond: \"ERROR: No quotation number provided. Please specify the booking/quotation number you want to update.\"",
+        "text": "=You are a travel quotation update assistant. Analyze the user's update request and extract the specific changes they want to make.\n\nUser input: {{ $json.chatInput }}\n\nExtract and identify:\n1. **Quotation Number**: Look for patterns like:\n   - \"quotation_no 291179\"\n   - \"quotation no 291179\"\n   - \"booking 291179\"\n   - \"quote 291179\"\n   - \"under quotation_no 291179\"\n   - Numbers appearing after \"quotation\" or \"booking\"\n\n2. **What to Change**: Identify ALL changes the user wants to make:\n   - **Passengers (Pax)**: \"3 adults 1 child\", \"5 adults\", \"2 adults 3 children\"\n     * Count both adults and children explicitly\n   - **Duration**: \"5 nights\", \"7 days\", \"extend to 10 nights\"\n     * If user says \"X days\" convert to nights (X-1)\n     * If user says \"X nights\" use that number\n   - **Dates**: \"start date 2025-12-24\", \"arrival date December 24, 2025\", \"check-in date\"\n   - **Hotels**: \"change hotel to [hotel name]\", \"upgrade to 5-star\"\n   - **Cities**: \"add Ella\", \"remove Kandy\", \"visit Galle\"\n   - **Meal Plan**: \"half board\", \"full board\", \"all inclusive\", \"bed & breakfast\"\n\n3. **Extract New Values**: Be specific and numerical\n\nIMPORTANT RULES:\n- If user mentions BOTH passengers AND duration in one sentence, extract BOTH\n- Always output the quotation number clearly\n- Be specific with numbers (adults count, children count, nights count)\n\nFormat your output EXACTLY as:\n\"UPDATE REQUEST for quotation_no [NUMBER]:\nPassengers: [X] adults, [Y] children\nDuration: [Z] nights\n[Other changes if any]\"\n\nExamples:\n- Input: \"Change the 3 adults 1 child in 5 nights under quotation_no 291179\"\n  Output: \"UPDATE REQUEST for quotation_no 291179:\nPassengers: 3 adults, 1 children\nDuration: 5 nights\"\n\n- Input: \"Update booking 12345 to 2 adults 2 children for 7 nights\"\n  Output: \"UPDATE REQUEST for quotation_no 12345:\nPassengers: 2 adults, 2 children\nDuration: 7 nights\"\n\n- Input: \"I want to change start date to 2025-12-24 for booking 12345\"\n  Output: \"UPDATE REQUEST for quotation_no 12345:\nStart Date: 2025-12-24\"\n\n- Input: \"Change quotation 98765 to 5 adults only\"\n  Output: \"UPDATE REQUEST for quotation_no 98765:\nPassengers: 5 adults, 0 children\"\n\nIf no quotation number is found, respond: \"ERROR: No quotation number provided. Please specify the booking/quotation number you want to update.\"",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "=You are a professional travel quotation assistant. Create concise, formatted summaries of customer travel requests. Always use the exact format specified and calculate dates accurately. Pay special attention to hotel star categories, meal plans mentioned by the user and which cities they apply to."
+          "systemMessage": "=You are a professional travel quotation update assistant. Extract quotation numbers and change details accurately. Always be specific with numbers for adults, children, and nights. If multiple changes are mentioned, extract ALL of them."
         }
       },
       "id": "ac18f31f-755e-4e80-a07f-01fcb8e3b717",
@@ -643,6 +701,17 @@
       ]
     },
     "Parse Update Request": {
+      "main": [
+        [
+          {
+            "node": "Validate Update Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Update Request": {
       "main": [
         [
           {
