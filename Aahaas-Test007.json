@@ -400,11 +400,11 @@
           "id": "CYHGS3KAjICCaQqY",
           "name": "OpenAi account 2"
         }
-      }rs": {
+      }drs": {
           "parameters": [
             {
               "name": "Content-Type",
-              "value": "application/json"
+              "valuapplication/json"
             }
           ]
         },
