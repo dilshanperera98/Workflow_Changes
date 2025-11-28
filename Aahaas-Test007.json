@@ -395,22 +395,7 @@
       },
       "td
       "pd
-      ],
-      "d
-     
-        -528,
-        -1008
-      ],
-      "id": "a302fcec-a85c-44e7-8e47-9db34b686e81",
-      "name": "Save Hotels Itinerary"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Pass through the original itinerary data (not the save response)\nconst originalData = $('Parse Itinerary Response').first().json;\nconst saveResponse = $input.first().json;\n\n// Add save confirmation to metadata\nconst dataWithSaveConfirmation = {\n  ...originalData,\n  saved_to_cache: saveResponse.success || true,\n  cache_key: saveResponse.cache_key || null\n};\n\nreturn [{ json: dataWithSaveConfirmation }];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
+      ]ition": [
         -336,
         -1008
       ],
