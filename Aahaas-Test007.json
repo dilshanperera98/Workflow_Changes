@@ -414,13 +414,7 @@
       "id": "62f7dbca-79b0-4991-8f14-f1b8c138054a",
       "name": "Save Activities Itinerary"
     },
-    {
-      "parameters": {
-        "jsCode": "// Pass through the original activities data (not the save response)\nconst originalData = $('Format Activities API Payload').first().json;\nconst saveResponse = $input.first().json;\n\n// Add save confirmation to metadata\nconst dataWithSaveConfirmation = {\n  ...originalData,\n  saved_to_cache: saveResponse.success || true,\n  cache_key: saveResponse.cache_key || null\n};\n\nreturn [{ json: dataWithSaveConfirmation }];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
+    {: [
         -304,
         -336
       ],
