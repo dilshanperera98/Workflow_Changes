@@ -404,8 +404,7 @@
           "parameters": [
             {
               "name"
-              "valuapplication/json"
-            }
+              "valuapplication
           ]
         },
         "sendBody": true,
