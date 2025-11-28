@@ -404,16 +404,7 @@
           "id": "CYHGS3KAjICCaQqY",
           "name": "OpenAi account 2"
         }
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://dev-gateway.aahaas.com/api/automate/itinerary/save",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  user_id: $json.user_id,\n  cart_name: $json.cart_name,\n  type: 'hotels',\n  itinerary_title: $json.itinerary_title,\n  cart_reference: $json.cart_reference,\n  request_id: $json.request_id,\n  itinerary: $json.itinerary,\n  travel_data: $json.travel_data,\n  user_id: $json.user_id,\n  version: $json.metadata?.version || 1,\n  force_new_cart: $json.force_new_cart,\n  itinerary_data: $json.itinerary,\n  travel_metadata: $json.travel_data,\n  hotels_by_city: $json.travel_data?.hotels_by_city || {},\n  metadata: $json.metadata\n}) }}",
-        "options": {
-          "response": {
-            "response": {
+    {ponse": {
               "neverError": true,
               "responseFormat": "json"
             }
