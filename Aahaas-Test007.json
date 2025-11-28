@@ -396,20 +396,11 @@
       "td
       "pd
       ],
-      "d
+      "dd
           "id": "CYHGS3KAjICCaQqY",
           "name": "OpenAi account 2"
         }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://api.openai.com/v1/chat/completions",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "openAiApi",
-        "sendHeaders": true,
-        "headerParameters": {
+      }rs": {
           "parameters": [
             {
               "name": "Content-Type",
