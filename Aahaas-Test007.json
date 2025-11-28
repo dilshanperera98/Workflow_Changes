@@ -404,18 +404,7 @@
         -528,
         160
       ],
-  Payload"
-    },
-    {
-      "parameters": {
-        "ody": "json",
-       : {
-              "neverError": true,
-              "responseFormat": "json"
-            }
-          }
-        }
-      },
+  
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
