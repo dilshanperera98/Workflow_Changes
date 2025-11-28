@@ -419,9 +419,7 @@
         -336
       ],
 
-    {
-      "parameters": {
-        "method": "POST",
+
         "url": "https://dev-gateway.aahaas.com/api/automate/cart_process",
         "sendBody": true,
         "specifyBody": "json",
