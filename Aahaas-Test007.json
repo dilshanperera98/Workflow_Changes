@@ -396,23 +396,7 @@
       "td
       "pd
       ],
-      "derary Prompt"
-    },
-    {,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify($json.openai_request) }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        -864,
-        -864
-      ],
-      "id": "eb450c73-9dcd-4385-a0e6-669767476924",
-      "name": "Generate Hotels Itinerary",
-      "credentials": {
-        "openAiApi": {
+      "d
           "id": "CYHGS3KAjICCaQqY",
           "name": "OpenAi account 2"
         }
