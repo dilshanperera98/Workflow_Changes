@@ -418,9 +418,7 @@
         -304,
         -336
       ],
-      "id": "9069d852-90d2-40db-bbb9-60e46ded30f3",
-      "name": "Pass Through Activities Data"
-    },
+
     {
       "parameters": {
         "method": "POST",
