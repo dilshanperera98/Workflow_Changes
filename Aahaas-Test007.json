@@ -399,16 +399,7 @@
         -336,
         -1008
       ],
-      "id": "7beec51e-6945-4903-97b1-1f2b3cce66b1",
-      "na
-      "id": "3acda538-a85b-4dc4-851c-b3143177ba9d",
-      "name": "Parse Activities Response"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://dev-gateway.aahaas.com/api/automate/cart_process/hotels",
-        "sendBody": true,
+      "id": 
         "specifyBody": "json",
         "jsonBody": "={{ $json }}",
         "options": {}
