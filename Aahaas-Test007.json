@@ -398,22 +398,6 @@
       ],
       "d
      
-          ]
-        },: {
-        "openAiApi": {
-          "id": "CYHGS3KAjICCaQqY",
-          "name": "OpenAi account 2"
-        }
-    {ponse": {
-              "neverError": true,
-              "responseFormat": "json"
-            }
-          }
-        }
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
         -528,
         -1008
       ],
