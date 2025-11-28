@@ -403,7 +403,7 @@
       }drs": {
           "parameters": [
             {
-              "name": "Content-Type",
+              "name"
               "valuapplication/json"
             }
           ]
