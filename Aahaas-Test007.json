@@ -401,26 +401,7 @@
         ]
       ]
     },
-    "Format for OpenAI Parser": {
-      "main": [
-        [
-          {
-            "node": "OpenAI Travel Parser",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "OpenAI Travel Parser": {
-      "main": [
-        [
-          {
-            "node": "Parse Travel Data",
-            "type": "main",
-            "index": 0
-          }
-        ]
+   
       ]
     },
     "Parse Travel Data": {
