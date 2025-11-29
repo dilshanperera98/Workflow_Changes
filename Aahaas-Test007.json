@@ -394,24 +394,7 @@
         "jsd for Hotels API and validate required fields\nconst inputData = $input.first().json;\n\n// CRITICAL: Validate that we have the required travel_data structure\nif (!inputData.travel_data || typeof inputData.travel_data !== 'object') {\n  throw new Error('Missing travel_data object. Data flow is broken. Check that \"Merge Sheets Data1\" is receiving data from \"Process Cities & Hotel Rating\".');\n}\n\nif (!inputData.user_id) {\n  throw new Error('Missing user_id. Check data flow from \"Add Cart Metadata\".');\n}\n\nif (!inputData.cart_reference) {\n  throw new Error('Missing cart_reference. Check data flow from \"Add Cart Metadata\".');\n}\n\n// WARNING: Log if destination or city_details are missing, but don't fail\n// These will be populated by OpenAI if missing\nif (!inputData.travel_data.destination || inputData.travel_data.destination.length === 0) {\n  console.warn('WARNING: destination is empty in travel_data. OpenAI will generate it.');\n  // Initialize empty array if missing\n  if (!inputData.travel_data.destination) {\n    inputData.travel_data.destination = [];\n  }\n}\n\nif (!inputData.travel_data.city_details || inputData.travel_data.city_details.length === 0) {\n  console.warn('WARNING: city_details is empty in travel_data. OpenAI will generate it.');\n  // Initialize empty array if missing\n  if (!inputData.travel_data.city_details) {\n    inputData.travel_data.city_details = [];\n  }\n}\n\nfunction cleanString(str) {\n  if (typeof str !== 'string') return str;\n  return str.replace(/[\\x00-\\x08\\x0B-\\x0C\\x0E-\\x1F\\x7F]/g, '');\n}\n\nfunction cleanObject(obj) {\n  if (obj === null || obj === undefined) return obj;\n  if (typeof obj === 'string') return cleanString(obj);\n  if (Array.isArray(obj)) return obj.map(item => cleanObject(item));\n  if (typeof obj === 'object') {\n    const cleaned = {};\n    for (const key in obj) {\n      if (obj.hasOwnProperty(key)) cleaned[key] = cleanObject(obj[key]);\n    }\n    return cleaned;\n  }\n  return obj;\n}\n\nreturn [{ json: cleanObject(inputData) }];"
       },
       "td
-      "pd
-     API"
-    },
-    {
-      ],
-     
-    },
-    "M
-            "node": "Load Existing Itinerary",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Merge Edit & New Paths",
-            "type": "main",
-            "index": 1
+   
           }
         ]
       ]
