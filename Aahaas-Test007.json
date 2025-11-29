@@ -399,24 +399,6 @@
     },
     {
       ],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "4bqLa45KMMhTDuqo",
-          "name": "Google Sheets account 2"
-        }
-      }
-    }
-  ],
-  "pinData": {},
-  "connections": {
-    "When chat message received": {
-      "main": [
-        [
-          {
-            "node": "Merge Input Sources",
-            "type": "main",
-            "index": 0
-          }
         ]
       ]
     },
