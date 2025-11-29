@@ -399,30 +399,7 @@
     },
     {
       ],
-        ]
-      ]
-    },
-    "Webhook API Trigger": {
-      "main": [
-        [
-          {
-            "node": "Extract Webhook Data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extract Webhook Data": {
-      "main": [
-        [
-          {
-            "node": "Merge Input Sources",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+     
     },
     "Merge Input Sources": {
       "main": [
