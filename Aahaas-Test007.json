@@ -403,24 +403,7 @@
     },
    
       ]
-    },
-    "Parse Travel Data": {
-      "main": [
-        [
-          {
-            "node": "Add Cart Metadata",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Generate Activities Itinerary": {
-      "main": [
-        [
-          {
-            "node": "Parse Activities Response",
-            "type": "main",
+ 
             "index": 0
           }
         ]
