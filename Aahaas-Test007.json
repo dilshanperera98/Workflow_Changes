@@ -402,26 +402,7 @@
       "id": "9e2afb46-0882-4406-8d2d-9f41b3f2ec06",
       "name": "Merge Both Responses"
     },
-    {
-      "parameters": {
-        "jsCode": "// Combine hotels and activities responses\n// Handle case where we might only have activities (0 nights = no hotels)\nconst inputs = $input.all();\nconst hotelsResponse = inputs.find(i => i.json.cart?.cart_title && i.json.cart?.items_count > 0);\nconst activitiesResponse = inputs.find(i => i.json.cart && i !== hotelsResponse) || inputs[inputs.length - 1];\n\nconst hasHotels = hotelsResponse ? true : false;\nconst hasActivities = activitiesResponse ? true : false;\n\nconst cartTitle = hotelsResponse?.json.cart?.cart_title || activitiesResponse?.json.cart?.cart_title || 'Your Travel Cart';\nconst cartId = hotelsResponse?.json.cart?.id || activitiesResponse?.json.cart?.id;\n\nlet message;\nif (hasHotels && hasActivities) {\n  message = `\"${cartTitle}\" has been created with both hotels and activities. Check your itinerary.`;\n} else if (hasActivities && !hasHotels) {\n  message = `\"${cartTitle}\" has been created with activities only (1-day trip, no hotels needed). Check your itinerary.`;\n} else if (hasHotels && !hasActivities) {\n  message = `\"${cartTitle}\" has been created with hotels only. Check your itinerary.`;\n} else {\n  message = `\"${cartTitle}\" has been created. Check your itinerary.`;\n}\n\nreturn [{\n  json: {\n    message: message,\n    cart_id: cartId,\n    hotels_added: hasHotels,\n    activities_added: hasActivities,\n    success: true,\n    hotels_response: hotelsResponse?.json || {},\n    activities_response: activitiesResponse?.json || {}\n  }\n}];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -160,
-        -496
-      ],
-      "id": "e6501327-c784-4996-98a5-8ddb88d97bbe",
-      "name": "Combine Final Response"
-    },
-    {
-      "parameters": {
-        "documentId": {
-          "__rl": true,
-          "value": "https://docs.google.com/spreadsheets/d/1n-xL0h9PHeOhfcpytCouV7_pkYj4BzSMZghqTsKrgYo/edit?usp=sharing",
-          "mode": "url"
-        },
+    {update
         "sheetName": {
           "__rl": true,
           "value": "Sheet4",
