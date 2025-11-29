@@ -398,27 +398,6 @@
      API"
     },
     {
-      "parameters": {
-        "j
-        "jsonBody": "={{ $json }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        -192,
-        -80
-      ],
-      "id": "c35f9f70-6745-4dc3-add6-0b95f119b4a8",
-      "name": "Send to Activities API"
-    },
-    {
-      "parameters": {},
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 3,
-      "position": [
-        -384,
-        -496
       ],
       "id": "9e2afb46-0882-4406-8d2d-9f41b3f2ec06",
       "name": "Merge Both Responses"
