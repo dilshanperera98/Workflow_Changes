@@ -401,21 +401,7 @@
       ],
      
     },
-    "Merge Input Sources": {
-      "main": [
-        [
-          {
-            "node": "Check If Editable",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Check If Editable": {
-      "main": [
-        [
-          {
+    "M
             "node": "Load Existing Itinerary",
             "type": "main",
             "index": 0
