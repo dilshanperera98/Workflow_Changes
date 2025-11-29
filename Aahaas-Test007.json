@@ -402,30 +402,7 @@
       ]
 
             "index": 0
-          }
-        ]
-      ]
-    },
-    "Format Activities API Payload": {
-      "main": [
-        [
-          {
-            "node": "Save Activities Itinerary",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Save Activities Itinerary": {
-      "main": [
-        [
-          {
-            "node": "Pass Through Activities Data",
-            "type": "main",
-            "index": 0
-          }
-        ]
+      
       ]
     },
     "Pass Through Activities Data": {
