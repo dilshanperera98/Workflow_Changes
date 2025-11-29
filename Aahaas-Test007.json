@@ -399,21 +399,6 @@
     },
     {
       ],
-      "id": "9e2afb46-0882-4406-8d2d-9f41b3f2ec06",
-      "name": 
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -1488,
-        -864
-      ],
-      "id": "b69f54b4-d551-4a5c-bf5e-ff66537def6d",
-      "name": "Merge Sheets Data1"
-    },
-    {
-      "parameters": {
-        "documentId": {
-          "__rl": true,
           "value": "https://docs.google.com/spreadsheets/d/1n-xL0h9PHeOhfcpytCouV7_pkYj4BzSMZghqTsKrgYo/edit?usp=sharing",
           "mode": "url"
         },
