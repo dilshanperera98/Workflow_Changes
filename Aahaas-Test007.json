@@ -400,21 +400,7 @@
    
         ]
       ]
-    },
-   
-      ]
- 
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Parse Activities Response": {
-      "main": [
-        [
-          {
-            "node": "Format Activities API Payload",
-            "type": "main",
+
             "index": 0
           }
         ]
