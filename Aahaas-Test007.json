@@ -400,24 +400,7 @@
     {
       ],
       "id": "9e2afb46-0882-4406-8d2d-9f41b3f2ec06",
-      "name": "Merge Both Responses"
-    },
-        -208
-      ],
-      "id": "d10161cd-8934-42be-a3b8-3366f0df9925",
-      "name": "Get row(s) in sheet",
-      "executeOnce": false,
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "4bqLa45KMMhTDuqo",
-          "name": "Google Sheets account 2"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "// Merge Google Sheets hotel data with processed travel data\n// Filter by cities from 'Get row(s) in sheet1' input side and include ALL hotel parameters\nconst processedData = $('Process Cities & Hotel Rating').first().json;\nconst sheetsData = $input.all();\n\n// Get the list of cities from 'Get row(s) in sheet1' input (from Process Cities & Hotel Rating)\nconst requestedCities = processedData.travel_data?.destination || [];\n\n// Extract ALL hotel parameters from Google Sheets (Sheet3)\n// HANDLE COMMA-SEPARATED VALUES: Split Hotel Names, Aahaas Hotel ID, and Apple Hotel ID\nconst sheetHotels = [];\n\nsheetsData.forEach(row => {\n  const country = row.json.Country || row.json.country;\n  const city = row.json.City || row.json.city;\n  const hotelClass = row.json['Hotel Class'] || row.json.hotel_class;\n  const hotelNames = row.json['Hotel Name'] || row.json.hotel_name;\n  const aahaasIds = row.json['Aahaas Hotel ID'] || row.json.aahaas_hotel_id;\n  const appleIds = row.json['Apple Hotel ID'] || row.json.apple_hotel_id;\n  const basicRoomCategory = row.json['Basic Room Category'] || row.json.basic_room_category || row.json['Basic Room Categoty'];\n  const deluxe = row.json['Deluxe'] || row.json.deluxe;\n  \n  // Split comma-separated values and trim whitespace (handles both \", \" and \",\")\n  const hotelNameArray = String(hotelNames || '').split(',').map(name => name.trim()).filter(name => name);\n  const aahaasIdArray = String(aahaasIds || '').split(',').map(id => id.trim()).filter(id => id);\n  const appleIdArray = String(appleIds || '').split(',').map(id => id.trim()).filter(id => id);\n  \n  // Determine the maximum count to ensure we create entries for all data\n  const maxCount = Math.max(hotelNameArray.length, aahaasIdArray.length, appleIdArray.length);\n  \n  if (maxCount > 0) {\n    // Create a hotel entry for each index position\n    for (let i = 0; i < maxCount; i++) {\n      const hotelName = hotelNameArray[i] || hotelNameArray[0] || '';\n      const aahaasId = aahaasIdArray[i] || '';\n      const appleId = appleIdArray[i] || '';\n      \n      // Only create entry if we have at least a name or an ID\n      if (hotelName || aahaasId || appleId) {\n        sheetHotels.push({\n          country: country,\n          city: city,\n          hotel_class: hotelClass,\n          hotel_name: hotelName,\n          aahaas_hotel_id: aahaasId,\n          apple_hotel_id: appleId,\n          basic_room_category: basicRoomCategory,\n          deluxe: deluxe\n        });\n      }\n    }\n  } else {\n    // If no data at all, create one entry with empty values\n    sheetHotels.push({\n      country: country,\n      city: city,\n      hotel_class: hotelClass,\n      hotel_name: '',\n      aahaas_hotel_id: '',\n      apple_hotel_id: '',\n      basic_room_category: basicRoomCategory,\n      deluxe: deluxe\n    });\n  }\n});\n\n// CRITICAL: Filter hotels to ONLY include cities that are in the city array from input\nconst filteredHotels = sheetHotels.filter(item => {\n  if (!item.city) return false;\n  \n  // Check if this city is in the requested cities list (case-insensitive)\n  return requestedCities.some(requestedCity => \n    requestedCity.toLowerCase().trim() === item.city.toLowerCase().trim()\n  );\n});\n\n// Add filtered Google Sheets hotel data to processed data\nprocessedData.google_sheets_hotels = filteredHotels;\n\n// Group hotels by city from Google Sheets (only for requested cities)\n// Include ALL hotel parameters in the output\nconst hotelsByCity = {};\nfilteredHotels.forEach(item => {\n  const city = item.city;\n  if (city && item.hotel_name) {\n    if (!hotelsByCity[city]) {\n      hotelsByCity[city] = [];\n    }\n    hotelsByCity[city].push({\n      hotel_class: item.hotel_class,\n      hotel_name: item.hotel_name,\n      aahaas_hotel_id: item.aahaas_hotel_id,\n      apple_hotel_id: item.apple_hotel_id,\n      basic_room_category: item.basic_room_category,\n      deluxe: item.deluxe,\n      country: item.country,\n      city: item.city\n    });\n  }\n});\n\nprocessedData.hotels_by_city = hotelsByCity;\n\n// Add metadata about filtering\nprocessedData.hotel_metadata = {\n  requested_cities: requestedCities,\n  total_sheet_hotels: sheetHotels.length,\n  filtered_hotels_count: filteredHotels.length,\n  cities_with_hotels: Object.keys(hotelsByCity),\n  cities_without_hotels: requestedCities.filter(city => !hotelsByCity[city])\n};\n\nreturn [{\n  json: processedData\n}];"
-      },
+      "name": 
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
