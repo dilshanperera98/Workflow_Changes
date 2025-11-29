@@ -402,18 +402,6 @@
       "id": "9e2afb46-0882-4406-8d2d-9f41b3f2ec06",
       "name": "Merge Both Responses"
     },
-    {update
-        "sheetName": {
-          "__rl": true,
-          "value": "Sheet4",
-          "mode": "name"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.5,
-      "position": [
-        -1664,
         -208
       ],
       "id": "d10161cd-8934-42be-a3b8-3366f0df9925",
