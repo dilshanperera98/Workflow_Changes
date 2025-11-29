@@ -404,24 +404,6 @@
         ]
       ]
     },
-    "Parse Intent & Modify Request": {
-      "main": [
-        [
-          {
-            "node": "Merge Edit & New Paths",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Merge Edit & New Paths": {
-      "main": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "main",
-            "index": 0
           }
         ]
       ]
