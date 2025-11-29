@@ -400,24 +400,6 @@
     {
       "parameters": {
         "j
-      "position": [
-        -528,
-        160
-  
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-        -576,0-4991-8f14-f1b8c138054a",
-      "name": "Save Activities Itinerary"
-    },
-    {: [
-        -304,
-        -336
-      ],
-
-
-        "url": "https://dev-gateway.aahaas.com/api/automate/cart_process",
-        "sendBody": true,
-        "specifyBody": "json",
         "jsonBody": "={{ $json }}",
         "options": {}
       },
