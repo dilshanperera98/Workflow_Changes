@@ -399,25 +399,6 @@
     },
     {
       ],
-          "value": "https://docs.google.com/spreadsheets/d/1n-xL0h9PHeOhfcpytCouV7_pkYj4BzSMZghqTsKrgYo/edit?usp=sharing",
-          "mode": "url"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "Sheet3",
-          "mode": "name"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.5,
-      "position": [
-        -1680,
-        -864
-      ],
-      "id": "5ea57c8e-f840-4d21-8076-4d2145d7a99d",
-      "name": "Get row(s) in sheet1",
-      "executeOnce": false,
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "4bqLa45KMMhTDuqo",
