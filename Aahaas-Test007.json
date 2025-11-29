@@ -399,27 +399,7 @@
         ]
       ]
     },
-    "Load Existing Itinerary": {
-      "main": [
-        [
-          {
-            "node": "Build Intent Detection Prompt",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Build Intent Detection Prompt": {
-      "main": [
-        [
-          {
-            "node": "Detect Modification Intent",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Load Ex
     },
     "Detect Modification Intent": {
       "main": [
