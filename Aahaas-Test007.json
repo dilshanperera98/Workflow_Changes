@@ -397,25 +397,7 @@
    
           }
         ]
-      ]
-    },
-        "index": 0
-          }
-        ]
-      ]
-    },
-          }
-        ]
-      ]
-    },
-    "AI Agent": {
-      "main": [
-        [
-          {
-            "node": "Format for OpenAI Parser",
-            "type": "main",
-            "index": 0
-          }
+   
         ]
       ]
     },
