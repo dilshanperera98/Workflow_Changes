@@ -406,10 +406,7 @@
   
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-        -576,
-        -336
-      ],
-      "id": "62f7dbca-79b0-4991-8f14-f1b8c138054a",
+        -576,0-4991-8f14-f1b8c138054a",
       "name": "Save Activities Itinerary"
     },
     {: [
