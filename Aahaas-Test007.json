@@ -422,12 +422,7 @@
       ]
     },
     "Simple Memory": {
-      "ai_memory": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_memory",
-            "index": 0
+
           }
         ]
       ]
