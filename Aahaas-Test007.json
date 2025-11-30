@@ -412,17 +412,7 @@
         ]
       ]
     },
-    "Merge Both Responses": {
-      "main": [
-        [
-          {
-            "node": "Combine Final Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
+  
     "Combine Final Response": {
       "main": [
         [
