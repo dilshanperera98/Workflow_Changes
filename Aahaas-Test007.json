@@ -416,12 +416,7 @@
       ]
     },
     "OpenAI Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
-            "index": 0
+
           }
         ]
       ]
