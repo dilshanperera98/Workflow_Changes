@@ -412,7 +412,23 @@
         ]
       ]
     },
-    "Op
+
+    "OpenAI Chat Model": {
+
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+
+          }
+        ]
+      ]
+    },
+    "Add Cart Metadata": {
+      "main": [
+        [
+          {
             "node": "Check If Hotels Needed",
             "type": "main",
             "index": 0
