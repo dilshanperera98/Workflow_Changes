@@ -408,15 +408,7 @@
           }
         ]
       ]
-    },
-    "Send to Activities API": {
-      "main": [
-        [
-          {
-            "node": "Merge Both Responses",
-            "type": "main",
-            "index": 1
-          }
+ 
         ]
       ]
     },
