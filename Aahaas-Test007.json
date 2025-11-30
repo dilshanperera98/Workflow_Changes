@@ -402,7 +402,7 @@
       ]
 
             "index": 0
-      
+      Customer Order Number : 222186269120742
       ]
     },
     "Pass Through Activities Data": {
@@ -419,7 +419,7 @@
     "Send to Hotels API": {
       "main": [
         [
-          {
+  
             "node": "Merge Both Responses",
             "type": "main",
             "index": 0
