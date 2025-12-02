@@ -399,21 +399,6 @@
         ]
       ]
     },s
-            "node": "Check If Hoc ctels Needed",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Check If Hoteded": {
-      "main": [
-        [
-          {
-            "node": "Process Cities & Activities",
-            "type": "main",
-            "index": 0
-          },
           {
             "node": "Process Cities & Hotel Rating",
             "type": "main",
