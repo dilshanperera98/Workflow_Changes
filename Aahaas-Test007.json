@@ -401,12 +401,12 @@
     },s
           {
             "node": "Process Cities & Hotel Rating",
-            "type": "main",
+            "type":in",
             "index": 0
           }
         ],
         [
-          {
+      
             "node": "Process Cities & Activities",
             "type": "main",
             "index": 0
