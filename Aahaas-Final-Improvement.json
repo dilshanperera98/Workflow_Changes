@@ -14,7 +14,6 @@
       "id": "163e6793-ba59-4983-9ed6-482b3e23c8a7",
       "name": "When chat message received",
       "webhookId": "9d2612f3-b699-4bee-bda6-52b98551f2c
-    {
       "parameters": {
         "httpMethod": "POST",
         "path": "127e3f0a-4469-48c8-996c-ab7c16ec18ce",
